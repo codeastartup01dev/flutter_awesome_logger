@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2024-10-13
+
+### Added
+- 🎯 **Comprehensive unfocus functionality** - Search field unfocuses on all interactions
+- 🔄 **Smart keyboard management** - Dismisses keyboard when scrolling, tapping buttons, or interacting with UI
+- 📱 **Enhanced mobile UX** - Follows platform conventions for keyboard behavior
+
+### Fixed
+- 🔧 **Layout issues in example app** - Fixed ParentDataWidget errors and pixel overflow
+- 🎨 **Responsive design improvements** - Better layout handling for different screen sizes
+- 📜 **SingleChildScrollView integration** - Proper scrolling behavior without layout conflicts
+
+### Improved
+- ⌨️ **Keyboard interaction patterns** - Consistent unfocus behavior across all tabs
+- 🎯 **Touch interactions** - All buttons, filters, and controls dismiss keyboard automatically
+- 📊 **User experience** - Smoother navigation and interaction flow
+
+### Technical
+- 🏗️ **Widget hierarchy fixes** - Resolved Expanded/Flex widget constraint issues
+- 📱 **Scroll view optimization** - Proper handling of unbounded height constraints
+- 🎯 **Event handling** - Added FocusScope management to all interactive elements
+
 ## [0.1.3] - 2024-10-13
 
 ### Changed
