@@ -68,7 +68,7 @@ class _DemoPageState extends State<DemoPage> {
   void _setupDio() {
     _dio = Dio();
     // Add the awesome logger interceptor
-    _dio.interceptors.add(AwesomeLoggerInterceptor());
+    _dio.interceptors.add(FlutterAwesomeLoggerDioInterceptor());
     logger.d('Dio configured with AwesomeLoggerInterceptor');
   }
 

@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'api_logger_service.dart';
 
 /// Dio interceptor that logs API requests, responses, and errors using ApiLoggerService
-class AwesomeLoggerInterceptor extends Interceptor {
+class FlutterAwesomeLoggerDioInterceptor extends Interceptor {
   /// Instance of ApiLoggerService for logging
   final ApiLoggerService _apiLogger = ApiLoggerService();
 
