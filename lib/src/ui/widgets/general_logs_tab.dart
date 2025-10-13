@@ -301,7 +301,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
       children: [
         // Search bar and controls
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
           child: Row(
             children: [
               Expanded(
@@ -329,83 +329,9 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                   ),
                 ),
               ),
+              // Clear logs
+              _buildClearLogsButton(context),
               // Controls
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    // Sort toggle
-                    IconButton(
-                      icon: Icon(
-                        _sortNewestFirst
-                            ? Icons.arrow_downward
-                            : Icons.arrow_upward,
-                        color: Colors.deepPurple,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _sortNewestFirst = !_sortNewestFirst;
-                        });
-                      },
-                      tooltip: _sortNewestFirst
-                          ? 'Newest first'
-                          : 'Oldest first',
-                    ),
-                    // Auto scroll toggle
-                    IconButton(
-                      icon: Icon(
-                        _autoScroll
-                            ? Icons.vertical_align_bottom
-                            : Icons.vertical_align_center,
-                        color: _autoScroll ? Colors.blue : Colors.grey,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _autoScroll = !_autoScroll;
-                          if (_autoScroll) {
-                            _scrollController.animateTo(
-                              0,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeOut,
-                            );
-                          }
-                        });
-                      },
-                      tooltip: 'Toggle auto-scroll',
-                    ),
-                    // Clear logs
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Clear Logs'),
-                            content: const Text(
-                              'Are you sure you want to clear all logs?',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('CANCEL'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  LoggingUsingLogger.clearLogs();
-                                  setState(() {});
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('CLEAR'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      tooltip: 'Clear logs',
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -486,11 +412,13 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                   label: Text(_getFilterButtonLabel()),
                 ),
               ),
+
+              _buildSortLogsToggle(context),
               const SizedBox(width: 8),
               IconButton(
-                icon: const Icon(Icons.download),
+                icon: const Icon(Icons.content_copy),
                 onPressed: () => _exportLogs(),
-                tooltip: 'Export logs',
+                tooltip: 'Copy all logs',
               ),
             ],
           ),
@@ -685,6 +613,70 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                 ),
         ),
       ],
+    );
+  }
+
+  Padding _buildSortLogsToggle(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: Row(
+        children: [
+          // Sort toggle
+          IconButton(
+            icon: Icon(
+              _sortNewestFirst ? Icons.arrow_downward : Icons.arrow_upward,
+              color: Colors.deepPurple,
+            ),
+            onPressed: () {
+              setState(() {
+                _sortNewestFirst = !_sortNewestFirst;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      _sortNewestFirst
+                          ? 'Showing Newest logs first'
+                          : 'Showing Oldest logs first',
+                    ),
+                  ),
+                );
+              });
+            },
+            tooltip: _sortNewestFirst
+                ? 'Newest logs first'
+                : 'Oldest logs first',
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconButton _buildClearLogsButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.delete_outline),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Clear Logs'),
+            content: const Text('Are you sure you want to clear all logs?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () {
+                  LoggingUsingLogger.clearLogs();
+                  setState(() {});
+                  Navigator.pop(context);
+                },
+                child: const Text('CLEAR'),
+              ),
+            ],
+          ),
+        );
+      },
+      tooltip: 'Clear logs',
     );
   }
 }

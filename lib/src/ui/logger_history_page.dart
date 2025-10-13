@@ -65,7 +65,10 @@ class _LoggerHistoryPageState extends State<LoggerHistoryPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Awesome Logger'),
+        title: const Text(
+          'Flutter Awesome Logger',
+          style: TextStyle(fontSize: 14),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.download),

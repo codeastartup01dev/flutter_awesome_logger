@@ -646,32 +646,6 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  // Sort toggle button
-                  IconButton(
-                    icon: Icon(
-                      _sortNewestFirst
-                          ? Icons.arrow_downward
-                          : Icons.arrow_upward,
-                      color: Colors.deepPurple,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _sortNewestFirst = !_sortNewestFirst;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              _sortNewestFirst
-                                  ? 'Newest logs first'
-                                  : 'Oldest logs first',
-                            ),
-                          ),
-                        );
-                      });
-                    },
-                    tooltip: _sortNewestFirst
-                        ? 'Newest logs first'
-                        : 'Oldest logs first',
-                  ),
 
                   IconButton(
                     icon: const Icon(Icons.delete_outline),
@@ -712,7 +686,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
+                        horizontal: 0,
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
@@ -765,8 +739,11 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                       ),
                     ),
                   ),
+                  // Sort toggle button
+                  _buildToggleButton(context),
                   //vertical dots menu
                   PopupMenuButton<String>(
+                    padding: EdgeInsets.zero,
                     icon: const Icon(Icons.more_vert),
                     tooltip: 'More options',
                     onSelected: (value) {
@@ -782,16 +759,6 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                       }
                     },
                     itemBuilder: (BuildContext context) => [
-                      const PopupMenuItem<String>(
-                        value: 'export',
-                        child: Row(
-                          children: [
-                            Icon(Icons.download_outlined, size: 20),
-                            SizedBox(width: 8),
-                            Text('Export Data'),
-                          ],
-                        ),
-                      ),
                       PopupMenuItem<String>(
                         value: 'toggle_filters',
                         child: Row(
@@ -804,8 +771,20 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                             ),
                             SizedBox(width: 8),
                             Text(
-                              _showFilters ? 'Hide Filters' : 'Show Filters',
+                              _showFilters
+                                  ? 'Hide Status Code Filters'
+                                  : 'Show Status Code Filters',
                             ),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'export',
+                        child: Row(
+                          children: [
+                            Icon(Icons.download_outlined, size: 20),
+                            SizedBox(width: 8),
+                            Text('Export Data'),
                           ],
                         ),
                       ),
@@ -1126,6 +1105,30 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                 ),
         ),
       ],
+    );
+  }
+
+  IconButton _buildToggleButton(BuildContext context) {
+    return IconButton(
+      icon: Icon(
+        _sortNewestFirst ? Icons.arrow_downward : Icons.arrow_upward,
+        color: Colors.deepPurple,
+      ),
+      onPressed: () {
+        setState(() {
+          _sortNewestFirst = !_sortNewestFirst;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                _sortNewestFirst
+                    ? 'Showing Newest logs first'
+                    : 'Showing Oldest logs first',
+              ),
+            ),
+          );
+        });
+      },
+      tooltip: _sortNewestFirst ? 'Newest logs first' : 'Oldest logs first',
     );
   }
 }
