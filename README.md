@@ -17,10 +17,33 @@ A comprehensive Flutter logging package that makes debugging a breeze! Features 
 - 📱 **Responsive Design** - Works perfectly on all screen sizes
 
 ## 📸 Screenshots
-<img width="1080" height="2400" alt="Screenshot_1760373750" src="https://github.com/user-attachments/assets/83129e99-7e21-400a-a52c-74ecb1ab3492" />
-<img width="1080" height="2400" alt="Screenshot_1760373846" src="https://github.com/user-attachments/assets/707bd799-f7d6-40ae-9331-bafbf7a58680" />
-<img width="1080" height="2400" alt="Screenshot_1760373875" src="https://github.com/user-attachments/assets/61c2606e-f22f-496f-98e9-d39d6da3ccfd" />
-<img width="1080" height="2400" alt="Screenshot_1760374005" src="https://github.com/user-attachments/assets/a6947367-578c-4df4-b73f-eece6a411b14" />
+
+<table>
+  <tr>
+    <td align="center">
+      <img width="300" height="650" alt="Floating Logger Button" src="https://github.com/user-attachments/assets/83129e99-7e21-400a-a52c-74ecb1ab3492" />
+      <br>
+      <em>Floating Logger Button</em>
+    </td>
+    <td align="center">
+      <img width="300" height="650" alt="API Logs View" src="https://github.com/user-attachments/assets/707bd799-f7d6-40ae-9331-bafbf7a58680" />
+      <br>
+      <em>API Logs View</em>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img width="300" height="650" alt="General Logs View" src="https://github.com/user-attachments/assets/61c2606e-f22f-496f-98e9-d39d6da3ccfd" />
+      <br>
+      <em>General Logs View</em>
+    </td>
+    <td align="center">
+      <img width="300" height="650" alt="Log Details" src="https://github.com/user-attachments/assets/a6947367-578c-4df4-b73f-eece6a411b14" />
+      <br>
+      <em>Log Details</em>
+    </td>
+  </tr>
+</table>
 
 ## 🚀 Getting Started
 
