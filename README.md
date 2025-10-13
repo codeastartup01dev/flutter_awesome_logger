@@ -247,14 +247,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🐛 Issues
 
-If you encounter any issues or have feature requests, please file them in the [issue tracker](https://github.com/your_username/flutter_awesome_logger/issues).
+If you encounter any issues or have feature requests, please file them in the [issue tracker](https://github.com/codeastartup01dev/flutter_awesome_logger/issues).
 
 ## 📞 Support
 
-- 📧 Email: your.email@example.com
-- 🐦 Twitter: [@yourusername](https://twitter.com/yourusername)
-- 💬 Discord: [Join our community](https://discord.gg/yourlink)
+- 📧 Email: codeastartup01dev@gmail.com
+- 🐦 Twitter: [@codeastartup01dev](https://twitter.com/codeastartup01dev)
+- 💬 Discord: [Join our community](https://discord.gg/codeastartup01dev)
 
 ---
 
-Made with ❤️ by [Your Name](https://github.com/yourusername)
+Made with ❤️ by [codeastartup01dev](https://github.com/codeastartup01dev)
