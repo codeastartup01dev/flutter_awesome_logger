@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: FlutterAwesomeLogger(
         enabled: true,
-        
+
         // ✨ Auto-configure logger - no need for manual setup in main()!
         loggerConfig: const AwesomeLoggerConfig(
           enabled: true,
@@ -27,10 +27,10 @@ class MyApp extends StatelessWidget {
           showEmojis: true,
           useColors: true,
         ),
-        
+
         // 🔄 Auto-initialize floating logger (true by default)
         autoInitialize: true,
-        
+
         // 🎨 Floating logger UI configuration
         config: const FloatingLoggerConfig(
           backgroundColor: Colors.deepPurple,
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           enableGestures: true,
           autoSnapToEdges: true,
         ),
-        
+
         child: const DemoPage(),
       ),
       debugShowCheckedModeBanner: false,
@@ -166,10 +166,10 @@ class _DemoPageState extends State<DemoPage> {
                       style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 8),
+                    Text('✨ Auto-configured logger (no manual setup)'),
                     Text(
-                      '✨ Auto-configured logger (no manual setup)',
+                      '🎯 Floating logger button (look for the purple button!)',
                     ),
-                    Text('🎯 Floating logger button (look for the purple button!)'),
                     Text('📊 General logging with different levels'),
                     Text('🌐 API request/response logging'),
                     Text('🎨 Beautiful UI for browsing logs'),
