@@ -34,6 +34,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
       if (mounted) setState(() {});
     });
     _searchController.addListener(_onSearchChanged);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -48,6 +49,11 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
     setState(() {
       _searchQuery = _searchController.text.toLowerCase();
     });
+  }
+
+  void _onScroll() {
+    // Unfocus search field when scrolling
+    FocusScope.of(context).unfocus();
   }
 
   List<String> _getUniqueClasses() {
@@ -268,6 +274,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                         selected: _selectedClasses.contains(className),
                         label: Text(className),
                         onSelected: (selected) {
+                          FocusScope.of(context).unfocus();
                           setState(() {
                             if (selected) {
                               _selectedClasses.add(className);
@@ -297,266 +304,261 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
   Widget build(BuildContext context) {
     final filteredLogs = _getFilteredLogs();
 
-    return Column(
-      children: [
-        // Search bar and controls
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search logs...',
-                    filled: true,
-                    fillColor: Colors.white,
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () => _searchController.clear(),
-                          )
-                        : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                  ),
-                ),
-              ),
-              // Clear logs
-              _buildClearLogsButton(context),
-              // Controls
-            ],
-          ),
-        ),
-
-        // Level filter chips
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Column(
+        children: [
+          // Search bar and controls
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
             child: Row(
               children: [
-                ..._getAvailableLevels().map(
-                  (level) => Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      selected: _selectedLevels.contains(level),
-                      label: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '(${_getFilteredLogStats()[level] ?? 0})',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(level),
-                        ],
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search logs...',
+                      filled: true,
+                      fillColor: Colors.white,
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () => _searchController.clear(),
+                            )
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none,
                       ),
-                      onSelected: (selected) {
-                        setState(() {
-                          if (selected) {
-                            _selectedLevels.add(level);
-                          } else {
-                            _selectedLevels.remove(level);
-                          }
-                        });
-                      },
-                      selectedColor: _getLevelColor(level),
-                      checkmarkColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                     ),
                   ),
                 ),
-                // Clear filters
-                if (_selectedLevels.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: IconButton(
-                      icon: const Icon(Icons.clear_all),
-                      onPressed: () {
-                        setState(() {
-                          _selectedLevels.clear();
-                        });
-                      },
-                      tooltip: 'Clear level filters',
-                    ),
-                  ),
+                // Clear logs
+                _buildClearLogsButton(context),
+                // Controls
               ],
             ),
           ),
-        ),
 
-        // Class filter and export
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) => _buildClassFilterSheet(),
-                    );
-                  },
-                  icon: const Icon(Icons.filter_list),
-                  label: Text(_getFilterButtonLabel()),
-                ),
-              ),
-
-              _buildSortLogsToggle(context),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.content_copy),
-                onPressed: () => _exportLogs(),
-                tooltip: 'Copy all logs',
-              ),
-            ],
-          ),
-        ),
-
-        // Logs list
-        Expanded(
-          child: filteredLogs.isEmpty
-              ? Center(
-                  child: Text(
-                    _searchQuery.isEmpty
-                        ? 'No logs available'
-                        : 'No logs matching "${_searchController.text}"',
-                  ),
-                )
-              : ListView.builder(
-                  controller: _scrollController,
-                  itemCount: filteredLogs.length,
-                  itemBuilder: (context, index) {
-                    final log = filteredLogs[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      child: ExpansionTile(
-                        leading: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: _getLevelColor(log.level),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            _getLevelIcon(log.level),
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ),
-                        title: Text(
-                          log.message,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+          // Level filter chips
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ..._getAvailableLevels().map(
+                    (level) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        selected: _selectedLevels.contains(level),
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const SizedBox(height: 4),
                             Text(
-                              log.timestamp.toString().substring(0, 19),
+                              '(${_getFilteredLogStats()[level] ?? 0})',
                               style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            if (widget.showFilePaths)
-                              Text(
-                                log.filePath,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontFamily: 'monospace',
-                                  color: Colors.blue,
-                                ),
-                              ),
+                            const SizedBox(width: 4),
+                            Text(level),
                           ],
                         ),
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (value) => _handleLogAction(value, log),
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'copy_message',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.copy, size: 16),
-                                  SizedBox(width: 8),
-                                  Text('Copy Message'),
-                                ],
-                              ),
+                        onSelected: (selected) {
+                          FocusScope.of(context).unfocus();
+                          setState(() {
+                            if (selected) {
+                              _selectedLevels.add(level);
+                            } else {
+                              _selectedLevels.remove(level);
+                            }
+                          });
+                        },
+                        selectedColor: _getLevelColor(level),
+                        checkmarkColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                  // Clear filters
+                  if (_selectedLevels.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: IconButton(
+                        icon: const Icon(Icons.clear_all),
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          setState(() {
+                            _selectedLevels.clear();
+                          });
+                        },
+                        tooltip: 'Clear level filters',
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+
+          // Class filter and export
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      FocusScope.of(context).unfocus();
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) => _buildClassFilterSheet(),
+                      );
+                    },
+                    icon: const Icon(Icons.filter_list),
+                    label: Text(_getFilterButtonLabel()),
+                  ),
+                ),
+
+                _buildSortLogsToggle(context),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.content_copy),
+                  onPressed: () {
+                    FocusScope.of(context).unfocus();
+                    _exportLogs();
+                  },
+                  tooltip: 'Copy all logs',
+                ),
+              ],
+            ),
+          ),
+
+          // Logs list
+          Expanded(
+            child: filteredLogs.isEmpty
+                ? Center(
+                    child: Text(
+                      _searchQuery.isEmpty
+                          ? 'No logs available'
+                          : 'No logs matching "${_searchController.text}"',
+                    ),
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    itemCount: filteredLogs.length,
+                    itemBuilder: (context, index) {
+                      final log = filteredLogs[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        child: ExpansionTile(
+                          onExpansionChanged: (expanded) {
+                            FocusScope.of(context).unfocus();
+                          },
+                          leading: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: _getLevelColor(log.level),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            const PopupMenuItem(
-                              value: 'copy_full',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.content_copy, size: 16),
-                                  SizedBox(width: 8),
-                                  Text('Copy Full Log'),
-                                ],
-                              ),
+                            child: Icon(
+                              _getLevelIcon(log.level),
+                              color: Colors.white,
+                              size: 18,
                             ),
-                            if (log.stackTrace != null)
+                          ),
+                          title: Text(
+                            log.message,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 4),
+                              Text(
+                                log.timestamp.toString().substring(0, 19),
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              if (widget.showFilePaths)
+                                Text(
+                                  log.filePath,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontFamily: 'monospace',
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                            ],
+                          ),
+                          trailing: PopupMenuButton<String>(
+                            onSelected: (value) => _handleLogAction(value, log),
+                            itemBuilder: (context) => [
                               const PopupMenuItem(
-                                value: 'copy_stack',
+                                value: 'copy_message',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.bug_report, size: 16),
+                                    Icon(Icons.copy, size: 16),
                                     SizedBox(width: 8),
-                                    Text('Copy Stack Trace'),
+                                    Text('Copy Message'),
                                   ],
                                 ),
                               ),
-                          ],
-                        ),
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              border: Border(
-                                top: BorderSide(color: Colors.grey[200]!),
+                              const PopupMenuItem(
+                                value: 'copy_full',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.content_copy, size: 16),
+                                    SizedBox(width: 8),
+                                    Text('Copy Full Log'),
+                                  ],
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Full message
-                                const Text(
-                                  'Message:',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                              if (log.stackTrace != null)
+                                const PopupMenuItem(
+                                  value: 'copy_stack',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.bug_report, size: 16),
+                                      SizedBox(width: 8),
+                                      Text('Copy Stack Trace'),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                SelectableText(
-                                  log.message,
-                                  style: const TextStyle(fontSize: 14),
+                            ],
+                          ),
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                border: Border(
+                                  top: BorderSide(color: Colors.grey[200]!),
                                 ),
-                                const SizedBox(height: 12),
-
-                                // File info
-                                if (widget.showFilePaths) ...[
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Full message
                                   const Text(
-                                    'Source:',
+                                    'Message:',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
@@ -564,55 +566,72 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                                   ),
                                   const SizedBox(height: 4),
                                   SelectableText(
-                                    log.filePath,
-                                    style: const TextStyle(
-                                      fontFamily: 'monospace',
-                                      fontSize: 12,
-                                      color: Colors.blue,
-                                    ),
+                                    log.message,
+                                    style: const TextStyle(fontSize: 14),
                                   ),
                                   const SizedBox(height: 12),
-                                ],
 
-                                // Stack trace if available
-                                if (log.stackTrace != null) ...[
-                                  const Text(
-                                    'Stack Trace:',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: Colors.grey[300]!,
+                                  // File info
+                                  if (widget.showFilePaths) ...[
+                                    const Text(
+                                      'Source:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
                                       ),
                                     ),
-                                    child: SelectableText(
-                                      log.stackTrace!,
+                                    const SizedBox(height: 4),
+                                    SelectableText(
+                                      log.filePath,
                                       style: const TextStyle(
                                         fontFamily: 'monospace',
-                                        fontSize: 11,
+                                        fontSize: 12,
+                                        color: Colors.blue,
                                       ),
                                     ),
-                                  ),
+                                    const SizedBox(height: 12),
+                                  ],
+
+                                  // Stack trace if available
+                                  if (log.stackTrace != null) ...[
+                                    const Text(
+                                      'Stack Trace:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[100],
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: Colors.grey[300]!,
+                                        ),
+                                      ),
+                                      child: SelectableText(
+                                        log.stackTrace!,
+                                        style: const TextStyle(
+                                          fontFamily: 'monospace',
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ],
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -628,6 +647,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
               color: Colors.deepPurple,
             ),
             onPressed: () {
+              FocusScope.of(context).unfocus();
               setState(() {
                 _sortNewestFirst = !_sortNewestFirst;
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -654,6 +674,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
     return IconButton(
       icon: const Icon(Icons.delete_outline),
       onPressed: () {
+        FocusScope.of(context).unfocus();
         showDialog(
           context: context,
           builder: (context) => AlertDialog(

@@ -41,6 +41,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
       if (mounted) setState(() {});
     });
     _searchController.addListener(_onSearchChanged);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -55,6 +56,11 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
     setState(() {
       _searchQuery = _searchController.text.toLowerCase();
     });
+  }
+
+  void _onScroll() {
+    // Unfocus search field when scrolling
+    FocusScope.of(context).unfocus();
   }
 
   /// Get filtered API logs based on search and filters
@@ -598,282 +604,249 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
     final filteredLogs = _getFilteredApiLogs();
     final stats = ApiLoggerService.getApiLogStats();
 
-    return Column(
-      children: [
-        // Header with search and actions
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withValues(alpha: 0.1),
-                spreadRadius: 1,
-                blurRadius: 3,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // Search bar and actions
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search API logs...',
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        prefixIcon: const Icon(Icons.search, size: 20),
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear, size: 20),
-                                onPressed: () => _searchController.clear(),
-                              )
-                            : null,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Clear API Logs'),
-                          content: const Text(
-                            'Are you sure you want to clear all API logs?',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('CANCEL'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                ApiLoggerService.clearApiLogs();
-                                setState(() {});
-                                Navigator.pop(context);
-                              },
-                              child: const Text('CLEAR'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    tooltip: 'Clear logs',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Statistics and sorting vertical dots menu
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 0,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildStatItem(
-                            'Total',
-                            '${ApiLoggerService.getApiLogs().length}',
-                            Colors.blue,
-                            onTap: () {
-                              setState(() {
-                                _statsFilter = null; // Show all logs
-                              });
-                            },
-                          ),
-                          _buildStatItem(
-                            'Success',
-                            '${_getSuccessCount()}',
-                            Colors.green,
-                            onTap: () {
-                              setState(() {
-                                _statsFilter = _statsFilter == 'success'
-                                    ? null
-                                    : 'success';
-                              });
-                            },
-                          ),
-                          _buildStatItem(
-                            'Errors',
-                            '${_getErrorCount()}',
-                            Colors.red,
-                            onTap: () {
-                              setState(() {
-                                _statsFilter = _statsFilter == 'errors'
-                                    ? null
-                                    : 'errors';
-                              });
-                            },
-                          ),
-                          _buildStatItem(
-                            'Avg Time',
-                            '${(stats['avgDuration'] as double).toStringAsFixed(0)}ms',
-                            Colors.orange,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Sort toggle button
-                  _buildToggleButton(context),
-                  //vertical dots menu
-                  PopupMenuButton<String>(
-                    padding: EdgeInsets.zero,
-                    icon: const Icon(Icons.more_vert),
-                    tooltip: 'More options',
-                    onSelected: (value) {
-                      switch (value) {
-                        case 'export':
-                          _exportApiLogs();
-                          break;
-                        case 'toggle_filters':
-                          setState(() {
-                            _showFilters = !_showFilters;
-                          });
-                          break;
-                      }
-                    },
-                    itemBuilder: (BuildContext context) => [
-                      PopupMenuItem<String>(
-                        value: 'toggle_filters',
-                        child: Row(
-                          children: [
-                            Icon(
-                              _showFilters
-                                  ? Icons.filter_alt_off
-                                  : Icons.filter_alt,
-                              size: 20,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              _showFilters
-                                  ? 'Hide Status Code Filters'
-                                  : 'Show Status Code Filters',
-                            ),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'export',
-                        child: Row(
-                          children: [
-                            Icon(Icons.download_outlined, size: 20),
-                            SizedBox(width: 8),
-                            Text('Export Data'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        // Filters
-        if (_showFilters)
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Column(
+        children: [
+          // Header with search and actions
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Type filters
-                const Text(
-                  'Status:',
-                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withValues(alpha: 0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
                 ),
-                const SizedBox(height: 4),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: ApiLogType.values
-                        .map(
-                          (type) => Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              selected: _selectedTypes.contains(type),
-                              label: Text(
-                                _getTypeDisplayName(type),
-                                style: const TextStyle(fontSize: 11),
+              ],
+            ),
+            child: Column(
+              children: [
+                // Search bar and actions
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search API logs...',
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          prefixIcon: const Icon(Icons.search, size: 20),
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear, size: 20),
+                                  onPressed: () => _searchController.clear(),
+                                )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline),
+                      onPressed: () {
+                        FocusScope.of(context).unfocus();
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Clear API Logs'),
+                            content: const Text(
+                              'Are you sure you want to clear all API logs?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('CANCEL'),
                               ),
-                              backgroundColor: _selectedTypes.contains(type)
-                                  ? _getTypeColor(type).withValues(alpha: 0.2)
-                                  : null,
-                              selectedColor: _getTypeColor(
-                                type,
-                              ).withValues(alpha: 0.3),
-                              onSelected: (selected) {
+                              TextButton(
+                                onPressed: () {
+                                  ApiLoggerService.clearApiLogs();
+                                  setState(() {});
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('CLEAR'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      tooltip: 'Clear logs',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Statistics and sorting vertical dots menu
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 0,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildStatItem(
+                              'Total',
+                              '${ApiLoggerService.getApiLogs().length}',
+                              Colors.blue,
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
                                 setState(() {
-                                  if (selected) {
-                                    _selectedTypes.add(type);
-                                  } else {
-                                    _selectedTypes.remove(type);
-                                  }
+                                  _statsFilter = null; // Show all logs
                                 });
                               },
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: VisualDensity.compact,
                             ),
+                            _buildStatItem(
+                              'Success',
+                              '${_getSuccessCount()}',
+                              Colors.green,
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
+                                setState(() {
+                                  _statsFilter = _statsFilter == 'success'
+                                      ? null
+                                      : 'success';
+                                });
+                              },
+                            ),
+                            _buildStatItem(
+                              'Errors',
+                              '${_getErrorCount()}',
+                              Colors.red,
+                              onTap: () {
+                                FocusScope.of(context).unfocus();
+                                setState(() {
+                                  _statsFilter = _statsFilter == 'errors'
+                                      ? null
+                                      : 'errors';
+                                });
+                              },
+                            ),
+                            _buildStatItem(
+                              'Avg Time',
+                              '${(stats['avgDuration'] as double).toStringAsFixed(0)}ms',
+                              Colors.orange,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Sort toggle button
+                    _buildToggleButton(context),
+                    //vertical dots menu
+                    PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(Icons.more_vert),
+                      tooltip: 'More options',
+                      onSelected: (value) {
+                        FocusScope.of(context).unfocus();
+                        switch (value) {
+                          case 'export':
+                            _exportApiLogs();
+                            break;
+                          case 'toggle_filters':
+                            setState(() {
+                              _showFilters = !_showFilters;
+                            });
+                            break;
+                        }
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        PopupMenuItem<String>(
+                          value: 'toggle_filters',
+                          child: Row(
+                            children: [
+                              Icon(
+                                _showFilters
+                                    ? Icons.filter_alt_off
+                                    : Icons.filter_alt,
+                                size: 20,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                _showFilters
+                                    ? 'Hide Status Code Filters'
+                                    : 'Show Status Code Filters',
+                              ),
+                            ],
                           ),
-                        )
-                        .toList(),
-                  ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'export',
+                          child: Row(
+                            children: [
+                              Icon(Icons.download_outlined, size: 20),
+                              SizedBox(width: 8),
+                              Text('Export Data'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
+              ],
+            ),
+          ),
 
-                // Method filters
-                if (_getUniqueMethods().isNotEmpty) ...[
+          // Filters
+          if (_showFilters)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Type filters
                   const Text(
-                    'Methods:',
+                    'Status:',
                     style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
                   ),
                   const SizedBox(height: 4),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: _getUniqueMethods()
+                      children: ApiLogType.values
                           .map(
-                            (method) => Padding(
+                            (type) => Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: FilterChip(
-                                selected: _selectedMethods.contains(method),
+                                selected: _selectedTypes.contains(type),
                                 label: Text(
-                                  method,
+                                  _getTypeDisplayName(type),
                                   style: const TextStyle(fontSize: 11),
                                 ),
+                                backgroundColor: _selectedTypes.contains(type)
+                                    ? _getTypeColor(type).withValues(alpha: 0.2)
+                                    : null,
+                                selectedColor: _getTypeColor(
+                                  type,
+                                ).withValues(alpha: 0.3),
                                 onSelected: (selected) {
                                   setState(() {
                                     if (selected) {
-                                      _selectedMethods.add(method);
+                                      _selectedTypes.add(type);
                                     } else {
-                                      _selectedMethods.remove(method);
+                                      _selectedTypes.remove(type);
                                     }
                                   });
                                 },
@@ -886,225 +859,278 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                           .toList(),
                     ),
                   ),
-                ],
-                const SizedBox(height: 8),
-                // Clear all filters button
-                if (_selectedTypes.isNotEmpty ||
-                    _selectedMethods.isNotEmpty ||
-                    _statsFilter != null)
-                  Row(
-                    children: [
-                      const Text(
-                        'Active filters:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _selectedTypes.clear();
-                            _selectedMethods.clear();
-                            _statsFilter = null;
-                          });
-                        },
-                        icon: const Icon(Icons.clear_all, size: 16),
-                        label: const Text(
-                          'Clear All',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-          ),
+                  const SizedBox(height: 8),
 
-        // API logs list - This takes up the remaining space
-        Expanded(
-          child: filteredLogs.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.api, size: 64, color: Colors.grey[400]),
-                      const SizedBox(height: 16),
-                      Text(
-                        _searchQuery.isEmpty
-                            ? 'No API logs available'
-                            : 'No logs matching "${_searchController.text}"',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                  // Method filters
+                  if (_getUniqueMethods().isNotEmpty) ...[
+                    const Text(
+                      'Methods:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'API calls will appear here automatically',
-                        style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                    ),
+                    const SizedBox(height: 4),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _getUniqueMethods()
+                            .map(
+                              (method) => Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: FilterChip(
+                                  selected: _selectedMethods.contains(method),
+                                  label: Text(
+                                    method,
+                                    style: const TextStyle(fontSize: 11),
+                                  ),
+                                  onSelected: (selected) {
+                                    setState(() {
+                                      if (selected) {
+                                        _selectedMethods.add(method);
+                                      } else {
+                                        _selectedMethods.remove(method);
+                                      }
+                                    });
+                                  },
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  itemCount: filteredLogs.length,
-                  itemBuilder: (context, index) {
-                    final log = filteredLogs[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      elevation: 1,
-                      // color: _getLogColor(log),
-                      child: ExpansionTile(
-                        leading: _buildApiStatus(log),
-                        title: Text(
-                          log.displayTitle,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+                  // Clear all filters button
+                  if (_selectedTypes.isNotEmpty ||
+                      _selectedMethods.isNotEmpty ||
+                      _statsFilter != null)
+                    Row(
+                      children: [
+                        const Text(
+                          'Active filters:',
+                          style: TextStyle(
                             fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        TextButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              _selectedTypes.clear();
+                              _selectedMethods.clear();
+                              _statsFilter = null;
+                            });
+                          },
+                          icon: const Icon(Icons.clear_all, size: 16),
+                          label: const Text(
+                            'Clear All',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+
+          // API logs list - This takes up the remaining space
+          Expanded(
+            child: filteredLogs.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.api, size: 64, color: Colors.grey[400]),
+                        const SizedBox(height: 16),
+                        Text(
+                          _searchQuery.isEmpty
+                              ? 'No API logs available'
+                              : 'No logs matching "${_searchController.text}"',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'API calls will appear here automatically',
+                          style: TextStyle(
+                            color: Colors.grey[500],
                             fontSize: 14,
                           ),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              log.shortDescription,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey,
-                              ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    itemCount: filteredLogs.length,
+                    itemBuilder: (context, index) {
+                      final log = filteredLogs[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        elevation: 1,
+                        // color: _getLogColor(log),
+                        child: ExpansionTile(
+                          onExpansionChanged: (expanded) {
+                            FocusScope.of(context).unfocus();
+                          },
+                          leading: _buildApiStatus(log),
+                          title: Text(
+                            log.displayTitle,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
                             ),
-                            if (log.duration != null)
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                'Duration: ${log.duration}ms',
+                                log.shortDescription,
                                 style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.blue,
+                                  fontSize: 11,
+                                  color: Colors.grey,
                                 ),
                               ),
-                          ],
-                        ),
-                        trailing: Column(
-                          children: [
-                            // _buildApiStatus(log),
-                            PopupMenuButton<String>(
-                              child: Icon(Icons.more_horiz, size: 28),
-                              onSelected: (value) =>
-                                  _handleCopyAction(value, log),
-                              itemBuilder: (context) => [
-                                const PopupMenuItem(
-                                  value: 'copy_curl',
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.terminal, size: 16),
-                                      SizedBox(width: 8),
-                                      Text('Copy cURL'),
-                                    ],
+                              if (log.duration != null)
+                                Text(
+                                  'Duration: ${log.duration}ms',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.blue,
                                   ),
                                 ),
-                                const PopupMenuItem(
-                                  value: 'copy_url',
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.link, size: 16),
-                                      SizedBox(width: 8),
-                                      Text('Copy URL'),
-                                    ],
-                                  ),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'copy_request',
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.upload, size: 16),
-                                      SizedBox(width: 8),
-                                      Text('Copy Request'),
-                                    ],
-                                  ),
-                                ),
-                                if (log.type != ApiLogType.pending)
+                            ],
+                          ),
+                          trailing: Column(
+                            children: [
+                              // _buildApiStatus(log),
+                              PopupMenuButton<String>(
+                                child: Icon(Icons.more_horiz, size: 28),
+                                onSelected: (value) =>
+                                    _handleCopyAction(value, log),
+                                itemBuilder: (context) => [
                                   const PopupMenuItem(
-                                    value: 'copy_response',
+                                    value: 'copy_curl',
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.download, size: 16),
+                                        Icon(Icons.terminal, size: 16),
                                         SizedBox(width: 8),
-                                        Text('Copy Response'),
+                                        Text('Copy cURL'),
                                       ],
                                     ),
                                   ),
-                                const PopupMenuItem(
-                                  value: 'copy_full',
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                  const PopupMenuItem(
+                                    value: 'copy_url',
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.link, size: 16),
+                                        SizedBox(width: 8),
+                                        Text('Copy URL'),
+                                      ],
+                                    ),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 'copy_request',
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.upload, size: 16),
+                                        SizedBox(width: 8),
+                                        Text('Copy Request'),
+                                      ],
+                                    ),
+                                  ),
+                                  if (log.type != ApiLogType.pending)
+                                    const PopupMenuItem(
+                                      value: 'copy_response',
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.download, size: 16),
+                                          SizedBox(width: 8),
+                                          Text('Copy Response'),
+                                        ],
+                                      ),
+                                    ),
+                                  const PopupMenuItem(
+                                    value: 'copy_full',
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.content_copy, size: 16),
+                                        SizedBox(width: 8),
+                                        Text('Copy Full Log'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                border: Border(
+                                  top: BorderSide(color: Colors.grey[200]!),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // View selector chips
+                                  Row(
                                     children: [
-                                      Icon(Icons.content_copy, size: 16),
-                                      SizedBox(width: 8),
-                                      Text('Copy Full Log'),
+                                      _buildViewChip('Request', 'request', log),
+                                      const SizedBox(width: 8),
+                                      if (log.type != ApiLogType.pending)
+                                        _buildViewChip(
+                                          'Response',
+                                          'response',
+                                          log,
+                                        ),
+                                      if (log.type != ApiLogType.pending)
+                                        const SizedBox(width: 8),
+                                      _buildViewChip('Curl', 'curl', log),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 12),
+                                  // Content based on selected view
+                                  if (_selectedExpandedView != null)
+                                    _buildExpandedContent(log),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              border: Border(
-                                top: BorderSide(color: Colors.grey[200]!),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // View selector chips
-                                Row(
-                                  children: [
-                                    _buildViewChip('Request', 'request', log),
-                                    const SizedBox(width: 8),
-                                    if (log.type != ApiLogType.pending)
-                                      _buildViewChip(
-                                        'Response',
-                                        'response',
-                                        log,
-                                      ),
-                                    if (log.type != ApiLogType.pending)
-                                      const SizedBox(width: 8),
-                                    _buildViewChip('Curl', 'curl', log),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                // Content based on selected view
-                                if (_selectedExpandedView != null)
-                                  _buildExpandedContent(log),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1115,6 +1141,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
         color: Colors.deepPurple,
       ),
       onPressed: () {
+        FocusScope.of(context).unfocus();
         setState(() {
           _sortNewestFirst = !_sortNewestFirst;
           ScaffoldMessenger.of(context).showSnackBar(

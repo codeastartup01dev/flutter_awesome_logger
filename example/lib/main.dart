@@ -144,128 +144,129 @@ class _DemoPageState extends State<DemoPage> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '🚀 Awesome Flutter Logger Demo',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '🚀 Awesome Flutter Logger Demo',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'This demo showcases the new auto-configuration approach - no manual setup needed in main()!',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    SizedBox(height: 8),
-                    Text('✨ Auto-configured logger (no manual setup)'),
-                    Text(
-                      '🎯 Floating logger button (look for the purple button!)',
-                    ),
-                    Text('📊 General logging with different levels'),
-                    Text('🌐 API request/response logging'),
-                    Text('🎨 Beautiful UI for browsing logs'),
-                    Text('💾 Persistent settings and positioning'),
-                  ],
+                      SizedBox(height: 8),
+
+                      Text(
+                        '\n🎯 Floating logger button (look for the floating button!)',
+                      ),
+                      Text(
+                        '\n📊 General logging with different levels using logger.d, logger.i, logger.w, logger.e, logger.v',
+                      ),
+                      Text(
+                        '\n🌐 API request/response logging using Dio interceptor (FlutterAwesomeLoggerDioInterceptor)',
+                      ),
+                      Text('\n🎨 Clean UI for browsing and searching logs'),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Demo Actions:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _generateDifferentLogs,
-              icon: const Icon(Icons.note_add),
-              label: Text('Generate Logs ($_logCounter generated)'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(16),
+              const SizedBox(height: 20),
+              const Text(
+                'Demo Actions:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: () =>
-                  _makeApiCall('https://jsonplaceholder.typicode.com/posts/1'),
-              icon: const Icon(Icons.web),
-              label: const Text('Make Successful API Call'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.all(16),
-              ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: () => _makeApiCall('https://httpstat.us/500'),
-              icon: const Icon(Icons.error),
-              label: const Text('Make Failing API Call'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.all(16),
-              ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: () =>
-                  _makeApiCall('https://nonexistent-domain-xyz.com/api'),
-              icon: const Icon(Icons.cloud_off),
-              label: const Text('Make Network Error Call'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.all(16),
-              ),
-            ),
-            const SizedBox(height: 24),
-            OutlinedButton.icon(
-              onPressed: _openLogger,
-              icon: const Icon(Icons.history),
-              label: const Text('Open Logger History'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.all(16),
-              ),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: _toggleLoggerVisibility,
-              icon: const Icon(Icons.visibility),
-              label: const Text('Toggle Floating Logger'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.all(16),
-              ),
-            ),
-            const Spacer(),
-            const Card(
-              color: Colors.blue,
-              child: Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Column(
-                  children: [
-                    Icon(Icons.info, color: Colors.white),
-                    SizedBox(height: 8),
-                    Text(
-                      'Tap the floating purple button to access logs quickly!',
-                      style: TextStyle(color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: _generateDifferentLogs,
+                icon: const Icon(Icons.note_add),
+                label: Text('Generate GeneralLogs ($_logCounter generated)'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(16),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () => _makeApiCall(
+                  'https://jsonplaceholder.typicode.com/posts/1',
+                ),
+                icon: const Icon(Icons.web),
+                label: const Text('Make Successful API Call'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(16),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () => _makeApiCall('https://httpstat.us/500'),
+                icon: const Icon(Icons.error),
+                label: const Text('Make Failing API Call'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(16),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () =>
+                    _makeApiCall('https://nonexistent-domain-xyz.com/api'),
+                icon: const Icon(Icons.cloud_off),
+                label: const Text('Make Network Error Call'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(16),
+                ),
+              ),
+              const SizedBox(height: 24),
+              OutlinedButton.icon(
+                onPressed: _openLogger,
+                icon: const Icon(Icons.history),
+                label: const Text('Open Logger History'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.all(16),
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _toggleLoggerVisibility,
+                icon: const Icon(Icons.visibility),
+                label: const Text('Toggle Floating Logger'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.all(16),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Card(
+                color: Colors.blue,
+                child: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Column(
+                    children: [
+                      Icon(Icons.info, color: Colors.white),
+                      SizedBox(height: 8),
+                      Text(
+                        'Tap the floating button to access logs quickly!',
+                        style: TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
