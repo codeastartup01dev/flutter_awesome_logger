@@ -24,12 +24,22 @@ class FlutterAwesomeLogger extends StatefulWidget {
   /// If not provided, will try to find navigator from context
   final GlobalKey<NavigatorState>? navigatorKey;
 
+  /// Optional logger configuration - if provided, will auto-configure the logger
+  /// This eliminates the need to call LoggingUsingLogger.configure() manually
+  final AwesomeLoggerConfig? loggerConfig;
+
+  /// Whether to auto-initialize the floating logger manager
+  /// If true, eliminates the need to call FloatingLoggerManager.initialize() manually
+  final bool autoInitialize;
+
   const FlutterAwesomeLogger({
     super.key,
     required this.child,
     this.enabled = true,
     this.config = const FloatingLoggerConfig(),
     this.navigatorKey,
+    this.loggerConfig,
+    this.autoInitialize = true,
   });
 
   @override
@@ -47,6 +57,17 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   @override
   void initState() {
     super.initState();
+    
+    // Auto-configure logger if config is provided
+    if (widget.loggerConfig != null) {
+      LoggingUsingLogger.configure(widget.loggerConfig!);
+    }
+    
+    // Auto-initialize floating logger manager if enabled
+    if (widget.autoInitialize) {
+      FloatingLoggerManager.initialize();
+    }
+    
     _loadPreferences();
     _startStatsTimer();
 

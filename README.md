@@ -39,15 +39,60 @@ flutter pub get
 
 ### Basic Usage
 
-1. **Initialize the logger in your main.dart:**
+#### **Option 1: Auto-Configuration (Recommended - Easiest)**
+
+Simply wrap your app with `FlutterAwesomeLogger` and pass the configuration:
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
 void main() {
-  // Configure the logger
-  FlutterAwesomeLogger.configure(
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: FlutterAwesomeLogger(
+        // Auto-configure logger settings
+        loggerConfig: const AwesomeLoggerConfig(
+          enabled: true,
+          storeLogs: true,
+          maxLogEntries: 500,
+          showFilePaths: true,
+          showEmojis: true,
+          useColors: true,
+        ),
+        // Auto-initialize (true by default)
+        autoInitialize: true,
+        // Floating logger UI configuration
+        config: const FloatingLoggerConfig(
+          backgroundColor: Colors.deepPurple,
+          icon: Icons.developer_mode,
+          showCount: true,
+          enableGestures: true,
+          autoSnapToEdges: true,
+        ),
+        child: const YourHomePage(),
+      ),
+    );
+  }
+}
+```
+
+#### **Option 2: Manual Configuration (Advanced)**
+
+For more control, configure manually in main():
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+
+void main() {
+  // Manual configuration
+  LoggingUsingLogger.configure(
     const AwesomeLoggerConfig(
       enabled: true,
       storeLogs: true,
@@ -58,22 +103,19 @@ void main() {
     ),
   );
 
-  // Initialize floating logger manager
+  // Manual initialization
   FloatingLoggerManager.initialize();
 
   runApp(const MyApp());
 }
-```
 
-2. **Wrap your app with the floating logger:**
-
-```dart
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: AwesomeFloatingLogger(
-        enabled: true,
+      home: FlutterAwesomeLogger(
+        // Don't auto-configure since we did it manually
+        autoInitialize: false,
         config: const FloatingLoggerConfig(
           backgroundColor: Colors.deepPurple,
           icon: Icons.developer_mode,

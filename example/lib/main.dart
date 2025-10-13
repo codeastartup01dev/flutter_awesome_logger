@@ -3,21 +3,20 @@ import 'package:dio/dio.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
 void main() {
-  // Configure the logger
-  LoggingUsingLogger.configure(
-    const AwesomeLoggerConfig(
-      enabled: true,
-      storeLogs: true,
-      maxLogEntries: 500,
-      showFilePaths: true,
-      showEmojis: true,
-      useColors: true,
-    ),
-  );
+  // Option 1: Manual configuration (traditional approach)
+  // LoggingUsingLogger.configure(
+  //   const AwesomeLoggerConfig(
+  //     enabled: true,
+  //     storeLogs: true,
+  //     maxLogEntries: 500,
+  //     showFilePaths: true,
+  //     showEmojis: true,
+  //     useColors: true,
+  //   ),
+  // );
+  // FloatingLoggerManager.initialize();
 
-  // Initialize floating logger manager
-  FloatingLoggerManager.initialize();
-
+  // Option 2: Auto-configuration (new approach - no manual setup needed!)
   runApp(const MyApp());
 }
 
@@ -31,6 +30,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: FlutterAwesomeLogger(
         enabled: true,
+        // Auto-configure logger with these settings
+        loggerConfig: const AwesomeLoggerConfig(
+          enabled: true,
+          storeLogs: true,
+          maxLogEntries: 500,
+          showFilePaths: true,
+          showEmojis: true,
+          useColors: true,
+        ),
+        // Auto-initialize floating logger (true by default)
+        autoInitialize: true,
+        // Floating logger UI configuration
         config: const FloatingLoggerConfig(
           backgroundColor: Colors.deepPurple,
           icon: Icons.developer_mode,
