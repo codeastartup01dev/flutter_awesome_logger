@@ -657,26 +657,20 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                     onPressed: () {
                       setState(() {
                         _sortNewestFirst = !_sortNewestFirst;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              _sortNewestFirst
+                                  ? 'Newest logs first'
+                                  : 'Oldest logs first',
+                            ),
+                          ),
+                        );
                       });
                     },
-                    tooltip: _sortNewestFirst ? 'Newest first' : 'Oldest first',
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      _showFilters ? Icons.filter_alt_off : Icons.filter_alt,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _showFilters = !_showFilters;
-                      });
-                    },
-                    tooltip: _showFilters ? 'hide filters' : 'show filters',
-                  ),
-
-                  IconButton(
-                    icon: const Icon(Icons.download_outlined),
-                    onPressed: _exportApiLogs,
-                    tooltip: 'Export logs',
+                    tooltip: _sortNewestFirst
+                        ? 'Newest logs first'
+                        : 'Oldest logs first',
                   ),
 
                   IconButton(
@@ -712,60 +706,108 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
               ),
               const SizedBox(height: 12),
 
-              // Statistics
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatItem(
-                      'Total',
-                      '${ApiLoggerService.getApiLogs().length}',
-                      Colors.blue,
-                      onTap: () {
-                        setState(() {
-                          _statsFilter = null; // Show all logs
-                        });
-                      },
+              // Statistics and sorting vertical dots menu
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatItem(
+                            'Total',
+                            '${ApiLoggerService.getApiLogs().length}',
+                            Colors.blue,
+                            onTap: () {
+                              setState(() {
+                                _statsFilter = null; // Show all logs
+                              });
+                            },
+                          ),
+                          _buildStatItem(
+                            'Success',
+                            '${_getSuccessCount()}',
+                            Colors.green,
+                            onTap: () {
+                              setState(() {
+                                _statsFilter = _statsFilter == 'success'
+                                    ? null
+                                    : 'success';
+                              });
+                            },
+                          ),
+                          _buildStatItem(
+                            'Errors',
+                            '${_getErrorCount()}',
+                            Colors.red,
+                            onTap: () {
+                              setState(() {
+                                _statsFilter = _statsFilter == 'errors'
+                                    ? null
+                                    : 'errors';
+                              });
+                            },
+                          ),
+                          _buildStatItem(
+                            'Avg Time',
+                            '${(stats['avgDuration'] as double).toStringAsFixed(0)}ms',
+                            Colors.orange,
+                          ),
+                        ],
+                      ),
                     ),
-                    _buildStatItem(
-                      'Success',
-                      '${_getSuccessCount()}',
-                      Colors.green,
-                      onTap: () {
-                        setState(() {
-                          _statsFilter = _statsFilter == 'success'
-                              ? null
-                              : 'success';
-                        });
-                      },
-                    ),
-                    _buildStatItem(
-                      'Errors',
-                      '${_getErrorCount()}',
-                      Colors.red,
-                      onTap: () {
-                        setState(() {
-                          _statsFilter = _statsFilter == 'errors'
-                              ? null
-                              : 'errors';
-                        });
-                      },
-                    ),
-                    _buildStatItem(
-                      'Avg Time',
-                      '${(stats['avgDuration'] as double).toStringAsFixed(0)}ms',
-                      Colors.orange,
-                    ),
-                  ],
-                ),
+                  ),
+                  //vertical dots menu
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert),
+                    tooltip: 'More options',
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'export':
+                          _exportApiLogs();
+                          break;
+                        case 'toggle_filters':
+                          setState(() {
+                            _showFilters = !_showFilters;
+                          });
+                          break;
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => [
+                      const PopupMenuItem<String>(
+                        value: 'export',
+                        child: Row(
+                          children: [
+                            Icon(Icons.download_outlined, size: 20),
+                            SizedBox(width: 8),
+                            Text('Export Data'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'toggle_filters',
+                        child: Row(
+                          children: [
+                            Icon(
+                              _showFilters ? Icons.filter_alt_off : Icons.filter_alt,
+                              size: 20,
+                            ),
+                            SizedBox(width: 8),
+                            Text(_showFilters ? 'Hide Filters' : 'Show Filters'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
