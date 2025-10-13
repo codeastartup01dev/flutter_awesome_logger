@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
 void main() {
   // 🚀 No manual setup needed! Configuration is done in the widget below
   runApp(const MyApp());
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: FlutterAwesomeLogger(
         enabled: true,
+        navigatorKey: navigatorKey,
 
         // ✨ Auto-configure logger - no need for manual setup in main()!
         loggerConfig: const AwesomeLoggerConfig(
