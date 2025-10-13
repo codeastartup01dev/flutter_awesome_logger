@@ -1,5 +1,5 @@
 name: flutter_awesome_logger
-description: "A comprehensive Flutter logging package with floating logger, API logging, and beautiful UI for debugging."
+description: "Making Flutter Devs Life Easy with flutter_awesome_logger - A comprehensive Flutter logging package with floating logger,auto API logging with dio interceptor, and beautiful UI for debugging."
 version: 0.1.0
 homepage: https://github.com/your_username/flutter_awesome_logger
 repository: https://github.com/your_username/flutter_awesome_logger
