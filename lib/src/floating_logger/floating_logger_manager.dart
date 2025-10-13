@@ -1,29 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Global manager for floating logger visibility and position
 class FloatingLoggerManager {
-  static const String _visibilityKey = 'awesome_floating_logger_visible';
-  static const String _positionXKey = 'awesome_floating_logger_position_x';
-  static const String _positionYKey = 'awesome_floating_logger_position_y';
-
   static final ValueNotifier<bool> _visibilityNotifier = ValueNotifier<bool>(
     true,
   );
+
+  // In-memory storage for position
+  static Offset? _savedPosition;
 
   /// Get the visibility notifier for listening to changes
   static ValueNotifier<bool> get visibilityNotifier => _visibilityNotifier;
 
   /// Check if floating logger is currently visible
   static Future<bool> isVisible() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_visibilityKey) ?? true;
+    return _visibilityNotifier.value;
   }
 
   /// Set floating logger visibility
   static Future<void> setVisible(bool visible) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_visibilityKey, visible);
     _visibilityNotifier.value = visible;
   }
 
@@ -35,34 +30,24 @@ class FloatingLoggerManager {
 
   /// Get saved position of floating logger
   static Future<Offset?> getSavedPosition() async {
-    final prefs = await SharedPreferences.getInstance();
-    final x = prefs.getDouble(_positionXKey);
-    final y = prefs.getDouble(_positionYKey);
-
-    if (x != null && y != null) {
-      return Offset(x, y);
-    }
-    return null;
+    return _savedPosition;
   }
 
   /// Save position of floating logger
   static Future<void> savePosition(Offset position) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_positionXKey, position.dx);
-    await prefs.setDouble(_positionYKey, position.dy);
+    _savedPosition = position;
   }
 
   /// Clear all saved preferences
   static Future<void> clearPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_visibilityKey);
-    await prefs.remove(_positionXKey);
-    await prefs.remove(_positionYKey);
+    _savedPosition = null;
+    _visibilityNotifier.value = true;
   }
 
   /// Initialize visibility from saved preferences
   static Future<void> initialize() async {
-    final visible = await isVisible();
-    _visibilityNotifier.value = visible;
+    // Initialize with default values since we don't persist data
+    _visibilityNotifier.value = true;
+    _savedPosition = null;
   }
 }

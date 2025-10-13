@@ -221,19 +221,10 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
                 size: widget.config.size * 0.4,
               ),
             ),
-
-            // General logs badge (top-left)
-            if (widget.config.showCount && _generalLogs > 0)
-              Positioned(
-                left: 0,
-                top: 0,
-                child: _buildBadge(_generalLogs.toString(), Colors.grey[600]!),
-              ),
-
-            // API logs badge (top-right)
+            // API logs badge (top-left)
             if (widget.config.showCount && _apiLogs > 0)
               Positioned(
-                right: 0,
+                left: 0,
                 top: 0,
                 child: _buildBadge(
                   _apiLogs.toString(),
@@ -241,10 +232,18 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
                 ),
               ),
 
-            // API errors badge (bottom-right) - only if there are errors
+            // General logs badge (top-right)
+            if (widget.config.showCount && _generalLogs > 0)
+              Positioned(
+                right: 0,
+                top: 0,
+                child: _buildBadge(_generalLogs.toString(), Colors.grey[600]!),
+              ),
+
+            // API errors badge (bottom-left) - only if there are errors
             if (widget.config.showCount && _apiErrors > 0)
               Positioned(
-                right: 2,
+                left: 2,
                 bottom: 0,
                 child: _buildBadge('⚠', Colors.orange, small: true),
               ),
@@ -444,254 +443,6 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     } catch (e) {
       // Dialog failed - provide helpful guidance
       _showNavigatorContextError();
-    }
-  }
-}
-
-/// Simple floating logger button widget for basic usage
-class SimpleFloatingLogger extends StatefulWidget {
-  /// Child widget to wrap
-  final Widget child;
-
-  /// Whether the floating logger is enabled
-  final bool enabled;
-
-  /// Background color of the button
-  final Color backgroundColor;
-
-  /// Icon for the button
-  final IconData icon;
-
-  /// Size of the button
-  final double size;
-
-  /// Tooltip text
-  final String? tooltip;
-
-  /// Navigator key to use for navigation (optional)
-  /// If not provided, will try to find navigator from context
-  final GlobalKey<NavigatorState>? navigatorKey;
-
-  const SimpleFloatingLogger({
-    super.key,
-    required this.child,
-    this.enabled = true,
-    this.backgroundColor = Colors.blue,
-    this.icon = Icons.bug_report,
-    this.size = 56.0,
-    this.tooltip,
-    this.navigatorKey,
-  });
-
-  @override
-  State<SimpleFloatingLogger> createState() => _SimpleFloatingLoggerState();
-}
-
-class _SimpleFloatingLoggerState extends State<SimpleFloatingLogger> {
-  Offset _position = const Offset(20, 100);
-  bool _isDragging = false;
-
-  @override
-  Widget build(BuildContext context) {
-    if (!widget.enabled) {
-      return widget.child;
-    }
-
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Stack(
-        children: [
-          widget.child,
-          Positioned(
-            left: _position.dx,
-            top: _position.dy,
-            child: _buildSimpleButton(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSimpleButton(BuildContext context) {
-    return GestureDetector(
-      onPanStart: (_) => _isDragging = false,
-      onPanUpdate: (details) {
-        setState(() {
-          _isDragging = true;
-          _position = Offset(
-            (_position.dx + details.delta.dx).clamp(
-              0.0,
-              MediaQuery.of(context).size.width - widget.size,
-            ),
-            (_position.dy + details.delta.dy).clamp(
-              0.0,
-              MediaQuery.of(context).size.height - widget.size - 100,
-            ),
-          );
-        });
-      },
-      onPanEnd: (_) {
-        Future.delayed(const Duration(milliseconds: 100), () {
-          if (_isDragging && mounted) {
-            _snapToEdge();
-          }
-        });
-      },
-      onTap: () {
-        if (!_isDragging) {
-          _openLogger(context);
-        }
-      },
-      child: Container(
-        width: widget.size,
-        height: widget.size,
-        decoration: BoxDecoration(
-          color: widget.backgroundColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              spreadRadius: 1,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(widget.size / 2),
-            onTap: () => _openLogger(context),
-            child: Tooltip(
-              message: widget.tooltip ?? 'Open Logger',
-              child: Icon(
-                widget.icon,
-                color: Colors.white,
-                size: widget.size * 0.4,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _snapToEdge([BuildContext? context]) {
-    final screenWidth = context != null
-        ? MediaQuery.of(context).size.width
-        : MediaQuery.of(this.context).size.width;
-
-    setState(() {
-      if (_position.dx < screenWidth / 2) {
-        _position = Offset(20, _position.dy);
-      } else {
-        _position = Offset(screenWidth - widget.size - 20, _position.dy);
-      }
-    });
-  }
-
-  void _openLogger(BuildContext context) {
-    // Check if logger is already open
-    if (LoggerHistoryPage.isLoggerOpen) {
-      // Show message that logger is already open
-      _showLoggerAlreadyOpenMessage(context);
-      return;
-    }
-
-    // Try to use provided navigator key first, then fallback to context
-    NavigatorState? navigator;
-
-    if (widget.navigatorKey?.currentState != null) {
-      navigator = widget.navigatorKey!.currentState!;
-    } else {
-      // Try to find navigator from context
-      try {
-        navigator = Navigator.of(context);
-      } catch (e) {
-        // Navigation failed - provide helpful guidance
-        _showNavigatorContextError();
-        return;
-      }
-    }
-
-    try {
-      navigator.push(
-        MaterialPageRoute(builder: (context) => const LoggerHistoryPage()),
-      );
-    } catch (e) {
-      // Push failed - provide helpful guidance
-      _showNavigatorContextError();
-    }
-  }
-
-  /// Shows helpful error message and solution when Navigator context issues occur
-  void _showNavigatorContextError() {
-    debugPrint('');
-    debugPrint('🚨 SimpleFloatingLogger Navigation Error 🚨');
-    debugPrint('═══════════════════════════════════════════════');
-    debugPrint('❌ Could not find Navigator context for floating logger.');
-    debugPrint('');
-    debugPrint('💡 SOLUTION: Use one of these approaches:');
-    debugPrint('');
-    debugPrint('🎯 APPROACH 1 (Recommended): Wrap individual pages');
-    debugPrint('class MyApp extends StatelessWidget {');
-    debugPrint('  @override');
-    debugPrint('  Widget build(BuildContext context) {');
-    debugPrint('    return MaterialApp(');
-    debugPrint('      home: SimpleFloatingLogger(');
-    debugPrint('        child: const HomePage(), // ← Wrap the page');
-    debugPrint('      ),');
-    debugPrint('    );');
-    debugPrint('  }');
-    debugPrint('}');
-    debugPrint('');
-    debugPrint('🔑 APPROACH 2: Use Navigator Key (if wrapping MaterialApp)');
-    debugPrint('class MyApp extends StatelessWidget {');
-    debugPrint('  @override');
-    debugPrint('  Widget build(BuildContext context) {');
-    debugPrint('    final navigatorKey = GlobalKey<NavigatorState>();');
-    debugPrint('    return SimpleFloatingLogger(');
-    debugPrint('      navigatorKey: navigatorKey, // ← Add this');
-    debugPrint('      child: MaterialApp(');
-    debugPrint('        navigatorKey: navigatorKey, // ← And this');
-    debugPrint('        home: const HomePage(),');
-    debugPrint('      ),');
-    debugPrint('    );');
-    debugPrint('  }');
-    debugPrint('}');
-    debugPrint('');
-    debugPrint('📚 More info: https://pub.dev/packages/awesome_flutter_logger');
-    debugPrint('═══════════════════════════════════════════════');
-    debugPrint('');
-  }
-
-  /// Shows a snackbar message when logger is already open
-  void _showLoggerAlreadyOpenMessage(BuildContext context) {
-    // Get the current BuildContext or use navigator key
-    BuildContext? dialogContext;
-
-    if (widget.navigatorKey?.currentContext != null) {
-      dialogContext = widget.navigatorKey!.currentContext!;
-    } else {
-      dialogContext = context;
-    }
-
-    try {
-      // Schedule snackbar for next frame to avoid async gap
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && dialogContext != null) {
-          ScaffoldMessenger.of(dialogContext).showSnackBar(
-            const SnackBar(
-              content: Text('Logger is already open!'),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-      });
-    } catch (e) {
-      // If snackbar fails, show debug message
-      debugPrint('SimpleFloatingLogger: Logger is already open!');
     }
   }
 }
