@@ -569,7 +569,7 @@ class _SimpleFloatingLoggerState extends State<SimpleFloatingLogger> {
   }
 
   void _snapToEdge([BuildContext? context]) {
-    final screenWidth = context != null 
+    final screenWidth = context != null
         ? MediaQuery.of(context).size.width
         : MediaQuery.of(this.context).size.width;
 
