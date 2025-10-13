@@ -60,14 +60,14 @@ class _DemoPageState extends State<DemoPage> {
   void initState() {
     super.initState();
     _setupDio();
-    awesomeLogger.i('DemoPage initialized with Awesome Flutter Logger!');
+    logger.i('DemoPage initialized with Awesome Flutter Logger!');
   }
 
   void _setupDio() {
     _dio = Dio();
     // Add the awesome logger interceptor
     _dio.interceptors.add(AwesomeLoggerInterceptor());
-    awesomeLogger.d('Dio configured with AwesomeLoggerInterceptor');
+    logger.d('Dio configured with AwesomeLoggerInterceptor');
   }
 
   void _generateDifferentLogs() {
@@ -75,15 +75,15 @@ class _DemoPageState extends State<DemoPage> {
       _logCounter++;
     });
 
-    awesomeLogger.d('Debug log #$_logCounter - This is a debug message');
-    awesomeLogger.i('Info log #$_logCounter - Application state updated');
-    awesomeLogger.w('Warning log #$_logCounter - This is a warning message');
+    logger.d('Debug log #$_logCounter - This is a debug message');
+    logger.i('Info log #$_logCounter - Application state updated');
+    logger.w('Warning log #$_logCounter - This is a warning message');
 
     if (_logCounter % 3 == 0) {
       try {
         throw Exception('Sample error for demonstration');
       } catch (e, stackTrace) {
-        awesomeLogger.e(
+        logger.e(
           'Error log #$_logCounter - Something went wrong!',
           error: e,
           stackTrace: stackTrace,
@@ -94,11 +94,11 @@ class _DemoPageState extends State<DemoPage> {
 
   Future<void> _makeApiCall(String endpoint) async {
     try {
-      awesomeLogger.i('Making API call to: $endpoint');
+      logger.i('Making API call to: $endpoint');
       final response = await _dio.get(endpoint);
-      awesomeLogger.i('API call successful: ${response.statusCode}');
+      logger.i('API call successful: ${response.statusCode}');
     } catch (e) {
-      awesomeLogger.e('API call failed', error: e);
+      logger.e('API call failed', error: e);
     }
   }
 
