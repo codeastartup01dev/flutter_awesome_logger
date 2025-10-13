@@ -1,0 +1,23 @@
+name: flutter_awesome_logger_example
+description: Example app demonstrating Awesome Flutter Logger features
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.8.1
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_awesome_logger:
+    path: ../
+  dio: ^5.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
