@@ -565,7 +565,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? color : Colors.transparent,
@@ -607,7 +607,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
             color: Theme.of(context).cardColor,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
+                color: Colors.grey.withValues(alpha: 0.1),
                 spreadRadius: 1,
                 blurRadius: 3,
                 offset: const Offset(0, 1),
@@ -798,11 +798,11 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                                 style: const TextStyle(fontSize: 11),
                               ),
                               backgroundColor: _selectedTypes.contains(type)
-                                  ? _getTypeColor(type).withOpacity(0.2)
+                                  ? _getTypeColor(type).withValues(alpha: 0.2)
                                   : null,
                               selectedColor: _getTypeColor(
                                 type,
-                              ).withOpacity(0.3),
+                              ).withValues(alpha: 0.3),
                               onSelected: (selected) {
                                 setState(() {
                                   if (selected) {

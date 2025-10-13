@@ -78,7 +78,7 @@ class FlutterAwesomeLogger {
         colors: config.useColors,
         printEmojis: config.showEmojis,
         lineLength: 120,
-        printTime: true,
+        dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
       ),
     );
   }
@@ -94,7 +94,7 @@ class FlutterAwesomeLogger {
         colors: _config.useColors,
         printEmojis: _config.showEmojis,
         lineLength: 120,
-        printTime: true,
+        dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
       ),
     );
   }

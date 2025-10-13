@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_awesome_logger/exports_flutter_awesome_logger.dart';
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
 void main() {
   // Configure the logger

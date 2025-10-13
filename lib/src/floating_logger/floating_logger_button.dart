@@ -155,7 +155,7 @@ class _AwesomeFloatingLoggerState extends State<AwesomeFloatingLogger> {
             : Border.all(color: Colors.grey, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -524,8 +524,8 @@ class _SimpleFloatingLoggerState extends State<SimpleFloatingLogger> {
       },
       onPanEnd: (_) {
         Future.delayed(const Duration(milliseconds: 100), () {
-          if (_isDragging) {
-            _snapToEdge(context);
+          if (_isDragging && mounted) {
+            _snapToEdge();
           }
         });
       },
@@ -542,7 +542,7 @@ class _SimpleFloatingLoggerState extends State<SimpleFloatingLogger> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               spreadRadius: 1,
               blurRadius: 4,
               offset: const Offset(0, 2),
@@ -568,8 +568,10 @@ class _SimpleFloatingLoggerState extends State<SimpleFloatingLogger> {
     );
   }
 
-  void _snapToEdge(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+  void _snapToEdge([BuildContext? context]) {
+    final screenWidth = context != null 
+        ? MediaQuery.of(context).size.width
+        : MediaQuery.of(this.context).size.width;
 
     setState(() {
       if (_position.dx < screenWidth / 2) {
