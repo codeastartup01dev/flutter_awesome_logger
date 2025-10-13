@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../core/flutter_awesome_logger.dart';
+import '../../core/logging_using_logger.dart';
 import '../../core/log_entry.dart';
 
 /// General logs tab widget for displaying application logs
@@ -51,7 +51,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
   }
 
   List<String> _getUniqueClasses() {
-    final logs = FlutterAwesomeLogger.getLogs();
+    final logs = LoggingUsingLogger.getLogs();
     return logs
         .map((log) => log.filePath.split('/').last.split('.').first)
         .toSet()
@@ -59,7 +59,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
   }
 
   List<LogEntry> _getFilteredLogs() {
-    final logs = FlutterAwesomeLogger.getLogs();
+    final logs = LoggingUsingLogger.getLogs();
     final filteredLogs = logs.where((log) {
       final matchesSearch =
           _searchQuery.isEmpty ||
@@ -133,7 +133,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
       return;
     }
 
-    final exportText = FlutterAwesomeLogger.exportLogs(logs: filteredLogs);
+    final exportText = LoggingUsingLogger.exportLogs(logs: filteredLogs);
     Clipboard.setData(ClipboardData(text: exportText));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -391,7 +391,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  FlutterAwesomeLogger.clearLogs();
+                                  LoggingUsingLogger.clearLogs();
                                   setState(() {});
                                   Navigator.pop(context);
                                 },

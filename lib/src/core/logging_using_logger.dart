@@ -6,7 +6,7 @@ import 'package:path/path.dart' as path;
 import 'log_entry.dart';
 
 /// Global logger instance - use this for logging throughout your app
-final logger = FlutterAwesomeLogger();
+final logger = LoggingUsingLogger();
 
 /// Configuration for AwesomeLogger behavior
 class AwesomeLoggerConfig {
@@ -64,7 +64,7 @@ class AwesomeLoggerConfig {
 }
 
 /// Main logger class - handles logging with memory storage and console output
-class FlutterAwesomeLogger {
+class LoggingUsingLogger {
   static AwesomeLoggerConfig _config = const AwesomeLoggerConfig();
   static Logger? _logger;
   static final Queue<LogEntry> _logHistory = Queue<LogEntry>();

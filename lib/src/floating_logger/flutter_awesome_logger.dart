@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 
 import '../api_logger/api_log_entry.dart';
 import '../api_logger/api_logger_service.dart';
-import '../core/flutter_awesome_logger.dart';
+import '../core/logging_using_logger.dart';
 import '../ui/logger_history_page.dart';
 import 'floating_logger_config.dart';
 import 'floating_logger_manager.dart';
 
 /// Advanced floating logger with real-time stats and preferences
-class AwesomeFloatingLogger extends StatefulWidget {
+class FlutterAwesomeLogger extends StatefulWidget {
   /// Child widget to wrap
   final Widget child;
 
@@ -24,7 +24,7 @@ class AwesomeFloatingLogger extends StatefulWidget {
   /// If not provided, will try to find navigator from context
   final GlobalKey<NavigatorState>? navigatorKey;
 
-  const AwesomeFloatingLogger({
+  const FlutterAwesomeLogger({
     super.key,
     required this.child,
     this.enabled = true,
@@ -33,10 +33,10 @@ class AwesomeFloatingLogger extends StatefulWidget {
   });
 
   @override
-  State<AwesomeFloatingLogger> createState() => _AwesomeFloatingLoggerState();
+  State<FlutterAwesomeLogger> createState() => _FlutterAwesomeLoggerState();
 }
 
-class _AwesomeFloatingLoggerState extends State<AwesomeFloatingLogger> {
+class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   bool _isVisible = true;
   Offset _position = const Offset(20, 100);
   Timer? _statsTimer;
@@ -100,7 +100,7 @@ class _AwesomeFloatingLoggerState extends State<AwesomeFloatingLogger> {
   }
 
   void _updateStats() {
-    final logs = FlutterAwesomeLogger.getLogs();
+    final logs = LoggingUsingLogger.getLogs();
     final apiLogsData = ApiLoggerService.getApiLogs();
     final errors = apiLogsData
         .where(
@@ -411,7 +411,7 @@ class _AwesomeFloatingLoggerState extends State<AwesomeFloatingLogger> {
                 title: const Text('Clear All Logs'),
                 onTap: () {
                   Navigator.pop(context);
-                  FlutterAwesomeLogger.clearLogs();
+                  LoggingUsingLogger.clearLogs();
                   ApiLoggerService.clearApiLogs();
                 },
               ),

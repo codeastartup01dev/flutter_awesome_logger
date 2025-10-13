@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../api_logger/api_logger_service.dart';
-import '../core/flutter_awesome_logger.dart';
+import '../core/logging_using_logger.dart';
 import 'widgets/api_logs_tab.dart';
 import 'widgets/general_logs_tab.dart';
 
@@ -52,7 +52,7 @@ class _LoggerHistoryPageState extends State<LoggerHistoryPage>
   Widget build(BuildContext context) {
     final apiLogs = ApiLoggerService.getApiLogs();
     final apiLogCount = apiLogs.length;
-    final generalLogCount = FlutterAwesomeLogger.getLogs().length;
+    final generalLogCount = LoggingUsingLogger.getLogs().length;
 
     // Calculate API error count
     final apiErrorCount = apiLogs
@@ -171,7 +171,7 @@ class _LoggerHistoryPageState extends State<LoggerHistoryPage>
 
   /// Export all logs (both general and API)
   void _exportAllLogs() {
-    final generalLogs = FlutterAwesomeLogger.exportLogs();
+    final generalLogs = LoggingUsingLogger.exportLogs();
     final apiLogs = ApiLoggerService.exportApiLogs();
 
     final combinedExport = [

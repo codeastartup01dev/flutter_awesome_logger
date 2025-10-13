@@ -1,5 +1,5 @@
 // Core logger exports
-export 'src/core/flutter_awesome_logger.dart';
+export 'src/core/logging_using_logger.dart';
 export 'src/core/log_entry.dart';
 
 // API logger exports
@@ -8,7 +8,7 @@ export 'src/api_logger/api_logger_service.dart';
 export 'src/api_logger/dio_interceptor.dart';
 
 // Floating logger exports
-export 'src/floating_logger/floating_logger_button.dart';
+export 'src/floating_logger/flutter_awesome_logger.dart';
 export 'src/floating_logger/floating_logger_config.dart';
 export 'src/floating_logger/floating_logger_manager.dart';
 
