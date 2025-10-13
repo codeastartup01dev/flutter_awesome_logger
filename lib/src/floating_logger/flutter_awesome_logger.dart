@@ -337,29 +337,16 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     debugPrint('═══════════════════════════════════════════════');
     debugPrint('❌ Could not find Navigator context for floating logger.');
     debugPrint('');
-    debugPrint('💡 SOLUTION: Use one of these approaches:');
-    debugPrint('');
-    debugPrint('🎯 APPROACH 1 (Recommended): Wrap individual pages');
+    debugPrint('🔑Use Navigator Key:');
     debugPrint('class MyApp extends StatelessWidget {');
     debugPrint('  @override');
     debugPrint('  Widget build(BuildContext context) {');
-    debugPrint('    return MaterialApp(');
-    debugPrint('      home: AwesomeFloatingLogger(');
-    debugPrint('        child: const HomePage(), // ← Wrap the page');
-    debugPrint('      ),');
-    debugPrint('    );');
-    debugPrint('  }');
-    debugPrint('}');
-    debugPrint('');
-    debugPrint('🔑 APPROACH 2: Use Navigator Key (if wrapping MaterialApp)');
-    debugPrint('class MyApp extends StatelessWidget {');
-    debugPrint('  @override');
-    debugPrint('  Widget build(BuildContext context) {');
-    debugPrint('    final navigatorKey = GlobalKey<NavigatorState>();');
-    debugPrint('    return AwesomeFloatingLogger(');
+    debugPrint(
+      '    final navigatorKey = GlobalKey<NavigatorState>(); // or use call your global navigator key',
+    );
+    debugPrint('    return FlutterAwesomeLogger(');
     debugPrint('      navigatorKey: navigatorKey, // ← Add this');
     debugPrint('      child: MaterialApp(');
-    debugPrint('        navigatorKey: navigatorKey, // ← And this');
     debugPrint('        home: const HomePage(),');
     debugPrint('      ),');
     debugPrint('    );');
