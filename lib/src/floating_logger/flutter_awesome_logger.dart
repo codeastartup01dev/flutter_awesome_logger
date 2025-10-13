@@ -57,17 +57,17 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   @override
   void initState() {
     super.initState();
-    
+
     // Auto-configure logger if config is provided
     if (widget.loggerConfig != null) {
       LoggingUsingLogger.configure(widget.loggerConfig!);
     }
-    
+
     // Auto-initialize floating logger manager if enabled
     if (widget.autoInitialize) {
       FloatingLoggerManager.initialize();
     }
-    
+
     _loadPreferences();
     _startStatsTimer();
 
