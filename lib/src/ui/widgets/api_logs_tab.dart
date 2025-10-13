@@ -797,11 +797,15 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                         child: Row(
                           children: [
                             Icon(
-                              _showFilters ? Icons.filter_alt_off : Icons.filter_alt,
+                              _showFilters
+                                  ? Icons.filter_alt_off
+                                  : Icons.filter_alt,
                               size: 20,
                             ),
                             SizedBox(width: 8),
-                            Text(_showFilters ? 'Hide Filters' : 'Show Filters'),
+                            Text(
+                              _showFilters ? 'Hide Filters' : 'Show Filters',
+                            ),
                           ],
                         ),
                       ),
