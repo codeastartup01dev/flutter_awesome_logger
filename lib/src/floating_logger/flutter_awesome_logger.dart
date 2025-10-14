@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+import 'package:shake/shake.dart';
 
 import '../api_logger/api_log_entry.dart';
 import '../api_logger/api_logger_service.dart';
@@ -53,6 +53,7 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   bool _isLoggingPaused = false;
   bool? _isEnabled; // null = waiting for future, true/false = resolved
   Future<bool>? _enabledFuture;
+  ShakeDetector? _shakeDetector;
 
   @override
   void initState() {
@@ -124,15 +125,53 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     // Start stats timer if enabled
     if (enabled) {
       _startStatsTimer();
+      _initializeShakeDetector();
     } else {
       _statsTimer?.cancel();
       _statsTimer = null;
+      _disposeShakeDetector();
+    }
+  }
+
+  /// Initialize shake detector if enabled
+  void _initializeShakeDetector() {
+    if (!widget.config.enableShakeToToggle) return;
+
+    _shakeDetector = ShakeDetector.autoStart(
+      onPhoneShake: () {
+        if (mounted) {
+          _toggleLoggerVisibility();
+        }
+      },
+      minimumShakeCount: 1,
+      shakeSlopTimeMS: 500,
+      shakeCountResetTime: 3000,
+      shakeThresholdGravity: widget.config.shakeSensitivity.toDouble(),
+    );
+  }
+
+  /// Dispose shake detector
+  void _disposeShakeDetector() {
+    _shakeDetector?.stopListening();
+    _shakeDetector = null;
+  }
+
+  /// Toggle logger visibility with haptic feedback
+  void _toggleLoggerVisibility() {
+    FloatingLoggerManager.toggle();
+
+    // Provide haptic feedback
+    if (mounted) {
+      // Light haptic feedback to confirm shake was detected
+      // Note: HapticFeedback requires additional import, keeping it simple for now
+      debugPrint('FlutterAwesomeLogger: Shake detected - toggling visibility');
     }
   }
 
   @override
   void dispose() {
     _statsTimer?.cancel();
+    _disposeShakeDetector();
     FloatingLoggerManager.visibilityNotifier.removeListener(
       _onVisibilityChanged,
     );

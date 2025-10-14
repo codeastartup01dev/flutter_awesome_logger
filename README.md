@@ -8,6 +8,7 @@ A comprehensive Flutter logging package that makes debugging a breeze! Features 
 ## ✨ Features
 
 - 📱 **Floating Logger Button** - Always accessible debug button that floats over your app (can be disabled)
+- 🤳 **Shake to Toggle** - Shake your device to show/hide the floating logger button(Only active when logger is enabled)
 - 🌐 **Automatic API Logging** - Built-in Dio interceptor for seamless API request/response logging
 - 🎨 **Beautiful UI** - Clean, modern interface for viewing logs with syntax highlighting
 - 📊 **Multiple Log Levels** - Support for debug, info, warning, error, and verbose logs
@@ -216,12 +217,14 @@ const AwesomeLoggerConfig({
 
 ```dart
 const FloatingLoggerConfig({
-  Color backgroundColor = Colors.blue,     // Background color of the floating button
-  IconData icon = Icons.bug_report,       // Icon for the floating button
-  bool showCount = true,                  // Show log count badge
-  bool enableGestures = true,             // Enable drag gestures
-  bool autoSnapToEdges = true,            // Auto-snap to screen edges
-  double size = 56.0,                     // Size of the floating button
+  Color backgroundColor = Colors.deepPurple, // Background color of the floating button
+  IconData icon = Icons.developer_mode,      // Icon for the floating button
+  bool showCount = true,                     // Show log count badge
+  bool enableGestures = true,                // Enable drag gestures
+  bool autoSnapToEdges = true,               // Auto-snap to screen edges
+  double size = 60.0,                       // Size of the floating button
+  bool enableShakeToToggle = true,          // Enable shake-to-toggle functionality
+  int shakeSensitivity = 8,                 // Shake sensitivity (1-15, higher = less sensitive)
 });
 ```
 
@@ -287,6 +290,8 @@ The logger UI is highly customizable. You can:
 - Add custom filters and search options
 - Pause/resume logging as needed
 - Control logging behavior with simple configuration
+- Enable/disable shake-to-toggle functionality
+- Adjust shake sensitivity for different devices
 
 ## 🤝 Contributing
 

@@ -42,6 +42,8 @@ class MyApp extends StatelessWidget {
           showCount: true,
           enableGestures: true,
           autoSnapToEdges: true,
+          enableShakeToToggle: true,
+          shakeSensitivity: 8,
         ),
 
         child: const DemoPage(),
@@ -259,7 +261,7 @@ class _DemoPageState extends State<DemoPage> {
                       Icon(Icons.info, color: Colors.white),
                       SizedBox(height: 8),
                       Text(
-                        'Tap the floating button to access logs quickly!',
+                        'Tap the floating button to access logs quickly!\n\n🤳 Shake your device to show/hide the logger button!',
                         style: TextStyle(color: Colors.white),
                         textAlign: TextAlign.center,
                       ),

@@ -29,6 +29,12 @@ class FloatingLoggerConfig {
   /// Margin from screen edges when snapping
   final double edgeMargin;
 
+  /// Whether to enable shake-to-toggle functionality
+  final bool enableShakeToToggle;
+
+  /// Shake sensitivity threshold (1-15, higher = less sensitive)
+  final int shakeSensitivity;
+
   const FloatingLoggerConfig({
     this.backgroundColor = Colors.deepPurple,
     this.icon = Icons.developer_mode,
@@ -39,6 +45,8 @@ class FloatingLoggerConfig {
     this.initialPosition,
     this.autoSnapToEdges = true,
     this.edgeMargin = 20.0,
+    this.enableShakeToToggle = true,
+    this.shakeSensitivity = 8,
   });
 
   /// Create a copy with updated fields
@@ -52,6 +60,8 @@ class FloatingLoggerConfig {
     Offset? initialPosition,
     bool? autoSnapToEdges,
     double? edgeMargin,
+    bool? enableShakeToToggle,
+    int? shakeSensitivity,
   }) {
     return FloatingLoggerConfig(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -63,6 +73,8 @@ class FloatingLoggerConfig {
       initialPosition: initialPosition ?? this.initialPosition,
       autoSnapToEdges: autoSnapToEdges ?? this.autoSnapToEdges,
       edgeMargin: edgeMargin ?? this.edgeMargin,
+      enableShakeToToggle: enableShakeToToggle ?? this.enableShakeToToggle,
+      shakeSensitivity: shakeSensitivity ?? this.shakeSensitivity,
     );
   }
 }
