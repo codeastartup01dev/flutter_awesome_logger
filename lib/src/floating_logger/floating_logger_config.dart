@@ -30,7 +30,10 @@ class FloatingLoggerConfig {
   final double edgeMargin;
 
   /// Whether to enable shake-to-toggle functionality
-  final bool enableShakeToToggle;
+  final bool enableShakeToShowHideFloatingButton;
+
+  /// Whether to enable shake-to-enable logger when disabled
+  final bool enableShakeToEnableLogger;
 
   /// Shake sensitivity threshold (1-15, higher = less sensitive)
   final int shakeSensitivity;
@@ -45,7 +48,8 @@ class FloatingLoggerConfig {
     this.initialPosition,
     this.autoSnapToEdges = true,
     this.edgeMargin = 20.0,
-    this.enableShakeToToggle = true,
+    this.enableShakeToShowHideFloatingButton = true,
+    this.enableShakeToEnableLogger = true,
     this.shakeSensitivity = 8,
   });
 
@@ -60,7 +64,8 @@ class FloatingLoggerConfig {
     Offset? initialPosition,
     bool? autoSnapToEdges,
     double? edgeMargin,
-    bool? enableShakeToToggle,
+    bool? enableShakeToShowHideFloatingButton,
+    bool? enableShakeToEnable,
     int? shakeSensitivity,
   }) {
     return FloatingLoggerConfig(
@@ -73,7 +78,11 @@ class FloatingLoggerConfig {
       initialPosition: initialPosition ?? this.initialPosition,
       autoSnapToEdges: autoSnapToEdges ?? this.autoSnapToEdges,
       edgeMargin: edgeMargin ?? this.edgeMargin,
-      enableShakeToToggle: enableShakeToToggle ?? this.enableShakeToToggle,
+      enableShakeToShowHideFloatingButton:
+          enableShakeToShowHideFloatingButton ??
+          this.enableShakeToShowHideFloatingButton,
+      enableShakeToEnableLogger:
+          enableShakeToEnable ?? this.enableShakeToEnableLogger,
       shakeSensitivity: shakeSensitivity ?? this.shakeSensitivity,
     );
   }

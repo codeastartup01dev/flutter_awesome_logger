@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9] (2024-10-14)
+
+### Added
+- 🤳 **Shake to Enable Logger** - Shake your device to enable the entire logger system when it's disabled (perfect for production builds)
+- 🎯 **Dual Shake Detection System** - Separate detectors for toggle visibility vs enable logger functionality
+- 🏗️ **Smart State Management** - Automatic switching between shake detectors based on logger state
+
+### Changed
+- 🔄 **Updated Shake Package** - Upgraded to shake ^3.0.0 with improved callback signatures
+- 📝 **Clearer Property Names** - Renamed `enableShakeToToggle` to `enableShakeToShowHideFloatingButton` and `enableShakeToEnable` to `enableShakeToEnableLogger`
+- 🎨 **Enhanced Configuration** - More descriptive parameter names for better developer experience
+
+### Fixed
+- 🐛 **Flutter Analyze Issues** - Fixed all linting errors and warnings
+- 🔧 **Callback Type Compatibility** - Updated shake detector callbacks to match new package API
+- 📖 **Documentation Updates** - Corrected interceptor class name and updated version references
+
+### Technical
+- 🏗️ **Proper Resource Management** - Only one shake detector active at a time for optimal performance
+- 🎯 **Type Safety** - Improved type checking and eliminated unnecessary type assertions
+- 📊 **Code Quality** - All Flutter analyze checks pass with zero issues
 
 ## [0.1.8] (2024-10-14)
 

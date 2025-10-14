@@ -8,7 +8,8 @@ A comprehensive Flutter logging package that makes debugging a breeze! Features 
 ## ✨ Features
 
 - 📱 **Floating Logger Button** - Always accessible debug button that floats over your app (can be disabled)
-- 🤳 **Shake to Toggle** - Shake your device to show/hide the floating logger button(Only active when logger is enabled)
+- 🤳 **Shake to Toggle** - Shake your device to show/hide the floating logger button (only when logger is enabled)
+- 🤳 **Shake to Enable** - Shake your device to enable the logger when it's disabled (perfect for production builds)
 - 🌐 **Automatic API Logging** - Built-in Dio interceptor for seamless API request/response logging
 - 🎨 **Beautiful UI** - Clean, modern interface for viewing logs with syntax highlighting
 - 📊 **Multiple Log Levels** - Support for debug, info, warning, error, and verbose logs
@@ -55,7 +56,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_awesome_logger: ^0.1.0
+  flutter_awesome_logger: ^0.1.9
 ```
 
 Then run:
@@ -183,7 +184,7 @@ import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 final dio = Dio();
 
 // Add the awesome logger interceptor
-dio.interceptors.add(AwesomeLoggerDioInterceptor());
+dio.interceptors.add(FlutterAwesomeLoggerDioInterceptor());
 
 // Now all your API calls will be automatically logged!
 final response = await dio.get('https://api.example.com/data');
@@ -223,7 +224,8 @@ const FloatingLoggerConfig({
   bool enableGestures = true,                // Enable drag gestures
   bool autoSnapToEdges = true,               // Auto-snap to screen edges
   double size = 60.0,                       // Size of the floating button
-  bool enableShakeToToggle = true,          // Enable shake-to-toggle functionality
+  bool enableShakeToShowHideFloatingButton = true, // Enable shake-to-toggle functionality
+  bool enableShakeToEnableLogger = true,           // Enable shake-to-enable logger when disabled
   int shakeSensitivity = 8,                 // Shake sensitivity (1-15, higher = less sensitive)
 });
 ```
@@ -291,6 +293,7 @@ The logger UI is highly customizable. You can:
 - Pause/resume logging as needed
 - Control logging behavior with simple configuration
 - Enable/disable shake-to-toggle functionality
+- Enable/disable shake-to-enable functionality for production builds
 - Adjust shake sensitivity for different devices
 
 ## 🤝 Contributing
