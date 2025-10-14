@@ -17,10 +17,13 @@ class MyApp extends StatelessWidget {
       title: 'Awesome Flutter Logger Demo',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: FlutterAwesomeLogger(
+        // 🔄 Auto-initialize floating logger on app start (optional - true by default)
+        autoInitialize: true,
+        // 🔄 Enable logging (optional - true by default)
         enabled: true,
         navigatorKey: navigatorKey,
 
-        // ✨ Auto-configure logger - no need for manual setup in main()!
+        // ✨ logger config (optional)
         loggerConfig: const AwesomeLoggerConfig(
           maxLogEntries: 500,
           showFilePaths: true,
@@ -28,10 +31,7 @@ class MyApp extends StatelessWidget {
           useColors: true,
         ),
 
-        // 🔄 Auto-initialize floating logger (true by default)
-        autoInitialize: true,
-
-        // 🎨 Floating logger UI configuration
+        // 🎨 Floating logger UI configuration (optional)
         config: const FloatingLoggerConfig(
           backgroundColor: Colors.deepPurple,
           icon: Icons.developer_mode,
