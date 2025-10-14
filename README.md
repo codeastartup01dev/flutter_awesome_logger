@@ -7,13 +7,13 @@ A comprehensive Flutter logging package that makes debugging a breeze! Features 
 
 ## ✨ Features
 
-- 📱 **Floating Logger Button** - Always accessible debug button that floats over your app
+- 📱 **Floating Logger Button** - Always accessible debug button that floats over your app (can be disabled)
 - 🌐 **Automatic API Logging** - Built-in Dio interceptor for seamless API request/response logging
 - 🎨 **Beautiful UI** - Clean, modern interface for viewing logs with syntax highlighting
 - 📊 **Multiple Log Levels** - Support for debug, info, warning, error, and verbose logs
-- 💾 **Persistent Storage** - Logs are stored and persist across app sessions
+- 💾 **Smart Storage** - Logs are stored only when logger is enabled, conserving memory
 - 🔍 **Search & Filter** - Easily find specific logs with search and filtering capabilities
-- 🎯 **Configurable** - Highly customizable with various configuration options
+- 🎯 **Simple Configuration** - Single `enabled` property controls both UI and storage
 - 📱 **Responsive Design** - Works perfectly on all screen sizes
 
 ## 📸 Screenshots
@@ -81,10 +81,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: FlutterAwesomeLogger(
+        enabled: true, // Shows floating logger AND enables log storage
         // Auto-configure logger settings
         loggerConfig: const AwesomeLoggerConfig(
-          enabled: true,
-          storeLogs: true,
           maxLogEntries: 500,
           showFilePaths: true,
           showEmojis: true,
@@ -109,7 +108,7 @@ class MyApp extends StatelessWidget {
 
 #### **Option 2: Manual Configuration (Advanced)**
 
-For more control, configure manually in main():
+For more control, configure manually in main(). Note: Manual configuration doesn't automatically control log storage - use Option 1 for simpler setup.
 
 ```dart
 import 'package:flutter/material.dart';
@@ -119,8 +118,6 @@ void main() {
   // Manual configuration
   LoggingUsingLogger.configure(
     const AwesomeLoggerConfig(
-      enabled: true,
-      storeLogs: true,
       maxLogEntries: 500,
       showFilePaths: true,
       showEmojis: true,
@@ -139,6 +136,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: FlutterAwesomeLogger(
+        enabled: true, // Controls both floating logger AND log storage
         // Don't auto-configure since we did it manually
         autoInitialize: false,
         config: const FloatingLoggerConfig(
@@ -191,9 +189,7 @@ final response = await dio.get('https://api.example.com/data');
 
 ```dart
 const AwesomeLoggerConfig({
-  bool storeLogs = true,           // Store logs in memory for UI display
   int maxLogEntries = 1000,        // Maximum number of log entries to keep
-  bool enabled = true,             // Enable/disable logger
   bool showFilePaths = true,       // Show file paths in console output
   bool showEmojis = true,          // Show emojis in console output
   bool useColors = true,           // Use colors in console output

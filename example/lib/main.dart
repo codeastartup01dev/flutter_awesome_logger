@@ -22,8 +22,6 @@ class MyApp extends StatelessWidget {
 
         // ✨ Auto-configure logger - no need for manual setup in main()!
         loggerConfig: const AwesomeLoggerConfig(
-          enabled: true,
-          storeLogs: true,
           maxLogEntries: 500,
           showFilePaths: true,
           showEmojis: true,

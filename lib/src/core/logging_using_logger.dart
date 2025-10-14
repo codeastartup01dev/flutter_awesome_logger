@@ -10,14 +10,8 @@ final logger = LoggingUsingLogger();
 
 /// Configuration for AwesomeLogger behavior
 class AwesomeLoggerConfig {
-  /// Whether to store logs in memory for UI display
-  final bool storeLogs;
-
   /// Maximum number of log entries to keep in memory
   final int maxLogEntries;
-
-  /// Whether logger is enabled (affects both console and storage)
-  final bool enabled;
 
   /// Whether to show file paths in console output
   final bool showFilePaths;
@@ -32,9 +26,7 @@ class AwesomeLoggerConfig {
   final int stackTraceLines;
 
   const AwesomeLoggerConfig({
-    this.storeLogs = true,
     this.maxLogEntries = 1000,
-    this.enabled = true,
     this.showFilePaths = true,
     this.showEmojis = true,
     this.useColors = true,
@@ -43,18 +35,14 @@ class AwesomeLoggerConfig {
 
   /// Create a copy with updated fields
   AwesomeLoggerConfig copyWith({
-    bool? storeLogs,
     int? maxLogEntries,
-    bool? enabled,
     bool? showFilePaths,
     bool? showEmojis,
     bool? useColors,
     int? stackTraceLines,
   }) {
     return AwesomeLoggerConfig(
-      storeLogs: storeLogs ?? this.storeLogs,
       maxLogEntries: maxLogEntries ?? this.maxLogEntries,
-      enabled: enabled ?? this.enabled,
       showFilePaths: showFilePaths ?? this.showFilePaths,
       showEmojis: showEmojis ?? this.showEmojis,
       useColors: useColors ?? this.useColors,
@@ -68,6 +56,7 @@ class LoggingUsingLogger {
   static AwesomeLoggerConfig _config = const AwesomeLoggerConfig();
   static Logger? _logger;
   static final Queue<LogEntry> _logHistory = Queue<LogEntry>();
+  static bool _storageEnabled = true; // Global flag for log storage
 
   /// Configure the logger behavior
   static void configure(AwesomeLoggerConfig config) {
@@ -81,6 +70,11 @@ class LoggingUsingLogger {
         dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
       ),
     );
+  }
+
+  /// Enable or disable log storage globally
+  static void setStorageEnabled(bool enabled) {
+    _storageEnabled = enabled;
   }
 
   /// Get current configuration
@@ -186,8 +180,8 @@ class LoggingUsingLogger {
 
   /// Add log entry to memory storage
   void _addLogEntry(String message, String level, {String? stackTrace}) {
-    // Only store logs if enabled and configured to store
-    if (!_config.enabled || !_config.storeLogs) return;
+    // Only store logs if storage is enabled
+    if (!_storageEnabled) return;
 
     final filePath = _getFilePath();
     final entry = LogEntry(
@@ -206,8 +200,6 @@ class LoggingUsingLogger {
 
   /// Log debug message
   void d(String message) {
-    if (!_config.enabled) return;
-
     _addLogEntry(message, 'DEBUG');
 
     if (_config.showFilePaths) {
@@ -219,8 +211,6 @@ class LoggingUsingLogger {
 
   /// Log info message
   void i(String message) {
-    if (!_config.enabled) return;
-
     _addLogEntry(message, 'INFO');
 
     if (_config.showFilePaths) {
@@ -232,8 +222,6 @@ class LoggingUsingLogger {
 
   /// Log warning message
   void w(String message) {
-    if (!_config.enabled) return;
-
     _addLogEntry(message, 'WARNING');
 
     if (_config.showFilePaths) {
@@ -245,8 +233,6 @@ class LoggingUsingLogger {
 
   /// Log error message with optional error object and stack trace
   void e(String message, {Object? error, StackTrace? stackTrace}) {
-    if (!_config.enabled) return;
-
     String? formattedError;
 
     if (error != null) {

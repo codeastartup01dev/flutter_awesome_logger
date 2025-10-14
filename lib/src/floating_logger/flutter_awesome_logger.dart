@@ -14,7 +14,7 @@ class FlutterAwesomeLogger extends StatefulWidget {
   /// Child widget to wrap
   final Widget child;
 
-  /// Whether the floating logger is enabled
+  /// Whether the floating logger is enabled and logs are stored
   final bool enabled;
 
   /// Configuration for the floating logger
@@ -63,6 +63,9 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
       LoggingUsingLogger.configure(widget.loggerConfig!);
     }
 
+    // Set storage enabled based on widget enabled state
+    LoggingUsingLogger.setStorageEnabled(widget.enabled);
+
     // Auto-initialize floating logger manager if enabled
     if (widget.autoInitialize) {
       FloatingLoggerManager.initialize();
@@ -73,6 +76,15 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
 
     // Listen to global visibility changes
     FloatingLoggerManager.visibilityNotifier.addListener(_onVisibilityChanged);
+  }
+
+  @override
+  void didUpdateWidget(FlutterAwesomeLogger oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update storage enabled if widget enabled state changed
+    if (oldWidget.enabled != widget.enabled) {
+      LoggingUsingLogger.setStorageEnabled(widget.enabled);
+    }
   }
 
   @override
