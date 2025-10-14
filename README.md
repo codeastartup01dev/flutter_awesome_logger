@@ -78,11 +78,18 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  // Example: Enable logger after checking some condition
+  Future<bool> _shouldEnableLogger() async {
+    // Check if we're in debug mode, user preferences, etc.
+    await Future.delayed(const Duration(seconds: 2)); // Simulate async check
+    return true; // Or false based on your logic
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: FlutterAwesomeLogger(
-        enabled: true, // Shows floating logger AND enables log storage
+        enabled: _shouldEnableLogger(), // Can be Future<bool> or bool
         // Auto-configure logger settings
         loggerConfig: const AwesomeLoggerConfig(
           maxLogEntries: 500,
@@ -90,8 +97,6 @@ class MyApp extends StatelessWidget {
           showEmojis: true,
           useColors: true,
         ),
-        // Auto-initialize (true by default)
-        autoInitialize: true,
         // Floating logger UI configuration
         config: const FloatingLoggerConfig(
           backgroundColor: Colors.deepPurple,
@@ -139,7 +144,6 @@ class MyApp extends StatelessWidget {
       home: FlutterAwesomeLogger(
         enabled: true, // Controls both floating logger AND log storage
         // Don't auto-configure since we did it manually
-        autoInitialize: false,
         config: const FloatingLoggerConfig(
           backgroundColor: Colors.deepPurple,
           icon: Icons.developer_mode,
@@ -185,6 +189,16 @@ final response = await dio.get('https://api.example.com/data');
 ```
 
 ## 🔧 Configuration Options
+
+### FlutterAwesomeLogger
+
+The `enabled` parameter can accept either a `bool` or `Future<bool>`:
+
+- **`enabled: true`** - Logger is immediately enabled
+- **`enabled: false`** - Logger is immediately disabled
+- **`enabled: someFuture()`** - Logger waits for the Future to resolve, then enables/disables accordingly
+
+This allows for conditional logger initialization based on async operations like checking debug mode, user preferences, or remote configuration.
 
 ### AwesomeLoggerConfig
 

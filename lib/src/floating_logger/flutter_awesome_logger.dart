@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '../api_logger/api_log_entry.dart';
 import '../api_logger/api_logger_service.dart';
@@ -14,8 +15,9 @@ class FlutterAwesomeLogger extends StatefulWidget {
   /// Child widget to wrap
   final Widget child;
 
-  /// Whether the floating logger is enabled and logs are stored
-  final bool enabled;
+  /// Whether the floating logger is enabled and logs are stored.
+  /// Can be a Future that resolves to a boolean for conditional enabling.
+  final FutureOr<bool> enabled;
 
   /// Configuration for the floating logger
   final FloatingLoggerConfig config;
@@ -28,10 +30,6 @@ class FlutterAwesomeLogger extends StatefulWidget {
   /// This eliminates the need to call LoggingUsingLogger.configure() manually
   final AwesomeLoggerConfig? loggerConfig;
 
-  /// Whether to auto-initialize the floating logger manager
-  /// If true, eliminates the need to call FloatingLoggerManager.initialize() manually
-  final bool autoInitialize;
-
   const FlutterAwesomeLogger({
     super.key,
     required this.child,
@@ -39,7 +37,6 @@ class FlutterAwesomeLogger extends StatefulWidget {
     this.config = const FloatingLoggerConfig(),
     this.navigatorKey,
     this.loggerConfig,
-    this.autoInitialize = true,
   });
 
   @override
@@ -54,6 +51,8 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   int _apiLogs = 0;
   int _apiErrors = 0;
   bool _isLoggingPaused = false;
+  bool? _isEnabled; // null = waiting for future, true/false = resolved
+  Future<bool>? _enabledFuture;
 
   @override
   void initState() {
@@ -64,16 +63,10 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
       LoggingUsingLogger.configure(widget.loggerConfig!);
     }
 
-    // Set storage enabled based on widget enabled state
-    LoggingUsingLogger.setStorageEnabled(widget.enabled);
-
-    // Auto-initialize floating logger manager if enabled
-    if (widget.autoInitialize) {
-      FloatingLoggerManager.initialize();
-    }
+    // Handle enabled parameter (FutureOr<bool>)
+    _resolveEnabledState();
 
     _loadPreferences();
-    _startStatsTimer();
 
     // Listen to global visibility changes
     FloatingLoggerManager.visibilityNotifier.addListener(_onVisibilityChanged);
@@ -82,9 +75,58 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   @override
   void didUpdateWidget(FlutterAwesomeLogger oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Update storage enabled if widget enabled state changed
-    if (oldWidget.enabled != widget.enabled) {
-      LoggingUsingLogger.setStorageEnabled(widget.enabled);
+    // Re-resolve enabled state if widget changed
+    if (!identical(oldWidget.enabled, widget.enabled)) {
+      _resolveEnabledState();
+    }
+  }
+
+  /// Resolves the enabled state from FutureOr<bool> to bool
+  void _resolveEnabledState() {
+    final enabled = widget.enabled;
+
+    if (enabled is bool) {
+      // Synchronous case
+      _setEnabledState(enabled);
+    } else if (enabled is Future<bool>) {
+      // Asynchronous case
+      _enabledFuture = enabled;
+      enabled
+          .then((value) {
+            if (mounted && _enabledFuture == enabled) {
+              setState(() {
+                _setEnabledState(value);
+              });
+              if (value) {
+                debugPrint(
+                  'FlutterAwesomeLogger: Logger enabled via Future resolution',
+                );
+              }
+            }
+          })
+          .catchError((error) {
+            // Default to false on error
+            if (mounted && _enabledFuture == enabled) {
+              setState(() {
+                _setEnabledState(false);
+              });
+            }
+            debugPrint('Error resolving logger enabled state: $error');
+          });
+    }
+  }
+
+  /// Sets the enabled state and updates dependent services
+  void _setEnabledState(bool enabled) {
+    _isEnabled = enabled;
+    LoggingUsingLogger.setStorageEnabled(enabled);
+
+    // Start stats timer if enabled
+    if (enabled) {
+      _startStatsTimer();
+    } else {
+      _statsTimer?.cancel();
+      _statsTimer = null;
     }
   }
 
@@ -155,8 +197,9 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
 
   @override
   Widget build(BuildContext context) {
-    // Only show if enabled and visible
-    if (!widget.enabled || !_isVisible) {
+    // Only show if enabled (default to false while resolving future) and visible
+    final isEnabled = _isEnabled ?? false;
+    if (!isEnabled || !_isVisible) {
       return widget.child;
     }
 

@@ -11,16 +11,20 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // Future that resolves to true after 3 seconds
+  Future<bool> _shouldEnableLogger() async {
+    await Future.delayed(const Duration(seconds: 3));
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Awesome Flutter Logger Demo',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: FlutterAwesomeLogger(
-        // 🔄 Auto-initialize floating logger on app start (optional - true by default)
-        autoInitialize: true,
-        // 🔄 Enable logging (optional - true by default)
-        enabled: true,
+        // 🔄 Enable logging after 3 seconds using Future
+        enabled: _shouldEnableLogger(),
         navigatorKey: navigatorKey,
 
         // ✨ logger config (optional)
@@ -62,7 +66,7 @@ class _DemoPageState extends State<DemoPage> {
   void initState() {
     super.initState();
     _setupDio();
-    logger.i('DemoPage initialized with Awesome Flutter Logger!');
+    logger.i('DemoPage initialized - Logger will be enabled in 3 seconds!');
   }
 
   void _setupDio() {
