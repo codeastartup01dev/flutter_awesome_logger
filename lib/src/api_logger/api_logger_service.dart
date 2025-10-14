@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:dio/dio.dart';
 
+import '../core/logging_using_logger.dart';
 import 'api_log_entry.dart';
 
 /// Service for logging API requests, responses, and errors with detailed information
@@ -23,7 +24,7 @@ class ApiLoggerService {
 
   /// Add API log entry to the queue
   void _addApiLogEntry(ApiLogEntry entry) {
-    if (!_enabled) return;
+    if (!_enabled || LoggingUsingLogger.isPaused) return;
 
     _apiLogs.addFirst(entry);
     if (_apiLogs.length > _maxApiLogEntries) {
@@ -38,7 +39,7 @@ class ApiLoggerService {
 
   /// Log API request
   String logRequest(RequestOptions options) {
-    if (!_enabled) return '';
+    if (!_enabled || LoggingUsingLogger.isPaused) return '';
 
     final apiId = _generateApiId();
     _requestStartTimes[apiId] = DateTime.now();
@@ -51,7 +52,7 @@ class ApiLoggerService {
 
   /// Log API response - updates the existing pending log entry
   void logResponse(String apiId, Response response) {
-    if (!_enabled || apiId.isEmpty) return;
+    if (!_enabled || apiId.isEmpty || LoggingUsingLogger.isPaused) return;
 
     final startTime = _requestStartTimes[apiId];
     final duration = startTime != null
@@ -94,7 +95,7 @@ class ApiLoggerService {
 
   /// Log API error - updates the existing pending log entry
   void logError(String apiId, DioException error) {
-    if (!_enabled || apiId.isEmpty) return;
+    if (!_enabled || apiId.isEmpty || LoggingUsingLogger.isPaused) return;
 
     final startTime = _requestStartTimes[apiId];
     final duration = startTime != null
