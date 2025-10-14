@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] (2024-10-14)
+
+### Added
+- ⏸️ **Pause/Resume Logging** - Global pause state that temporarily stops all logging (console output and storage)
+- 🎯 **Visual Pause Indicators** - Floating button changes color/icon when logging is paused, plus banner in logger history
+- 🎮 **Pause Controls** - Long press floating button opens options menu with pause/resume, plus dedicated button in app bar
+- 🔄 **Async Logger Initialization** - `enabled` parameter now accepts `FutureOr<bool>` for conditional initialization
+- 🏗️ **Simplified API** - Removed unnecessary `storeLogs` and `autoInitialize` parameters
+
+### Changed
+- 🚀 **Unified Control** - Single `enabled` parameter now controls both floating logger visibility AND log storage
+- 📱 **Enhanced Floating Logger** - Better visual feedback and more intuitive controls
+- 🎨 **Improved UI** - Pause banner in logger history page with clear messaging and quick resume action
+- 📖 **Updated Documentation** - Cleaner examples and better explanations of async capabilities
+
+### Fixed
+- 🐛 **API Logging Pause Issue** - API logs now properly respect the global pause state
+- 🎯 **Configuration Simplification** - Removed confusing parameters that served no real purpose
+- 🔧 **Code Cleanup** - Removed dead code and unnecessary complexity
+
+### Breaking Changes
+- ⚠️ **`AwesomeLoggerConfig.storeLogs` removed** - Use `FlutterAwesomeLogger.enabled` to control storage
+- ⚠️ **`FlutterAwesomeLogger.autoInitialize` removed** - No longer needed
+- ⚠️ **`FlutterAwesomeLogger.enabled` type changed** - Now accepts `FutureOr<bool>` instead of `bool`
+
+### Technical
+- 🏗️ **Future Resolution** - Proper async handling in widget lifecycle
+- 🎯 **State Management** - Improved pause state synchronization across UI components
+- 📊 **Performance** - Cleaner initialization logic and reduced unnecessary operations
+
 ## [0.1.6] (2024-10-14)
 
 - updated dependencies and flutter analysis fixes.
