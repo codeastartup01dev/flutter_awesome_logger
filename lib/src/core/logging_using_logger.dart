@@ -57,6 +57,7 @@ class LoggingUsingLogger {
   static Logger? _logger;
   static final Queue<LogEntry> _logHistory = Queue<LogEntry>();
   static bool _storageEnabled = true; // Global flag for log storage
+  static bool _pauseLogging = false; // Global flag to pause all logging
 
   /// Configure the logger behavior
   static void configure(AwesomeLoggerConfig config) {
@@ -76,6 +77,14 @@ class LoggingUsingLogger {
   static void setStorageEnabled(bool enabled) {
     _storageEnabled = enabled;
   }
+
+  /// Pause or resume all logging (both console and storage)
+  static void setPauseLogging(bool paused) {
+    _pauseLogging = paused;
+  }
+
+  /// Get current pause logging state
+  static bool get isPaused => _pauseLogging;
 
   /// Get current configuration
   static AwesomeLoggerConfig get config => _config;
@@ -200,6 +209,8 @@ class LoggingUsingLogger {
 
   /// Log debug message
   void d(String message) {
+    if (_pauseLogging) return;
+
     _addLogEntry(message, 'DEBUG');
 
     if (_config.showFilePaths) {
@@ -211,6 +222,8 @@ class LoggingUsingLogger {
 
   /// Log info message
   void i(String message) {
+    if (_pauseLogging) return;
+
     _addLogEntry(message, 'INFO');
 
     if (_config.showFilePaths) {
@@ -222,6 +235,8 @@ class LoggingUsingLogger {
 
   /// Log warning message
   void w(String message) {
+    if (_pauseLogging) return;
+
     _addLogEntry(message, 'WARNING');
 
     if (_config.showFilePaths) {
@@ -233,6 +248,8 @@ class LoggingUsingLogger {
 
   /// Log error message with optional error object and stack trace
   void e(String message, {Object? error, StackTrace? stackTrace}) {
+    if (_pauseLogging) return;
+
     String? formattedError;
 
     if (error != null) {

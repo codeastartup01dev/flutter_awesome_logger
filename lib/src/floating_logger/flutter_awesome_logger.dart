@@ -53,6 +53,7 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   int _generalLogs = 0;
   int _apiLogs = 0;
   int _apiErrors = 0;
+  bool _isLoggingPaused = false;
 
   @override
   void initState() {
@@ -148,6 +149,7 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
       _generalLogs = logs.length;
       _apiLogs = apiLogsData.length;
       _apiErrors = errors;
+      _isLoggingPaused = LoggingUsingLogger.isPaused;
     });
   }
 
@@ -177,11 +179,20 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   }
 
   Widget _buildFloatingWidget(BuildContext context) {
+    Color backgroundColor;
+    if (_isLoggingPaused) {
+      backgroundColor = Colors.grey;
+    } else if (_apiErrors > 0) {
+      backgroundColor = Colors.red;
+    } else {
+      backgroundColor = widget.config.backgroundColor;
+    }
+
     return Container(
       width: widget.config.size,
       height: widget.config.size,
       decoration: BoxDecoration(
-        color: _apiErrors > 0 ? Colors.red : widget.config.backgroundColor,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(widget.config.size / 2),
         border: widget.config.backgroundColor != Colors.transparent
             ? null
@@ -228,7 +239,7 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
             // Center icon
             Center(
               child: Icon(
-                widget.config.icon,
+                _isLoggingPaused ? Icons.pause : widget.config.icon,
                 color: Colors.white,
                 size: widget.config.size * 0.4,
               ),
@@ -417,6 +428,18 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              ListTile(
+                leading: Icon(
+                  _isLoggingPaused ? Icons.play_arrow : Icons.pause,
+                ),
+                title: Text(
+                  _isLoggingPaused ? 'Resume Logging' : 'Pause Logging',
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  LoggingUsingLogger.setPauseLogging(!_isLoggingPaused);
+                },
+              ),
               ListTile(
                 leading: const Icon(Icons.visibility_off),
                 title: const Text('Hide Logger'),

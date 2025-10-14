@@ -12,6 +12,7 @@ A comprehensive Flutter logging package that makes debugging a breeze! Features 
 - 🎨 **Beautiful UI** - Clean, modern interface for viewing logs with syntax highlighting
 - 📊 **Multiple Log Levels** - Support for debug, info, warning, error, and verbose logs
 - 💾 **Smart Storage** - Logs are stored only when logger is enabled, conserving memory
+- ⏸️ **Pause/Resume Logging** - Temporarily pause all logging with visual indicators
 - 🔍 **Search & Filter** - Easily find specific logs with search and filtering capabilities
 - 🎯 **Simple Configuration** - Single `enabled` property controls both UI and storage
 - 📱 **Responsive Design** - Works perfectly on all screen sizes
@@ -249,6 +250,19 @@ Navigator.push(
 );
 ```
 
+### Pause/Resume Logging
+
+```dart
+// Pause all logging (both console and storage)
+LoggingUsingLogger.setPauseLogging(true);
+
+// Resume logging
+LoggingUsingLogger.setPauseLogging(false);
+
+// Check if logging is paused
+bool isPaused = LoggingUsingLogger.isPaused;
+```
+
 ## 🎨 Customization
 
 The logger UI is highly customizable. You can:
@@ -257,6 +271,8 @@ The logger UI is highly customizable. You can:
 - Customize the floating button appearance
 - Configure log display formats
 - Add custom filters and search options
+- Pause/resume logging as needed
+- Control logging behavior with simple configuration
 
 ## 🤝 Contributing
 

@@ -29,14 +29,20 @@ class _LoggerHistoryPageState extends State<LoggerHistoryPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   Timer? _refreshTimer;
+  bool _isLoggingPaused = false;
 
   @override
   void initState() {
     super.initState();
     LoggerHistoryPage._isLoggerOpen = true;
     _tabController = TabController(length: 2, vsync: this);
+    _isLoggingPaused = LoggingUsingLogger.isPaused;
     _refreshTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {
+          _isLoggingPaused = LoggingUsingLogger.isPaused;
+        });
+      }
     });
   }
 
@@ -70,6 +76,11 @@ class _LoggerHistoryPageState extends State<LoggerHistoryPage>
           style: TextStyle(fontSize: 14),
         ),
         actions: [
+          IconButton(
+            icon: Icon(_isLoggingPaused ? Icons.play_arrow : Icons.pause),
+            onPressed: _toggleLoggingPause,
+            tooltip: _isLoggingPaused ? 'Resume Logging' : 'Pause Logging',
+          ),
           IconButton(
             icon: const Icon(Icons.download),
             onPressed: _exportAllLogs,
@@ -162,12 +173,91 @@ class _LoggerHistoryPageState extends State<LoggerHistoryPage>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          ApiLogsTab(showFilePaths: widget.showFilePaths),
-          GeneralLogsTab(showFilePaths: widget.showFilePaths),
+          // Pause banner
+          if (_isLoggingPaused)
+            Container(
+              width: double.infinity,
+              color: Colors.orange.shade100,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.pause_circle_filled,
+                    color: Colors.orange.shade700,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Logging is paused - No new logs will be recorded',
+                      style: TextStyle(
+                        color: Colors.orange.shade700,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: _toggleLoggingPause,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.play_arrow, color: Colors.white, size: 16),
+                          SizedBox(width: 4),
+                          Text(
+                            'Resume',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          // Tab content
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                ApiLogsTab(showFilePaths: widget.showFilePaths),
+                GeneralLogsTab(showFilePaths: widget.showFilePaths),
+              ],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  /// Toggle logging pause/resume
+  void _toggleLoggingPause() {
+    LoggingUsingLogger.setPauseLogging(!_isLoggingPaused);
+    setState(() {
+      _isLoggingPaused = !_isLoggingPaused;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_isLoggingPaused ? 'Logging paused' : 'Logging resumed'),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
