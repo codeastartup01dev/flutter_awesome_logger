@@ -25,7 +25,6 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
   final Set<String> _selectedClasses = {};
   final Set<String> _selectedLevels = {};
   bool _sortNewestFirst = true;
-  bool _autoScroll = true;
 
   @override
   void initState() {
