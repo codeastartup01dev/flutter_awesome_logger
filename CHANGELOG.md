@@ -5,14 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] (2024-10-15)
+
+### Changed
+- ✨ **Synchronous Methods** - Removed unnecessary async/await from visibility and preference methods
+- 📊 **Better Performance** - Visibility methods are now synchronous since they don't perform async operations
+- 🎯 **Cleaner API** - No need for `await` when checking visibility or toggling
+
+
+
 ## [1.0.1] (2024-10-15)
 
-### 🔧 Fix - Improved API Documentation
-- using `FlutterAwesomeLogger.isVisible()` instead of `FloatingLoggerManager.isVisible()`
-- using `FlutterAwesomeLogger.savePosition()` instead of `FloatingLoggerManager.savePosition()`
-- using `FlutterAwesomeLogger.getSavedPosition()` instead of `FloatingLoggerManager.getSavedPosition()`
-- using `FlutterAwesomeLogger.clearPreferences()` instead of `FloatingLoggerManager.clearPreferences()`
-- using `FlutterAwesomeLogger.initialize()` instead of `FloatingLoggerManager.initialize()`
+### Added
+- 📖 **Additional Methods** - `getSavedPosition()`, `savePosition()`, `clearPreferences()`, `initialize()` now available through `FlutterAwesomeLogger`
+```
 
 ## [1.0.0] (2024-10-15)
 

@@ -13,39 +13,39 @@ class FloatingLoggerManager {
   static ValueNotifier<bool> get visibilityNotifier => _visibilityNotifier;
 
   /// Check if floating logger is currently visible
-  static Future<bool> isVisible() async {
+  static bool isVisible() {
     return _visibilityNotifier.value;
   }
 
   /// Set floating logger visibility
-  static Future<void> setVisible(bool visible) async {
+  static void setVisible(bool visible) {
     _visibilityNotifier.value = visible;
   }
 
   /// Toggle floating logger visibility
-  static Future<void> toggle() async {
-    final current = await isVisible();
-    await setVisible(!current);
+  static void toggle() {
+    final current = isVisible();
+    setVisible(!current);
   }
 
   /// Get saved position of floating logger
-  static Future<Offset?> getSavedPosition() async {
+  static Offset? getSavedPosition() {
     return _savedPosition;
   }
 
   /// Save position of floating logger
-  static Future<void> savePosition(Offset position) async {
+  static void savePosition(Offset position) {
     _savedPosition = position;
   }
 
   /// Clear all saved preferences
-  static Future<void> clearPreferences() async {
+  static void clearPreferences() {
     _savedPosition = null;
     _visibilityNotifier.value = true;
   }
 
   /// Initialize visibility from saved preferences
-  static Future<void> initialize() async {
+  static void initialize() {
     // Initialize with default values since we don't persist data
     _visibilityNotifier.value = true;
     _savedPosition = null;

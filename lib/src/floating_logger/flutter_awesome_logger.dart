@@ -142,9 +142,9 @@ class FlutterAwesomeLogger extends StatefulWidget {
   ///
   /// Usage:
   /// ```dart
-  /// bool visible = await FlutterAwesomeLogger.isVisible();
+  /// bool visible = FlutterAwesomeLogger.isVisible();
   /// ```
-  static Future<bool> isVisible() async {
+  static bool isVisible() {
     return FloatingLoggerManager.isVisible();
   }
 
@@ -152,21 +152,21 @@ class FlutterAwesomeLogger extends StatefulWidget {
   ///
   /// Usage:
   /// ```dart
-  /// await FlutterAwesomeLogger.setVisible(false); // Hide
-  /// await FlutterAwesomeLogger.setVisible(true);  // Show
+  /// FlutterAwesomeLogger.setVisible(false); // Hide
+  /// FlutterAwesomeLogger.setVisible(true);  // Show
   /// ```
-  static Future<void> setVisible(bool visible) async {
-    return FloatingLoggerManager.setVisible(visible);
+  static void setVisible(bool visible) {
+    FloatingLoggerManager.setVisible(visible);
   }
 
   /// Toggle floating logger visibility
   ///
   /// Usage:
   /// ```dart
-  /// await FlutterAwesomeLogger.toggleVisibility();
+  /// FlutterAwesomeLogger.toggleVisibility();
   /// ```
-  static Future<void> toggleVisibility() async {
-    return FloatingLoggerManager.toggle();
+  static void toggleVisibility() {
+    FloatingLoggerManager.toggle();
   }
 
   /// Get the visibility notifier for listening to changes
@@ -179,6 +179,26 @@ class FlutterAwesomeLogger extends StatefulWidget {
   /// ```
   static ValueNotifier<bool> get visibilityNotifier =>
       FloatingLoggerManager.visibilityNotifier;
+
+  /// Get saved position of floating logger
+  static Offset? getSavedPosition() {
+    return FloatingLoggerManager.getSavedPosition();
+  }
+
+  /// Save position of floating logger
+  static void savePosition(Offset position) {
+    FloatingLoggerManager.savePosition(position);
+  }
+
+  /// Clear all saved preferences
+  static void clearPreferences() {
+    FloatingLoggerManager.clearPreferences();
+  }
+
+  /// Initialize the logger manager
+  static void initialize() {
+    FloatingLoggerManager.initialize();
+  }
 
   // ============================================================================
   // API LOGGER MANAGEMENT
@@ -426,9 +446,9 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     }
   }
 
-  Future<void> _loadPreferences() async {
-    final visible = await FloatingLoggerManager.isVisible();
-    final savedPosition = await FloatingLoggerManager.getSavedPosition();
+  void _loadPreferences() {
+    final visible = FloatingLoggerManager.isVisible();
+    final savedPosition = FloatingLoggerManager.getSavedPosition();
 
     // Update ValueNotifier to match stored preference
     FloatingLoggerManager.visibilityNotifier.value = visible;
@@ -442,8 +462,8 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     });
   }
 
-  Future<void> _savePosition(Offset position) async {
-    await FloatingLoggerManager.savePosition(position);
+  void _savePosition(Offset position) {
+    FloatingLoggerManager.savePosition(position);
   }
 
   void _startStatsTimer() {

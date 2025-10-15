@@ -318,14 +318,14 @@ bool isPaused = FlutterAwesomeLogger.isPaused;
 
 ```dart
 // Check if floating logger is visible
-bool isVisible = await FlutterAwesomeLogger.isVisible();
+bool isVisible = FlutterAwesomeLogger.isVisible();
 
 // Show/hide the floating logger
-await FlutterAwesomeLogger.setVisible(true);  // Show
-await FlutterAwesomeLogger.setVisible(false); // Hide
+FlutterAwesomeLogger.setVisible(true);  // Show
+FlutterAwesomeLogger.setVisible(false); // Hide
 
 // Toggle visibility
-await FlutterAwesomeLogger.toggleVisibility();
+FlutterAwesomeLogger.toggleVisibility();
 ```
 
 ### Manage API Logs
