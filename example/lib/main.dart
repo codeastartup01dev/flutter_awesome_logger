@@ -122,8 +122,8 @@ class _DemoPageState extends State<DemoPage> {
   }
 
   void _toggleLoggerVisibility() async {
-    await FloatingLoggerManager.toggle();
-    final isVisible = await FloatingLoggerManager.isVisible();
+    await FlutterAwesomeLogger.toggleVisibility();
+    final isVisible = await FlutterAwesomeLogger.isVisible();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

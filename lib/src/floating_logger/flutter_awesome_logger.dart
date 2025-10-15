@@ -5,6 +5,7 @@ import 'package:shake/shake.dart';
 
 import '../api_logger/api_log_entry.dart';
 import '../api_logger/api_logger_service.dart';
+import '../core/log_entry.dart';
 import '../core/logging_using_logger.dart';
 import '../ui/logger_history_page.dart';
 import 'floating_logger_config.dart';
@@ -12,6 +13,10 @@ import 'floating_logger_manager.dart';
 
 /// Advanced floating logger with real-time stats and preferences
 class FlutterAwesomeLogger extends StatefulWidget {
+  // ============================================================================
+  // LOGGER INSTANCE
+  // ============================================================================
+
   /// Get the global logger instance
   ///
   /// Usage:
@@ -23,6 +28,186 @@ class FlutterAwesomeLogger extends StatefulWidget {
   /// logger.e('Error message');
   /// ```
   static LoggingUsingLogger get loggingUsingLogger => logger;
+
+  // ============================================================================
+  // LOGGER CONFIGURATION
+  // ============================================================================
+
+  /// Configure the logger behavior
+  ///
+  /// Usage:
+  /// ```dart
+  /// FlutterAwesomeLogger.configure(AwesomeLoggerConfig(
+  ///   maxLogEntries: 500,
+  ///   showFilePaths: true,
+  ///   showEmojis: true,
+  ///   useColors: true,
+  /// ));
+  /// ```
+  static void configure(AwesomeLoggerConfig loggerConfig) {
+    LoggingUsingLogger.configure(loggerConfig);
+  }
+
+  /// Get current logger configuration
+  static AwesomeLoggerConfig getLoggerConfig() => LoggingUsingLogger.config;
+
+  // ============================================================================
+  // LOGGING CONTROL
+  // ============================================================================
+
+  /// Enable or disable log storage globally
+  ///
+  /// Usage:
+  /// ```dart
+  /// FlutterAwesomeLogger.setStorageEnabled(false); // Disable storage
+  /// FlutterAwesomeLogger.setStorageEnabled(true);  // Enable storage
+  /// ```
+  static void setStorageEnabled(bool enabled) {
+    LoggingUsingLogger.setStorageEnabled(enabled);
+  }
+
+  /// Pause or resume all logging (both console and storage)
+  ///
+  /// Usage:
+  /// ```dart
+  /// FlutterAwesomeLogger.setPauseLogging(true);  // Pause logging
+  /// FlutterAwesomeLogger.setPauseLogging(false); // Resume logging
+  /// ```
+  static void setPauseLogging(bool paused) {
+    LoggingUsingLogger.setPauseLogging(paused);
+  }
+
+  /// Get current pause logging state
+  static bool get isPaused => LoggingUsingLogger.isPaused;
+
+  // ============================================================================
+  // LOG MANAGEMENT
+  // ============================================================================
+
+  /// Clear all stored logs from memory
+  static void clearLogs() {
+    LoggingUsingLogger.clearLogs();
+  }
+
+  /// Get all stored logs
+  static List<LogEntry> getLogs() {
+    return LoggingUsingLogger.getLogs();
+  }
+
+  /// Get logs filtered by level
+  ///
+  /// Usage:
+  /// ```dart
+  /// final errorLogs = FlutterAwesomeLogger.getLogsByLevel('ERROR');
+  /// final debugLogs = FlutterAwesomeLogger.getLogsByLevel('DEBUG');
+  /// ```
+  static List<LogEntry> getLogsByLevel(String level) {
+    return LoggingUsingLogger.getLogsByLevel(level);
+  }
+
+  /// Get recent logs within specified duration
+  ///
+  /// Usage:
+  /// ```dart
+  /// final recentLogs = FlutterAwesomeLogger.getRecentLogs(
+  ///   duration: Duration(minutes: 10),
+  /// );
+  /// ```
+  static List<LogEntry> getRecentLogs({
+    Duration duration = const Duration(minutes: 5),
+  }) {
+    return LoggingUsingLogger.getRecentLogs(duration: duration);
+  }
+
+  /// Get log count by level
+  static Map<String, int> getLogCountByLevel() {
+    return LoggingUsingLogger.getLogCountByLevel();
+  }
+
+  /// Get logs from specific file
+  static List<LogEntry> getLogsFromFile(String filePath) {
+    return LoggingUsingLogger.getLogsFromFile(filePath);
+  }
+
+  /// Export logs as formatted text
+  static String exportLogs({List<LogEntry>? logs}) {
+    return LoggingUsingLogger.exportLogs(logs: logs);
+  }
+
+  // ============================================================================
+  // FLOATING LOGGER VISIBILITY MANAGEMENT
+  // ============================================================================
+
+  /// Check if floating logger is currently visible
+  ///
+  /// Usage:
+  /// ```dart
+  /// bool visible = await FlutterAwesomeLogger.isVisible();
+  /// ```
+  static Future<bool> isVisible() async {
+    return FloatingLoggerManager.isVisible();
+  }
+
+  /// Set floating logger visibility
+  ///
+  /// Usage:
+  /// ```dart
+  /// await FlutterAwesomeLogger.setVisible(false); // Hide
+  /// await FlutterAwesomeLogger.setVisible(true);  // Show
+  /// ```
+  static Future<void> setVisible(bool visible) async {
+    return FloatingLoggerManager.setVisible(visible);
+  }
+
+  /// Toggle floating logger visibility
+  ///
+  /// Usage:
+  /// ```dart
+  /// await FlutterAwesomeLogger.toggleVisibility();
+  /// ```
+  static Future<void> toggleVisibility() async {
+    return FloatingLoggerManager.toggle();
+  }
+
+  /// Get the visibility notifier for listening to changes
+  ///
+  /// Usage:
+  /// ```dart
+  /// FlutterAwesomeLogger.visibilityNotifier.addListener(() {
+  ///   print('Visibility changed: ${FlutterAwesomeLogger.visibilityNotifier.value}');
+  /// });
+  /// ```
+  static ValueNotifier<bool> get visibilityNotifier =>
+      FloatingLoggerManager.visibilityNotifier;
+
+  // ============================================================================
+  // API LOGGER MANAGEMENT
+  // ============================================================================
+
+  /// Clear all API logs
+  static void clearApiLogs() {
+    ApiLoggerService.clearApiLogs();
+  }
+
+  /// Get all API logs
+  static List<ApiLogEntry> getApiLogs() {
+    return ApiLoggerService.getApiLogs();
+  }
+
+  /// Get API logs filtered by type
+  ///
+  /// Usage:
+  /// ```dart
+  /// final successLogs = FlutterAwesomeLogger.getApiLogsByType(ApiLogType.success);
+  /// final errorLogs = FlutterAwesomeLogger.getApiLogsByType(ApiLogType.serverError);
+  /// ```
+  static List<ApiLogEntry> getApiLogsByType(ApiLogType type) {
+    return ApiLoggerService.getApiLogsByType(type);
+  }
+
+  // ============================================================================
+  // WIDGET PROPERTIES
+  // ============================================================================
 
   /// Child widget to wrap
   final Widget child;

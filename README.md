@@ -272,21 +272,21 @@ class MyService {
 
 ```dart
 // Get all stored logs
-final logs = LoggingUsingLogger.getLogs();
+final logs = FlutterAwesomeLogger.getLogs();
 
 // Get logs by level
-final errorLogs = LoggingUsingLogger.getLogsByLevel('ERROR');
+final errorLogs = FlutterAwesomeLogger.getLogsByLevel('ERROR');
 
 // Get recent logs
-final recentLogs = LoggingUsingLogger.getRecentLogs(
+final recentLogs = FlutterAwesomeLogger.getRecentLogs(
   duration: Duration(minutes: 10),
 );
 
 // Clear all logs
-LoggingUsingLogger.clearLogs();
+FlutterAwesomeLogger.clearLogs();
 
 // Export logs as formatted text
-String exportedLogs = LoggingUsingLogger.exportLogs();
+String exportedLogs = FlutterAwesomeLogger.exportLogs();
 ```
 
 ### Programmatically Show Logger UI
@@ -305,13 +305,41 @@ Navigator.push(
 
 ```dart
 // Pause all logging (both console and storage)
-LoggingUsingLogger.setPauseLogging(true);
+FlutterAwesomeLogger.setPauseLogging(true);
 
 // Resume logging
-LoggingUsingLogger.setPauseLogging(false);
+FlutterAwesomeLogger.setPauseLogging(false);
 
 // Check if logging is paused
-bool isPaused = LoggingUsingLogger.isPaused;
+bool isPaused = FlutterAwesomeLogger.isPaused;
+```
+
+### Control Floating Logger Visibility
+
+```dart
+// Check if floating logger is visible
+bool isVisible = await FlutterAwesomeLogger.isVisible();
+
+// Show/hide the floating logger
+await FlutterAwesomeLogger.setVisible(true);  // Show
+await FlutterAwesomeLogger.setVisible(false); // Hide
+
+// Toggle visibility
+await FlutterAwesomeLogger.toggleVisibility();
+```
+
+### Manage API Logs
+
+```dart
+// Get all API logs
+final apiLogs = FlutterAwesomeLogger.getApiLogs();
+
+// Get API logs by type
+final successLogs = FlutterAwesomeLogger.getApiLogsByType(ApiLogType.success);
+final errorLogs = FlutterAwesomeLogger.getApiLogsByType(ApiLogType.serverError);
+
+// Clear API logs
+FlutterAwesomeLogger.clearApiLogs();
 ```
 
 ## 🎨 Customization
