@@ -12,6 +12,18 @@ import 'floating_logger_manager.dart';
 
 /// Advanced floating logger with real-time stats and preferences
 class FlutterAwesomeLogger extends StatefulWidget {
+  /// Get the global logger instance
+  ///
+  /// Usage:
+  /// ```dart
+  /// final logger = FlutterAwesomeLogger.loggingUsingLogger;
+  /// logger.d('Debug message');
+  /// logger.i('Info message');
+  /// logger.w('Warning message');
+  /// logger.e('Error message');
+  /// ```
+  static LoggingUsingLogger get loggingUsingLogger => logger;
+
   /// Child widget to wrap
   final Widget child;
 

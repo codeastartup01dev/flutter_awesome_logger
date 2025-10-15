@@ -1,6 +1,6 @@
 // Core logger exports
-export 'src/core/logging_using_logger.dart';
 export 'src/core/log_entry.dart';
+export 'src/core/logging_using_logger.dart' show AwesomeLoggerConfig;
 
 // API logger exports
 export 'src/api_logger/api_log_entry.dart';

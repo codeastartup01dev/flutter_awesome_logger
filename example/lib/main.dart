@@ -3,8 +3,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
+
+// Create global logger instance using FlutterAwesomeLogger
+final logger = FlutterAwesomeLogger.loggingUsingLogger;
 void main() {
-  // 🚀 No manual setup needed! Configuration is done in the widget below
   runApp(const MyApp());
 }
 
@@ -23,6 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'Awesome Flutter Logger Demo',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: FlutterAwesomeLogger(
+        // enabled:true, //or
         // 🔄 Enable logging after 3 seconds using Future
         enabled: _shouldEnableLogger(),
         navigatorKey: navigatorKey,
