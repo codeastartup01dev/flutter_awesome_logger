@@ -56,7 +56,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_awesome_logger: ^0.1.9
+  flutter_awesome_logger: ^1.0.0
 ```
 
 Then run:
@@ -74,6 +74,9 @@ Simply wrap your app with `FlutterAwesomeLogger` and pass the configuration:
 ```dart
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+
+// Create global logger instance using FlutterAwesomeLogger
+final logger = FlutterAwesomeLogger.loggingUsingLogger;
 
 void main() {
   runApp(const MyApp());
@@ -122,6 +125,9 @@ For more control, configure manually in main(). Note: Manual configuration doesn
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
+// Create global logger instance using FlutterAwesomeLogger
+final logger = FlutterAwesomeLogger.loggingUsingLogger;
+
 void main() {
   // Manual configuration
   LoggingUsingLogger.configure(
@@ -165,12 +171,14 @@ class MyApp extends StatelessWidget {
 ```dart
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
-// Use the global logger instance
+// Create global logger instance using FlutterAwesomeLogger
+final logger = FlutterAwesomeLogger.loggingUsingLogger;
+
+// Use the logger instance anywhere in your app
 logger.d('Debug message');
 logger.i('Info message');
 logger.w('Warning message');
 logger.e('Error message');
-logger.v('Verbose message');
 ```
 
 ### API Logging with Dio
@@ -180,6 +188,9 @@ Automatically log all your API requests and responses:
 ```dart
 import 'package:dio/dio.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+
+// Create global logger instance
+final logger = FlutterAwesomeLogger.loggingUsingLogger;
 
 final dio = Dio();
 
@@ -232,29 +243,50 @@ const FloatingLoggerConfig({
 
 ## 📚 Advanced Usage
 
-### Custom Log Formatting
+### Logger Factory Pattern
+
+The package now uses a clean factory pattern for accessing the logger:
 
 ```dart
-// Log with custom formatting
-logger.logCustom(
-  level: LogLevel.info,
-  message: 'Custom formatted message',
-  error: someError,
-  stackTrace: someStackTrace,
-);
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+
+// Create global logger instance (recommended approach)
+final logger = FlutterAwesomeLogger.loggingUsingLogger;
+
+// Use anywhere in your app without additional imports
+class MyService {
+  void doSomething() {
+    logger.d('Debug message from service');
+    logger.i('Info: Operation completed');
+    
+    try {
+      // Some operation
+    } catch (e, stackTrace) {
+      logger.e('Error in service', error: e, stackTrace: stackTrace);
+    }
+  }
+}
 ```
 
 ### Accessing Log History
 
 ```dart
 // Get all stored logs
-final logs = FlutterAwesomeLogger.getLogs();
+final logs = LoggingUsingLogger.getLogs();
 
 // Get logs by level
-final errorLogs = FlutterAwesomeLogger.getLogsByLevel(LogLevel.error);
+final errorLogs = LoggingUsingLogger.getLogsByLevel('ERROR');
+
+// Get recent logs
+final recentLogs = LoggingUsingLogger.getRecentLogs(
+  duration: Duration(minutes: 10),
+);
 
 // Clear all logs
-FlutterAwesomeLogger.clearLogs();
+LoggingUsingLogger.clearLogs();
+
+// Export logs as formatted text
+String exportedLogs = LoggingUsingLogger.exportLogs();
 ```
 
 ### Programmatically Show Logger UI

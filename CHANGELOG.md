@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] (2024-10-15)
+
+### 🎉 Major Release - Stable API
+
+This release marks the first stable version of Flutter Awesome Logger with a clean, production-ready API.
+
+### Added
+- 🏭 **Factory Pattern Implementation** - Clean access to logger through `FlutterAwesomeLogger.loggingUsingLogger`
+- 🎯 **Simplified API** - Single entry point for logger access without exposing internal implementation
+- 📖 **Enhanced Documentation** - Updated README with comprehensive factory pattern examples
+- 🔧 **Better Encapsulation** - Internal logging classes are no longer directly exposed
+
+### Changed
+- 🚀 **New Recommended Usage** - `final logger = FlutterAwesomeLogger.loggingUsingLogger;`
+- 📦 **Cleaner Exports** - Only necessary classes and configs are exported
+- 📚 **Updated Examples** - All code examples now use the new factory pattern
+- 🎨 **Improved Developer Experience** - More intuitive API design
+
+### Technical
+- 🏗️ **Static Getter Implementation** - Added static `loggingUsingLogger` getter to `FlutterAwesomeLogger` widget class
+- 🧹 **Code Cleanup** - Removed unnecessary factory classes and simplified architecture
+- 📊 **Maintainability** - Easier to maintain and extend in future versions
+
+### Migration Guide
+If you were using the logger directly:
+```dart
+// Old way (still works but not recommended)
+import 'package:flutter_awesome_logger/src/core/logging_using_logger.dart';
+final logger = LoggingUsingLogger();
+
+// New way (recommended)
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+final logger = FlutterAwesomeLogger.loggingUsingLogger;
+```
+
+All existing functionality remains the same - only the access pattern has been improved.
+
 ## [0.1.9] (2024-10-14)
 
 ### Added
