@@ -9,6 +9,7 @@
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
+
 **Features a floating logger, automatic API logging with Dio interceptor, and a beautiful UI for viewing logs.**
 
 [📖 Documentation](#-getting-started) • [🚀 Installation](#installation) • [💡 Examples](#basic-usage) • [🎨 Customization](#-customization)
@@ -65,33 +66,25 @@
 
 ### 🖼️ App Screenshots Gallery
 
-<!-- Desktop/Tablet View -->
-<div class="desktop-view">
 <table width="100%">
   <tr>
     <td align="center" width="50%">
-      <picture>
-        <img 
-          src="https://github.com/user-attachments/assets/83129e99-7e21-400a-a52c-74ecb1ab3492" 
-          alt="Floating Logger Button"
-          style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-          width="300"
-        />
-      </picture>
+      <img 
+        src="https://github.com/user-attachments/assets/83129e99-7e21-400a-a52c-74ecb1ab3492" 
+        alt="Floating Logger Button"
+        width="300"
+      />
       <br><br>
       <strong>🎯 Floating Logger Button</strong>
       <br>
       <em>Always accessible debug interface</em>
     </td>
     <td align="center" width="50%">
-      <picture>
-        <img 
-          src="https://github.com/user-attachments/assets/707bd799-f7d6-40ae-9331-bafbf7a58680" 
-          alt="API Logs View"
-          style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-          width="300"
-        />
-      </picture>
+      <img 
+        src="https://github.com/user-attachments/assets/707bd799-f7d6-40ae-9331-bafbf7a58680" 
+        alt="API Logs View"
+        width="300"
+      />
       <br><br>
       <strong>🌐 API Logs View</strong>
       <br>
@@ -103,28 +96,22 @@
   </tr>
   <tr>
     <td align="center" width="50%">
-      <picture>
-        <img 
-          src="https://github.com/user-attachments/assets/61c2606e-f22f-496f-98e9-d39d6da3ccfd" 
-          alt="General Logs View"
-          style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-          width="300"
-        />
-      </picture>
+      <img 
+        src="https://github.com/user-attachments/assets/61c2606e-f22f-496f-98e9-d39d6da3ccfd" 
+        alt="General Logs View"
+        width="300"
+      />
       <br><br>
       <strong>📊 General Logs View</strong>
       <br>
       <em>Beautiful log interface with filtering</em>
     </td>
     <td align="center" width="50%">
-      <picture>
-        <img 
-          src="https://github.com/user-attachments/assets/a6947367-578c-4df4-b73f-eece6a411b14" 
-          alt="Log Details"
-          style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-          width="300"
-        />
-      </picture>
+      <img 
+        src="https://github.com/user-attachments/assets/a6947367-578c-4df4-b73f-eece6a411b14" 
+        alt="Log Details"
+        width="300"
+      />
       <br><br>
       <strong>🔍 Log Details</strong>
       <br>
@@ -132,83 +119,6 @@
     </td>
   </tr>
 </table>
-</div>
-
-<!-- Mobile View - Images stacked vertically -->
-<div class="mobile-view">
-
-<div align="center" style="margin-bottom: 30px;">
-  <picture>
-    <img 
-      src="https://github.com/user-attachments/assets/83129e99-7e21-400a-a52c-74ecb1ab3492" 
-      alt="Floating Logger Button"
-      style="max-width: 90%; height: auto; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-      width="300"
-    />
-  </picture>
-  <br><br>
-  <strong>🎯 Floating Logger Button</strong>
-  <br>
-  <em>Always accessible debug interface</em>
-</div>
-
-<div align="center" style="margin-bottom: 30px;">
-  <picture>
-    <img 
-      src="https://github.com/user-attachments/assets/707bd799-f7d6-40ae-9331-bafbf7a58680" 
-      alt="API Logs View"
-      style="max-width: 90%; height: auto; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-      width="300"
-    />
-  </picture>
-  <br><br>
-  <strong>🌐 API Logs View</strong>
-  <br>
-  <em>Comprehensive API request/response logging</em>
-</div>
-
-<div align="center" style="margin-bottom: 30px;">
-  <picture>
-    <img 
-      src="https://github.com/user-attachments/assets/61c2606e-f22f-496f-98e9-d39d6da3ccfd" 
-      alt="General Logs View"
-      style="max-width: 90%; height: auto; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-      width="300"
-    />
-  </picture>
-  <br><br>
-  <strong>📊 General Logs View</strong>
-  <br>
-  <em>Beautiful log interface with filtering</em>
-</div>
-
-<div align="center" style="margin-bottom: 30px;">
-  <picture>
-    <img 
-      src="https://github.com/user-attachments/assets/a6947367-578c-4df4-b73f-eece6a411b14" 
-      alt="Log Details"
-      style="max-width: 90%; height: auto; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
-      width="300"
-    />
-  </picture>
-  <br><br>
-  <strong>🔍 Log Details</strong>
-  <br>
-  <em>Detailed log inspection with syntax highlighting</em>
-</div>
-
-</div>
-
-<style>
-  @media (max-width: 768px) {
-    .desktop-view { display: none; }
-    .mobile-view { display: block; }
-  }
-  @media (min-width: 769px) {
-    .desktop-view { display: block; }
-    .mobile-view { display: none; }
-  }
-</style>
 
 </div>
 
