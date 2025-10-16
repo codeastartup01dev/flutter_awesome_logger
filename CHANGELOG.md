@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] (2024-10-16)
+
+### Added
+- 💬 **Simple Error Display** - Shows navigation error directly in the floating logger widget when navigation fails
+- 📖 **Better Developer Experience** - Navigation errors now show both console output and visual in-widget message
+
+### Fixed
+- 🔧 **Navigation Context Issues** - Simplified error handling with reliable in-widget display and console output
+- 🎯 **Error Visibility** - Users will always see navigation errors with clear instructions and code examples
+
 ## [1.0.7] (2024-10-16)
 
 ### Added
