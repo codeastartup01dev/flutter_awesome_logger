@@ -68,8 +68,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
     final logs = ApiLoggerService.getApiLogs();
     final filteredLogs = logs.where((log) {
       // Search filter
-      final matchesSearch =
-          _searchQuery.isEmpty ||
+      final matchesSearch = _searchQuery.isEmpty ||
           log.url.toLowerCase().contains(_searchQuery) ||
           log.method.toLowerCase().contains(_searchQuery) ||
           (log.error?.toLowerCase().contains(_searchQuery) ?? false) ||
@@ -89,8 +88,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
           _selectedEndpoints.isEmpty || _selectedEndpoints.contains(endpoint);
 
       // Statistics filter
-      final matchesStatsFilter =
-          _statsFilter == null ||
+      final matchesStatsFilter = _statsFilter == null ||
           (_statsFilter == 'success' && log.type == ApiLogType.success) ||
           (_statsFilter == 'success' && log.type == ApiLogType.redirect) ||
           (_statsFilter == 'errors' &&
@@ -381,9 +379,8 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
   Widget _buildContentSection(String title, String content) {
     const maxLength = 500; // Maximum characters to show initially
     final shouldTruncate = content.length > maxLength;
-    final displayContent = shouldTruncate
-        ? '${content.substring(0, maxLength)}...'
-        : content;
+    final displayContent =
+        shouldTruncate ? '${content.substring(0, maxLength)}...' : content;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -560,8 +557,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
     Color color, {
     VoidCallback? onTap,
   }) {
-    final isSelected =
-        (label == 'Total' && _statsFilter == null) ||
+    final isSelected = (label == 'Total' && _statsFilter == null) ||
         (label == 'Success' && _statsFilter == 'success') ||
         (label == 'Errors' && _statsFilter == 'errors');
 
@@ -571,7 +567,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
+          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? color : Colors.transparent,
@@ -615,7 +611,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
               color: Theme.of(context).cardColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withValues(alpha: 0.1),
+                  color: Colors.grey.withOpacity(0.1),
                   spreadRadius: 1,
                   blurRadius: 3,
                   offset: const Offset(0, 1),
@@ -654,7 +650,6 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                       ),
                     ),
                     const SizedBox(width: 8),
-
                     IconButton(
                       icon: const Icon(Icons.delete_outline),
                       onPressed: () {
@@ -836,11 +831,11 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                                   style: const TextStyle(fontSize: 11),
                                 ),
                                 backgroundColor: _selectedTypes.contains(type)
-                                    ? _getTypeColor(type).withValues(alpha: 0.2)
+                                    ? _getTypeColor(type).withOpacity(0.2)
                                     : null,
                                 selectedColor: _getTypeColor(
                                   type,
-                                ).withValues(alpha: 0.3),
+                                ).withOpacity(0.3),
                                 onSelected: (selected) {
                                   setState(() {
                                     if (selected) {

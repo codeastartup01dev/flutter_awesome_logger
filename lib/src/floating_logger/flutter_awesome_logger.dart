@@ -310,28 +310,26 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     } else {
       // Asynchronous case
       _enabledFuture = enabled;
-      enabled
-          .then((value) {
-            if (mounted && _enabledFuture == enabled) {
-              setState(() {
-                _setEnabledState(value);
-              });
-              if (value) {
-                debugPrint(
-                  'FlutterAwesomeLogger: Logger enabled via Future resolution',
-                );
-              }
-            }
-          })
-          .catchError((error) {
-            // Default to false on error
-            if (mounted && _enabledFuture == enabled) {
-              setState(() {
-                _setEnabledState(false);
-              });
-            }
-            debugPrint('Error resolving logger enabled state: $error');
+      enabled.then((value) {
+        if (mounted && _enabledFuture == enabled) {
+          setState(() {
+            _setEnabledState(value);
           });
+          if (value) {
+            debugPrint(
+              'FlutterAwesomeLogger: Logger enabled via Future resolution',
+            );
+          }
+        }
+      }).catchError((error) {
+        // Default to false on error
+        if (mounted && _enabledFuture == enabled) {
+          setState(() {
+            _setEnabledState(false);
+          });
+        }
+        debugPrint('Error resolving logger enabled state: $error');
+      });
     }
   }
 
@@ -455,8 +453,7 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
 
     setState(() {
       _isVisible = visible;
-      _position =
-          savedPosition ??
+      _position = savedPosition ??
           widget.config.initialPosition ??
           const Offset(20, 100);
     });
@@ -540,7 +537,7 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
             : Border.all(color: Colors.grey, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: Colors.black.withOpacity(0.2),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
