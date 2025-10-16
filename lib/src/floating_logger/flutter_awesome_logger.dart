@@ -664,10 +664,13 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     // Try to use provided navigator key first, then fallback to context
     NavigatorState? navigator;
 
-    if (widget.navigatorKey?.currentState != null) {
-      navigator = widget.navigatorKey!.currentState!;
-    } else {
-      // Try to find navigator from context
+    // First try the provided navigatorKey
+    if (widget.navigatorKey != null) {
+      navigator = widget.navigatorKey!.currentState;
+    }
+
+    // If navigatorKey is null or its currentState is null, try context-based navigation
+    if (navigator == null) {
       try {
         navigator = Navigator.of(context);
       } catch (e) {
@@ -692,6 +695,7 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
 
   /// Shows helpful error message and solution when Navigator context issues occur
   void _showNavigatorContextError() {
+    // Print to console for debugging
     debugPrint('');
     debugPrint('🚨 AwesomeFloatingLogger Navigation Error 🚨');
     debugPrint('═══════════════════════════════════════════════');
@@ -716,6 +720,92 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     debugPrint('📚 More info: https://pub.dev/packages/awesome_flutter_logger');
     debugPrint('═══════════════════════════════════════════════');
     debugPrint('');
+
+    // Show dialog to user
+    _showNavigatorErrorDialog();
+  }
+
+  /// Shows a user-friendly dialog with navigation error information
+  void _showNavigatorErrorDialog() {
+    try {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red),
+                SizedBox(width: 8),
+                Text('Navigation Error'),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    '❌ Could not find Navigator context for floating logger.',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    '🔑 Solution: Add navigatorKey to both MaterialApp and FlutterAwesomeLogger:',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: const Text(
+                      '''final navigatorKey = GlobalKey<NavigatorState>();
+
+return MaterialApp(
+  navigatorKey: navigatorKey, // ← Add this
+  home: FlutterAwesomeLogger(
+    navigatorKey: navigatorKey, // ← Add this
+    child: YourHomePage(),
+  ),
+);''',
+                      style: TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    '📚 For more details, visit:',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 4),
+                  const SelectableText(
+                    'https://pub.dev/packages/flutter_awesome_logger',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Got it!'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      // If dialog fails to show, at least we have console output
+      debugPrint('Failed to show navigation error dialog: $e');
+    }
   }
 
   /// Shows a snackbar message when logger is already open

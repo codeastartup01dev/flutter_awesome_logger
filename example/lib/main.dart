@@ -22,14 +22,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey:
+          navigatorKey, // IMPORTANT: add it here and in the FlutterAwesomeLogger if logger history page doesn't open on clicking the floating button
       title: 'Awesome Flutter Logger Demo',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: FlutterAwesomeLogger(
         // enabled:true, //or
         // 🔄 Enable logging after 3 seconds using Future
         enabled: _shouldEnableLogger(),
-        navigatorKey: navigatorKey,
-
+        navigatorKey:
+            navigatorKey, // IMPORTANT: add it here and in the MaterialApp if logger history page doesn't open on clicking the floating button
         // ✨ logger config (optional)
         loggerConfig: const AwesomeLoggerConfig(
           maxLogEntries: 500,
