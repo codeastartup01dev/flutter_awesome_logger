@@ -1,12 +1,12 @@
 name: flutter_awesome_logger
 description: "Awesome debugging with floating logger, automatic API logging (using interceptor), and a beautiful UI for viewing logs."
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/codeastartup01dev/flutter_awesome_logger
 repository: https://github.com/codeastartup01dev/flutter_awesome_logger
 issue_tracker: https://github.com/codeastartup01dev/flutter_awesome_logger/issues
 
 environment:
-  sdk: ^3.8.1
+  sdk: ">=3.0.0 <4.0.0"
   flutter: ">=3.0.0"
 
 dependencies:

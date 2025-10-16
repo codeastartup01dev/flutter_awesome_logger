@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] (2024-10-16)
+
+### Changed
+- 🔧 **Dart SDK Compatibility** - Lowered minimum Dart SDK requirement from `^3.8.1` to `>=3.0.0 <4.0.0`
+- 📦 **Wider Compatibility** - Package now works with Dart SDK 3.0.0 and above, including 3.5.x versions
+
+### Fixed
+- 🐛 **Dependency Resolution** - Fixed version solving issues for projects using Dart SDK < 3.8.1
+
 ## [1.0.2] (2024-10-15)
 
 ### Changed
