@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] (2024-10-16)
+
+### Improved README Documentation
+- 📖 **Enhanced README Documentation** - Complete overhaul of README with professional formatting and responsive design
+- ⚡ **Easiest Setup Guide** - Added ultra-simple 2-line setup instructions with MaterialApp example
+- 📱 **Mobile-Responsive Screenshots** - Images now stack vertically on mobile devices with CSS media queries
+- 🎯 **Professional Layout** - Replaced centered table layouts with clean, left-aligned professional sections
+- 📋 **Comprehensive Logging Guides** - Detailed explanations for both API logs and general logs tabs
+- ✨ **Enhanced Features Table** - Added long press floating button feature with 4 detailed interaction methods
+- 🎨 **Modern Badges and Styling** - Updated to for-the-badge style badges with Flutter/Dart technology indicators
+- 📚 **Improved Navigation** - Added collapsible table of contents and better section organization
+- 🔧 **Better Code Examples** - More practical examples with real-world usage patterns and best practices
+
 ## [1.0.8] (2024-10-16)
 
 ### Added

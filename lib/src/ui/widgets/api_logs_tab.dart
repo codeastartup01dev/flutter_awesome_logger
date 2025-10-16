@@ -952,7 +952,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                         const SizedBox(height: 16),
                         Text(
                           _searchQuery.isEmpty
-                              ? 'No API logs available'
+                              ? 'No API logs available\nIf using Dio, make sure to add the interceptor to your Dio instance \neg. `dio.interceptors.add(FlutterAwesomeLoggerDioInterceptor());`'
                               : 'No logs matching "${_searchController.text}"',
                           style: TextStyle(
                             color: Colors.grey[600],

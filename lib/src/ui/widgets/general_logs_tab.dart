@@ -66,15 +66,13 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
   List<LogEntry> _getFilteredLogs() {
     final logs = LoggingUsingLogger.getLogs();
     final filteredLogs = logs.where((log) {
-      final matchesSearch =
-          _searchQuery.isEmpty ||
+      final matchesSearch = _searchQuery.isEmpty ||
           log.message.toLowerCase().contains(_searchQuery) ||
           log.filePath.toLowerCase().contains(_searchQuery) ||
           log.level.toLowerCase().contains(_searchQuery) ||
           (log.stackTrace?.toLowerCase().contains(_searchQuery) ?? false);
 
-      final matchesClass =
-          _selectedClasses.isEmpty ||
+      final matchesClass = _selectedClasses.isEmpty ||
           _selectedClasses.contains(
             log.filePath.split('/').last.split('.').first,
           );
@@ -423,7 +421,6 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                     label: Text(_getFilterButtonLabel()),
                   ),
                 ),
-
                 _buildSortLogsToggle(context),
                 const SizedBox(width: 8),
                 IconButton(
@@ -444,7 +441,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                 ? Center(
                     child: Text(
                       _searchQuery.isEmpty
-                          ? 'No logs available'
+                          ? 'No logs available\nMake sure to add the logger to your app eg. `final logger = FlutterAwesomeLogger.loggingUsingLogger; \nlogger.d("Hello, world!");`'
                           : 'No logs matching "${_searchController.text}"',
                     ),
                   )
@@ -660,9 +657,8 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                 );
               });
             },
-            tooltip: _sortNewestFirst
-                ? 'Newest logs first'
-                : 'Oldest logs first',
+            tooltip:
+                _sortNewestFirst ? 'Newest logs first' : 'Oldest logs first',
           ),
         ],
       ),
