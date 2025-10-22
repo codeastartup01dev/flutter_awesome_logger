@@ -3,8 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../core/logging_using_logger.dart';
 import '../../core/log_entry.dart';
+import '../../core/logging_using_logger.dart';
+import 'common/logger_export_dialog.dart';
+import 'common/logger_filter_chips.dart';
+import 'common/logger_search_bar.dart';
+import 'common/logger_sort_toggle.dart';
 
 /// General logs tab widget for displaying application logs
 class GeneralLogsTab extends StatefulWidget {
@@ -130,57 +134,18 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
   void _exportLogs() {
     final filteredLogs = _getFilteredLogs();
     if (filteredLogs.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No logs to export')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No logs to export')),
+      );
       return;
     }
 
     final exportText = LoggingUsingLogger.exportLogs(logs: filteredLogs);
-    Clipboard.setData(ClipboardData(text: exportText));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Logs copied to clipboard'),
-        action: SnackBarAction(
-          label: 'View',
-          onPressed: () => _showExportDialog(exportText),
-        ),
-      ),
-    );
-  }
-
-  void _showExportDialog(String exportText) {
-    showDialog(
+    LoggerExportUtils.exportToClipboard(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Exported Logs'),
-        content: SizedBox(
-          width: double.maxFinite,
-          height: 400,
-          child: SingleChildScrollView(
-            child: SelectableText(
-              exportText,
-              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          TextButton(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: exportText));
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Copied to clipboard')),
-              );
-            },
-            child: const Text('Copy'),
-          ),
-        ],
-      ),
+      content: exportText,
+      successMessage: 'Logs copied to clipboard',
+      dialogTitle: 'Exported General Logs',
     );
   }
 
@@ -305,101 +270,40 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Column(
         children: [
-          // Search bar and controls
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search logs...',
-                      filled: true,
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () => _searchController.clear(),
-                            )
-                          : null,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                    ),
-                  ),
-                ),
-                // Clear logs
-                _buildClearLogsButton(context),
-                // Controls
-              ],
-            ),
+          // Search bar using reusable component
+          LoggerSearchBar(
+            controller: _searchController,
+            hintText: 'Search logs...',
+            searchQuery: _searchQuery,
+            actions: [
+              _buildClearLogsButton(context),
+            ],
           ),
 
-          // Level filter chips
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  ..._getAvailableLevels().map(
-                    (level) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        selected: _selectedLevels.contains(level),
-                        label: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '(${_getFilteredLogStats()[level] ?? 0})',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(level),
-                          ],
-                        ),
-                        onSelected: (selected) {
-                          FocusScope.of(context).unfocus();
-                          setState(() {
-                            if (selected) {
-                              _selectedLevels.add(level);
-                            } else {
-                              _selectedLevels.remove(level);
-                            }
-                          });
-                        },
-                        selectedColor: _getLevelColor(level),
-                        checkmarkColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                  // Clear filters
-                  if (_selectedLevels.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: IconButton(
-                        icon: const Icon(Icons.clear_all),
-                        onPressed: () {
-                          FocusScope.of(context).unfocus();
-                          setState(() {
-                            _selectedLevels.clear();
-                          });
-                        },
-                        tooltip: 'Clear level filters',
-                      ),
-                    ),
-                ],
-              ),
+          // Level filter chips using reusable component
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: LoggerFilterChips(
+              title: 'Levels:',
+              options: _getAvailableLevels().map((level) {
+                final count = _getFilteredLogStats()[level] ?? 0;
+                return FilterOption(
+                  label: '($count) $level',
+                  value: level,
+                  color: _getLevelColor(level),
+                );
+              }).toList(),
+              selectedFilters: _selectedLevels,
+              onFilterChanged: (value, selected) {
+                setState(() {
+                  if (selected) {
+                    _selectedLevels.add(value);
+                  } else {
+                    _selectedLevels.remove(value);
+                  }
+                });
+              },
+              onClearAll: () => setState(() => _selectedLevels.clear()),
             ),
           ),
 
@@ -423,7 +327,11 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                _buildSortLogsToggle(context),
+                LoggerSortToggle(
+                  sortNewestFirst: _sortNewestFirst,
+                  onToggle: () =>
+                      setState(() => _sortNewestFirst = !_sortNewestFirst),
+                ),
                 const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.content_copy),
@@ -629,47 +537,6 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                   ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSortLogsToggle(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8),
-      child: ElevatedButton.icon(
-        onPressed: () {
-          FocusScope.of(context).unfocus();
-          setState(() {
-            _sortNewestFirst = !_sortNewestFirst;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  _sortNewestFirst
-                      ? 'Showing Newest logs first'
-                      : 'Showing Oldest logs first',
-                ),
-              ),
-            );
-          });
-        },
-        icon: Icon(
-          _sortNewestFirst ? Icons.arrow_downward : Icons.arrow_upward,
-          size: 16,
-        ),
-        label: Text(
-          _sortNewestFirst
-              ? 'Showing Newest Logs First'
-              : 'Showing Oldest Logs First',
-          style: const TextStyle(fontSize: 12),
-        ),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          backgroundColor: Colors.deepPurple.withOpacity(0.1),
-          foregroundColor: Colors.deepPurple,
-          elevation: 0,
-        ),
       ),
     );
   }

@@ -5,6 +5,11 @@ import 'package:flutter/services.dart';
 
 import '../../api_logger/api_log_entry.dart';
 import '../../api_logger/api_logger_service.dart';
+import 'common/logger_export_dialog.dart';
+import 'common/logger_filter_chips.dart';
+import 'common/logger_search_bar.dart';
+import 'common/logger_sort_toggle.dart';
+import 'common/logger_statistics.dart';
 
 /// API logs tab widget for displaying HTTP request/response logs
 class ApiLogsTab extends StatefulWidget {
@@ -241,58 +246,18 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
   void _exportApiLogs() {
     final filteredLogs = _getFilteredApiLogs();
     if (filteredLogs.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No API logs to export')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No API logs to export')),
+      );
       return;
     }
 
     final exportText = ApiLoggerService.exportApiLogs(logs: filteredLogs);
-    Clipboard.setData(ClipboardData(text: exportText));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('API logs copied to clipboard'),
-        action: SnackBarAction(
-          label: 'View',
-          onPressed: () => _showExportDialog(exportText),
-        ),
-      ),
-    );
-  }
-
-  /// Show export dialog
-  void _showExportDialog(String exportText) {
-    showDialog(
+    LoggerExportUtils.exportToClipboard(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Exported API Logs'),
-        content: SizedBox(
-          width: double.maxFinite,
-          height: 400,
-          child: SingleChildScrollView(
-            child: Text(
-              exportText,
-              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          TextButton(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: exportText));
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Copied to clipboard')),
-              );
-            },
-            child: const Text('Copy'),
-          ),
-        ],
-      ),
+      content: exportText,
+      successMessage: 'API logs copied to clipboard',
+      dialogTitle: 'Exported API Logs',
     );
   }
 
@@ -550,61 +515,99 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
     }
   }
 
-  /// Build statistics item widget
-  Widget _buildStatItem(
-    String label,
-    String value,
-    Color color, {
-    VoidCallback? onTap,
-  }) {
-    final isSelected = (label == 'Total' && _statsFilter == null) ||
-        (label == 'Success' && _statsFilter == 'success') ||
-        (label == 'Errors' && _statsFilter == 'errors');
+  /// Get statistics for display
+  List<StatisticItem> _getStatistics() {
+    final allLogs = ApiLoggerService.getApiLogs();
+    final stats = ApiLoggerService.getApiLogStats();
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? color : Colors.transparent,
-            width: 1.5,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 10, color: Colors.grey),
-            ),
-          ],
-        ),
+    return [
+      StatisticItem(
+        label: 'Total',
+        value: '${allLogs.length}',
+        color: Colors.blue,
+        filterKey: 'total',
       ),
-    );
+      StatisticItem(
+        label: 'Success',
+        value: '${_getSuccessCount()}',
+        color: Colors.green,
+        filterKey: 'success',
+      ),
+      StatisticItem(
+        label: 'Errors',
+        value: '${_getErrorCount()}',
+        color: Colors.red,
+        filterKey: 'errors',
+      ),
+      StatisticItem(
+        label: 'Avg Time',
+        value: '${(stats['avgDuration'] as double).toStringAsFixed(0)}ms',
+        color: Colors.orange,
+        filterKey: 'avg_time',
+      ),
+    ];
+  }
+
+  /// Handle statistic tap for filtering
+  void _onStatisticTapped(String filterKey) {
+    setState(() {
+      if (_statsFilter == filterKey) {
+        _statsFilter = null; // Toggle off if already selected
+      } else {
+        _statsFilter =
+            filterKey == 'total' || filterKey == 'avg_time' ? null : filterKey;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final filteredLogs = _getFilteredApiLogs();
-    final stats = ApiLoggerService.getApiLogStats();
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Column(
         children: [
-          // Header with search and actions
+          // Search bar using reusable component
+          LoggerSearchBar(
+            controller: _searchController,
+            hintText: 'Search API logs...',
+            searchQuery: _searchQuery,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.delete_outline),
+                onPressed: () {
+                  FocusScope.of(context).unfocus();
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Clear API Logs'),
+                      content: const Text(
+                        'Are you sure you want to clear all API logs?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('CANCEL'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            ApiLoggerService.clearApiLogs();
+                            setState(() {});
+                            Navigator.pop(context);
+                          },
+                          child: const Text('CLEAR'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                tooltip: 'Clear logs',
+              ),
+            ],
+          ),
+
+          // Statistics and controls
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -620,130 +623,16 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
             ),
             child: Column(
               children: [
-                // Search bar and actions
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        decoration: InputDecoration(
-                          hintText: 'Search API logs...',
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          prefixIcon: const Icon(Icons.search, size: 20),
-                          suffixIcon: _searchQuery.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear, size: 20),
-                                  onPressed: () => _searchController.clear(),
-                                )
-                              : null,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          isDense: true,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline),
-                      onPressed: () {
-                        FocusScope.of(context).unfocus();
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Clear API Logs'),
-                            content: const Text(
-                              'Are you sure you want to clear all API logs?',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('CANCEL'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  ApiLoggerService.clearApiLogs();
-                                  setState(() {});
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('CLEAR'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      tooltip: 'Clear logs',
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 12),
 
-                // Statistics and sorting vertical dots menu
+                // Statistics using reusable component
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 0,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildStatItem(
-                              'Total',
-                              '${ApiLoggerService.getApiLogs().length}',
-                              Colors.blue,
-                              onTap: () {
-                                FocusScope.of(context).unfocus();
-                                setState(() {
-                                  _statsFilter = null; // Show all logs
-                                });
-                              },
-                            ),
-                            _buildStatItem(
-                              'Success',
-                              '${_getSuccessCount()}',
-                              Colors.green,
-                              onTap: () {
-                                FocusScope.of(context).unfocus();
-                                setState(() {
-                                  _statsFilter = _statsFilter == 'success'
-                                      ? null
-                                      : 'success';
-                                });
-                              },
-                            ),
-                            _buildStatItem(
-                              'Errors',
-                              '${_getErrorCount()}',
-                              Colors.red,
-                              onTap: () {
-                                FocusScope.of(context).unfocus();
-                                setState(() {
-                                  _statsFilter = _statsFilter == 'errors'
-                                      ? null
-                                      : 'errors';
-                                });
-                              },
-                            ),
-                            _buildStatItem(
-                              'Avg Time',
-                              '${(stats['avgDuration'] as double).toStringAsFixed(0)}ms',
-                              Colors.orange,
-                            ),
-                          ],
-                        ),
+                      child: LoggerStatistics(
+                        statistics: _getStatistics(),
+                        onStatisticTapped: _onStatisticTapped,
+                        selectedFilter: _statsFilter,
                       ),
                     ),
 
@@ -802,10 +691,17 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
               ],
             ),
           ),
-          // Sort toggle button
-          _buildToggleButton(context),
+          // Sort toggle button using reusable component
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: LoggerSortToggle(
+              sortNewestFirst: _sortNewestFirst,
+              onToggle: () =>
+                  setState(() => _sortNewestFirst = !_sortNewestFirst),
+            ),
+          ),
 
-          // Filters
+          // Filters using reusable components
           if (_showFilters)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -813,91 +709,58 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Type filters
-                  const Text(
-                    'Status:',
-                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
-                  ),
-                  const SizedBox(height: 4),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: ApiLogType.values
-                          .map(
-                            (type) => Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: FilterChip(
-                                selected: _selectedTypes.contains(type),
-                                label: Text(
-                                  _getTypeDisplayName(type),
-                                  style: const TextStyle(fontSize: 11),
-                                ),
-                                backgroundColor: _selectedTypes.contains(type)
-                                    ? _getTypeColor(type).withOpacity(0.2)
-                                    : null,
-                                selectedColor: _getTypeColor(
-                                  type,
-                                ).withOpacity(0.3),
-                                onSelected: (selected) {
-                                  setState(() {
-                                    if (selected) {
-                                      _selectedTypes.add(type);
-                                    } else {
-                                      _selectedTypes.remove(type);
-                                    }
-                                  });
-                                },
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ),
+                  LoggerFilterChips(
+                    title: 'Status:',
+                    options: ApiLogType.values
+                        .map((type) => FilterOption(
+                              label: _getTypeDisplayName(type),
+                              value: type.name,
+                              color: _getTypeColor(type),
+                            ))
+                        .toList(),
+                    selectedFilters: _selectedTypes.map((t) => t.name).toSet(),
+                    onFilterChanged: (value, selected) {
+                      final type =
+                          ApiLogType.values.firstWhere((t) => t.name == value);
+                      setState(() {
+                        if (selected) {
+                          _selectedTypes.add(type);
+                        } else {
+                          _selectedTypes.remove(type);
+                        }
+                      });
+                    },
+                    onClearAll: () => setState(() => _selectedTypes.clear()),
+                    showClearAll: false, // We'll show a global clear all below
                   ),
                   const SizedBox(height: 8),
 
                   // Method filters
                   if (_getUniqueMethods().isNotEmpty) ...[
-                    const Text(
-                      'Methods:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                      ),
+                    LoggerFilterChips(
+                      title: 'Methods:',
+                      options: _getUniqueMethods()
+                          .map((method) => FilterOption(
+                                label: method,
+                                value: method,
+                              ))
+                          .toList(),
+                      selectedFilters: _selectedMethods,
+                      onFilterChanged: (value, selected) {
+                        setState(() {
+                          if (selected) {
+                            _selectedMethods.add(value);
+                          } else {
+                            _selectedMethods.remove(value);
+                          }
+                        });
+                      },
+                      onClearAll: () =>
+                          setState(() => _selectedMethods.clear()),
+                      showClearAll:
+                          false, // We'll show a global clear all below
                     ),
-                    const SizedBox(height: 4),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: _getUniqueMethods()
-                            .map(
-                              (method) => Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: FilterChip(
-                                  selected: _selectedMethods.contains(method),
-                                  label: Text(
-                                    method,
-                                    style: const TextStyle(fontSize: 11),
-                                  ),
-                                  onSelected: (selected) {
-                                    setState(() {
-                                      if (selected) {
-                                        _selectedMethods.add(method);
-                                      } else {
-                                        _selectedMethods.remove(method);
-                                      }
-                                    });
-                                  },
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  visualDensity: VisualDensity.compact,
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
+                    const SizedBox(height: 8),
                   ],
                   const SizedBox(height: 8),
                   // Clear all filters button
@@ -1126,47 +989,6 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                   ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildToggleButton(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8),
-      child: ElevatedButton.icon(
-        onPressed: () {
-          FocusScope.of(context).unfocus();
-          setState(() {
-            _sortNewestFirst = !_sortNewestFirst;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  _sortNewestFirst
-                      ? 'Showing Newest logs first'
-                      : 'Showing Oldest logs first',
-                ),
-              ),
-            );
-          });
-        },
-        icon: Icon(
-          _sortNewestFirst ? Icons.arrow_downward : Icons.arrow_upward,
-          size: 16,
-        ),
-        label: Text(
-          _sortNewestFirst
-              ? 'Showing Newest Logs First'
-              : 'Showing Oldest Logs First',
-          style: const TextStyle(fontSize: 12),
-        ),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          backgroundColor: Colors.deepPurple.withOpacity(0.1),
-          foregroundColor: Colors.deepPurple,
-          elevation: 0,
-        ),
       ),
     );
   }

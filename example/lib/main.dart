@@ -123,6 +123,13 @@ class _DemoPageState extends State<DemoPage> {
     );
   }
 
+  void _openUnifiedLogger() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AwesomeLoggerHistoryPage()),
+    );
+  }
+
   void _toggleLoggerVisibility() {
     FlutterAwesomeLogger.toggleVisibility();
     final isVisible = FlutterAwesomeLogger.isVisible();
@@ -174,7 +181,6 @@ class _DemoPageState extends State<DemoPage> {
                         ),
                       ),
                       SizedBox(height: 8),
-
                       Text(
                         '\n🎯 Floating logger button (look for the floating button!)',
                       ),
@@ -246,6 +252,17 @@ class _DemoPageState extends State<DemoPage> {
                 label: const Text('Open Logger History'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _openUnifiedLogger,
+                icon: const Icon(Icons.list_alt),
+                label: const Text('Open Unified Logger (NEW!)'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.all(16),
+                  backgroundColor: Colors.purple.withOpacity(0.1),
+                  foregroundColor: Colors.purple,
                 ),
               ),
               const SizedBox(height: 12),
