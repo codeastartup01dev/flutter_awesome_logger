@@ -8,7 +8,6 @@ import '../core/logging_using_logger.dart';
 import '../core/unified_log_entry.dart';
 import '../core/unified_log_types.dart';
 import 'widgets/common/logger_export_dialog.dart';
-import 'widgets/common/logger_filter_chips.dart';
 import 'widgets/common/logger_search_bar.dart';
 import 'widgets/common/logger_sort_toggle.dart';
 import 'widgets/common/logger_statistics.dart';
@@ -37,7 +36,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   Timer? _refreshTimer;
   String _searchQuery = '';
   bool _sortNewestFirst = true;
-  bool _showFilters = false;
   bool _isLoggingPaused = false;
 
   // Filter sets
@@ -45,6 +43,18 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   final Set<LogSource> _selectedSources = {};
   final Set<String> _selectedClasses = {}; // For general logs
   final Set<String> _selectedMethods = {}; // For API logs
+
+  // Main filter section
+  bool _isFilterSectionExpanded = false;
+
+  // Expanded filter sections
+  bool _isLoggerFiltersExpanded = false;
+  bool _isApiFiltersExpanded = false;
+
+  // Collapsible sub-sections
+  bool _isLoggerLevelsExpanded = false;
+  bool _isHttpMethodsExpanded = false;
+  bool _isApiStatusExpanded = false;
 
   // Statistics filter
   String? _statsFilter;
@@ -211,13 +221,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     ];
   }
 
-  /// Get available log types from current logs
-  List<UnifiedLogType> _getAvailableTypes() {
-    final allLogs = _getUnifiedLogs();
-    return allLogs.map((l) => l.type).toSet().toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
-  }
-
   /// Get type counts for filter chips
   Map<UnifiedLogType, int> _getTypeCounts() {
     final allLogs = _getUnifiedLogs();
@@ -226,17 +229,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
       counts[log.type] = (counts[log.type] ?? 0) + 1;
     }
     return counts;
-  }
-
-  /// Get available classes from general logs
-  List<String> _getAvailableClasses() {
-    final allLogs = _getUnifiedLogs();
-    return allLogs
-        .where((l) => l.source == LogSource.general && l.className != null)
-        .map((l) => l.className!)
-        .toSet()
-        .toList()
-      ..sort();
   }
 
   /// Get available HTTP methods from API logs
@@ -333,6 +325,236 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     });
   }
 
+  /// Get count of general logs
+  int _getGeneralLogCount() {
+    final allLogs = _getUnifiedLogs();
+    return allLogs.where((l) => l.source == LogSource.general).length;
+  }
+
+  /// Get count of API logs
+  int _getApiLogCount() {
+    final allLogs = _getUnifiedLogs();
+    return allLogs.where((l) => l.source == LogSource.api).length;
+  }
+
+  /// Get count for specific HTTP method
+  int _getMethodCount(String method) {
+    final allLogs = _getUnifiedLogs();
+    return allLogs.where((l) => l.httpMethod == method).length;
+  }
+
+  /// Get logger level label for unified log type
+  String _getLoggerLevelLabel(UnifiedLogType type) {
+    switch (type) {
+      case UnifiedLogType.debug:
+        return 'logger.d';
+      case UnifiedLogType.info:
+        return 'logger.i';
+      case UnifiedLogType.warning:
+        return 'logger.w';
+      case UnifiedLogType.error:
+        return 'logger.e';
+      default:
+        return 'logger';
+    }
+  }
+
+  /// Get API status label for unified log type
+  String _getApiStatusLabel(UnifiedLogType type) {
+    switch (type) {
+      case UnifiedLogType.apiSuccess:
+        return 'Success (2xx)';
+      case UnifiedLogType.apiRedirect:
+        return 'Redirect (3xx)';
+      case UnifiedLogType.apiClientError:
+        return 'Client Error (4xx)';
+      case UnifiedLogType.apiServerError:
+        return 'Server Error (5xx)';
+      case UnifiedLogType.apiNetworkError:
+        return 'Network Error';
+      case UnifiedLogType.apiPending:
+        return 'Pending';
+      default:
+        return 'API';
+    }
+  }
+
+  /// Build main filter chip (Logger Logs, API Logs)
+  Widget _buildMainFilterChip({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required bool isSelected,
+    required int count,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.1) : Colors.grey[100],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey[300]!,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? color : Colors.grey[600],
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? color : Colors.grey[700],
+              ),
+            ),
+            if (count > 0) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isSelected ? color : Colors.grey[500],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$count',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build sub-filter chip (logger.d, GET, Success, etc.)
+  Widget _buildSubFilterChip({
+    required String label,
+    required Color color,
+    required bool isSelected,
+    required int count,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.1) : Colors.grey[50],
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey[300]!,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (count > 0) ...[
+              Text(
+                '($count)',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? color : Colors.grey[600],
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? color : Colors.grey[700],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build collapsible section with title and expand/collapse functionality
+  Widget _buildCollapsibleSection({
+    required String title,
+    required bool isExpanded,
+    required VoidCallback onToggle,
+    Widget? child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: onToggle,
+          borderRadius: BorderRadius.circular(4),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                  size: 16,
+                  color: Colors.grey[600],
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (isExpanded && child != null) ...[
+          const SizedBox(height: 4),
+          child,
+        ],
+      ],
+    );
+  }
+
+  /// Check if there are any active filters
+  bool _hasActiveFilters() {
+    return _selectedTypes.isNotEmpty ||
+        _selectedSources.isNotEmpty ||
+        _selectedClasses.isNotEmpty ||
+        _selectedMethods.isNotEmpty ||
+        _statsFilter != null;
+  }
+
+  /// Get count of active filters
+  int _getActiveFilterCount() {
+    int count = 0;
+    count += _selectedTypes.length;
+    count += _selectedSources.length;
+    count += _selectedClasses.length;
+    count += _selectedMethods.length;
+    if (_statsFilter != null) count += 1;
+    return count;
+  }
+
   /// Get appropriate label for log type display
   String _getLogTypeLabel(UnifiedLogEntry log) {
     if (log.source == LogSource.api) {
@@ -401,7 +623,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   Widget build(BuildContext context) {
     final filteredLogs = _getFilteredLogs();
     final statistics = _getStatistics();
-    final availableTypes = _getAvailableTypes();
     final typeCounts = _getTypeCounts();
 
     return Scaffold(
@@ -513,39 +734,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                       selectedFilter: _statsFilter,
                     ),
                   ),
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert),
-                    tooltip: 'More options',
-                    onSelected: (value) {
-                      FocusScope.of(context).unfocus();
-                      switch (value) {
-                        case 'toggle_filters':
-                          setState(() {
-                            _showFilters = !_showFilters;
-                          });
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem<String>(
-                        value: 'toggle_filters',
-                        child: Row(
-                          children: [
-                            Icon(
-                              _showFilters
-                                  ? Icons.filter_alt_off
-                                  : Icons.filter_alt,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _showFilters ? 'Hide Filters' : 'Show Filters',
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -564,115 +752,241 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
               ),
             ),
 
-            // Filters
-            if (_showFilters)
-              Container(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    // Log type filters
-                    UnifiedLogTypeFilterChips(
-                      availableTypes: availableTypes,
-                      selectedTypes: _selectedTypes,
-                      typeCounts: typeCounts,
-                      onTypeChanged: (type, selected) {
-                        setState(() {
-                          if (selected) {
-                            _selectedTypes.add(type);
-                          } else {
-                            _selectedTypes.remove(type);
-                          }
-                        });
-                      },
-                      onClearAll: () => setState(() => _selectedTypes.clear()),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Source filters
-                    LoggerFilterChips(
-                      title: 'Sources:',
-                      options: LogSource.values
-                          .map((source) => FilterOption(
-                                label: source.displayName,
-                                value: source.name,
-                                color: source.color,
-                              ))
-                          .toList(),
-                      selectedFilters:
-                          _selectedSources.map((s) => s.name).toSet(),
-                      onFilterChanged: (value, selected) {
-                        final source =
-                            LogSource.values.firstWhere((s) => s.name == value);
-                        setState(() {
-                          if (selected) {
-                            _selectedSources.add(source);
-                          } else {
-                            _selectedSources.remove(source);
-                          }
-                        });
-                      },
-                      onClearAll: () =>
-                          setState(() => _selectedSources.clear()),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Class filters (for general logs)
-                    if (_getAvailableClasses().isNotEmpty) ...[
-                      LoggerFilterChips(
-                        title: 'Classes:',
-                        options: _getAvailableClasses()
-                            .map((className) => FilterOption(
-                                  label: className,
-                                  value: className,
-                                ))
-                            .toList(),
-                        selectedFilters: _selectedClasses,
-                        onFilterChanged: (value, selected) {
-                          setState(() {
-                            if (selected) {
-                              _selectedClasses.add(value);
-                            } else {
-                              _selectedClasses.remove(value);
-                            }
-                          });
-                        },
-                        onClearAll: () =>
-                            setState(() => _selectedClasses.clear()),
+            // Collapsible filter section
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Filter section header with collapse/expand
+                  InkWell(
+                    onTap: () => setState(() =>
+                        _isFilterSectionExpanded = !_isFilterSectionExpanded),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _isFilterSectionExpanded
+                                ? Icons.expand_less
+                                : Icons.expand_more,
+                            size: 20,
+                            color: Colors.grey[700],
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Filter by',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const Spacer(),
+                          // Show active filter count when collapsed
+                          if (!_isFilterSectionExpanded &&
+                              _hasActiveFilters()) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                    color: Colors.blue.withOpacity(0.3)),
+                              ),
+                              child: Text(
+                                '${_getActiveFilterCount()} active',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.blue[700],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
+                    ),
+                  ),
+
+                  // Expandable filter content
+                  if (_isFilterSectionExpanded) ...[
+                    const SizedBox(height: 8),
+
+                    // Main filter categories
+                    Row(
+                      children: [
+                        // Logger Logs filter
+                        _buildMainFilterChip(
+                          label: 'Logger Logs',
+                          icon: Icons.bug_report,
+                          color: Colors.purple,
+                          isSelected:
+                              _selectedSources.contains(LogSource.general) ||
+                                  _isLoggerFiltersExpanded,
+                          count: _getGeneralLogCount(),
+                          onTap: () {
+                            setState(() {
+                              if (_selectedSources
+                                  .contains(LogSource.general)) {
+                                // If already selected, deselect and collapse
+                                _selectedSources.remove(LogSource.general);
+                                _isLoggerFiltersExpanded = false;
+                                _selectedTypes
+                                    .removeWhere((type) => type.isGeneralLog);
+                              } else {
+                                // Select and expand
+                                _selectedSources.add(LogSource.general);
+                                _isLoggerFiltersExpanded =
+                                    !_isLoggerFiltersExpanded;
+                              }
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 8),
+
+                        // API Logs filter
+                        _buildMainFilterChip(
+                          label: 'API Logs',
+                          icon: Icons.api,
+                          color: Colors.green,
+                          isSelected:
+                              _selectedSources.contains(LogSource.api) ||
+                                  _isApiFiltersExpanded,
+                          count: _getApiLogCount(),
+                          onTap: () {
+                            setState(() {
+                              if (_selectedSources.contains(LogSource.api)) {
+                                // If already selected, deselect and collapse
+                                _selectedSources.remove(LogSource.api);
+                                _isApiFiltersExpanded = false;
+                                _selectedTypes
+                                    .removeWhere((type) => type.isApiLog);
+                                _selectedMethods.clear();
+                              } else {
+                                // Select and expand
+                                _selectedSources.add(LogSource.api);
+                                _isApiFiltersExpanded = !_isApiFiltersExpanded;
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+
+                    // Expandable Logger sub-filters
+                    if (_isLoggerFiltersExpanded) ...[
                       const SizedBox(height: 12),
-                    ],
-
-                    // Method filters (for API logs)
-                    if (_getAvailableMethods().isNotEmpty) ...[
-                      LoggerFilterChips(
-                        title: 'HTTP Methods:',
-                        options: _getAvailableMethods()
-                            .map((method) => FilterOption(
-                                  label: method,
-                                  value: method,
-                                ))
-                            .toList(),
-                        selectedFilters: _selectedMethods,
-                        onFilterChanged: (value, selected) {
-                          setState(() {
-                            if (selected) {
-                              _selectedMethods.add(value);
-                            } else {
-                              _selectedMethods.remove(value);
-                            }
-                          });
-                        },
-                        onClearAll: () =>
-                            setState(() => _selectedMethods.clear()),
+                      _buildCollapsibleSection(
+                        title: 'Logger Levels',
+                        isExpanded: _isLoggerLevelsExpanded,
+                        onToggle: () => setState(() =>
+                            _isLoggerLevelsExpanded = !_isLoggerLevelsExpanded),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            UnifiedLogType.debug,
+                            UnifiedLogType.info,
+                            UnifiedLogType.warning,
+                            UnifiedLogType.error,
+                          ]
+                              .map((type) => _buildSubFilterChip(
+                                    label: _getLoggerLevelLabel(type),
+                                    color: type.color,
+                                    isSelected: _selectedTypes.contains(type),
+                                    count: typeCounts[type] ?? 0,
+                                    onTap: () {
+                                      setState(() {
+                                        if (_selectedTypes.contains(type)) {
+                                          _selectedTypes.remove(type);
+                                        } else {
+                                          _selectedTypes.add(type);
+                                        }
+                                      });
+                                    },
+                                  ))
+                              .toList(),
+                        ),
                       ),
                     ],
 
-                    // Clear all filters
+                    // Expandable API sub-filters
+                    if (_isApiFiltersExpanded) ...[
+                      const SizedBox(height: 12),
+                      _buildCollapsibleSection(
+                        title: 'HTTP Methods',
+                        isExpanded: _isHttpMethodsExpanded,
+                        onToggle: () => setState(() =>
+                            _isHttpMethodsExpanded = !_isHttpMethodsExpanded),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: _getAvailableMethods()
+                              .map((method) => _buildSubFilterChip(
+                                    label: method,
+                                    color: Colors.green,
+                                    isSelected:
+                                        _selectedMethods.contains(method),
+                                    count: _getMethodCount(method),
+                                    onTap: () {
+                                      setState(() {
+                                        if (_selectedMethods.contains(method)) {
+                                          _selectedMethods.remove(method);
+                                        } else {
+                                          _selectedMethods.add(method);
+                                        }
+                                      });
+                                    },
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _buildCollapsibleSection(
+                        title: 'API Status',
+                        isExpanded: _isApiStatusExpanded,
+                        onToggle: () => setState(
+                            () => _isApiStatusExpanded = !_isApiStatusExpanded),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            UnifiedLogType.apiSuccess,
+                            UnifiedLogType.apiRedirect,
+                            UnifiedLogType.apiClientError,
+                            UnifiedLogType.apiServerError,
+                            UnifiedLogType.apiNetworkError,
+                            UnifiedLogType.apiPending,
+                          ]
+                              .map((type) => _buildSubFilterChip(
+                                    label: _getApiStatusLabel(type),
+                                    color: type.color,
+                                    isSelected: _selectedTypes.contains(type),
+                                    count: typeCounts[type] ?? 0,
+                                    onTap: () {
+                                      setState(() {
+                                        if (_selectedTypes.contains(type)) {
+                                          _selectedTypes.remove(type);
+                                        } else {
+                                          _selectedTypes.add(type);
+                                        }
+                                      });
+                                    },
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                    ],
+
+                    // Clear all filters button
                     if (_selectedTypes.isNotEmpty ||
                         _selectedSources.isNotEmpty ||
                         _selectedClasses.isNotEmpty ||
                         _selectedMethods.isNotEmpty ||
-                        _statsFilter != null)
+                        _statsFilter != null) ...[
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           const Text(
@@ -691,6 +1005,11 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                 _selectedClasses.clear();
                                 _selectedMethods.clear();
                                 _statsFilter = null;
+                                _isLoggerFiltersExpanded = false;
+                                _isApiFiltersExpanded = false;
+                                _isLoggerLevelsExpanded = false;
+                                _isHttpMethodsExpanded = false;
+                                _isApiStatusExpanded = false;
                               });
                             },
                             icon: const Icon(Icons.clear_all, size: 16),
@@ -709,9 +1028,11 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                           ),
                         ],
                       ),
-                  ],
-                ),
+                    ],
+                  ], // End of _isFilterSectionExpanded
+                ],
               ),
+            ),
 
             // Logs list
             Expanded(
