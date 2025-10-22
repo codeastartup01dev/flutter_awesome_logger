@@ -24,7 +24,7 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
   String _searchQuery = '';
   final Set<String> _selectedClasses = {};
   final Set<String> _selectedLevels = {};
-  bool _sortNewestFirst = true;
+  bool _sortNewestFirst = false;
 
   @override
   void initState() {
@@ -418,9 +418,11 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                       );
                     },
                     icon: const Icon(Icons.filter_list),
-                    label: Text(_getFilterButtonLabel()),
+                    label: Text(_getFilterButtonLabel(),
+                        textAlign: TextAlign.center),
                   ),
                 ),
+                const SizedBox(width: 8),
                 _buildSortLogsToggle(context),
                 const SizedBox(width: 8),
                 IconButton(
@@ -631,36 +633,43 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
     );
   }
 
-  Padding _buildSortLogsToggle(BuildContext context) {
+  Widget _buildSortLogsToggle(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 8),
-      child: Row(
-        children: [
-          // Sort toggle
-          IconButton(
-            icon: Icon(
-              _sortNewestFirst ? Icons.arrow_downward : Icons.arrow_upward,
-              color: Colors.deepPurple,
-            ),
-            onPressed: () {
-              FocusScope.of(context).unfocus();
-              setState(() {
-                _sortNewestFirst = !_sortNewestFirst;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      _sortNewestFirst
-                          ? 'Showing Newest logs first'
-                          : 'Showing Oldest logs first',
-                    ),
-                  ),
-                );
-              });
-            },
-            tooltip:
-                _sortNewestFirst ? 'Newest logs first' : 'Oldest logs first',
-          ),
-        ],
+      child: ElevatedButton.icon(
+        onPressed: () {
+          FocusScope.of(context).unfocus();
+          setState(() {
+            _sortNewestFirst = !_sortNewestFirst;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  _sortNewestFirst
+                      ? 'Showing Newest logs first'
+                      : 'Showing Oldest logs first',
+                ),
+              ),
+            );
+          });
+        },
+        icon: Icon(
+          _sortNewestFirst ? Icons.arrow_downward : Icons.arrow_upward,
+          size: 16,
+        ),
+        label: Text(
+          _sortNewestFirst
+              ? 'Showing Newest Logs First'
+              : 'Showing Oldest Logs First',
+          style: const TextStyle(fontSize: 12),
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          backgroundColor: Colors.deepPurple.withOpacity(0.1),
+          foregroundColor: Colors.deepPurple,
+          elevation: 0,
+        ),
       ),
     );
   }

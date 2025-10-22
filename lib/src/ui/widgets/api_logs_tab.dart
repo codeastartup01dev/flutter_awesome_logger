@@ -25,7 +25,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
   final Set<String> _selectedMethods = {};
   final Set<ApiLogType> _selectedTypes = {};
   final Set<String> _selectedEndpoints = {};
-  bool _sortNewestFirst = true; // true = newest first, false = oldest first
+  bool _sortNewestFirst = false; // true = newest first, false = oldest first
   bool _showFilters = false;
 
   // Statistics filter: null = show all, 'success' = only success, 'errors' = only errors
@@ -746,8 +746,7 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
                         ),
                       ),
                     ),
-                    // Sort toggle button
-                    _buildToggleButton(context),
+
                     //vertical dots menu
                     PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
@@ -803,6 +802,8 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
               ],
             ),
           ),
+          // Sort toggle button
+          _buildToggleButton(context),
 
           // Filters
           if (_showFilters)
@@ -1129,28 +1130,44 @@ class _ApiLogsTabState extends State<ApiLogsTab> {
     );
   }
 
-  IconButton _buildToggleButton(BuildContext context) {
-    return IconButton(
-      icon: Icon(
-        _sortNewestFirst ? Icons.arrow_downward : Icons.arrow_upward,
-        color: Colors.deepPurple,
-      ),
-      onPressed: () {
-        FocusScope.of(context).unfocus();
-        setState(() {
-          _sortNewestFirst = !_sortNewestFirst;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                _sortNewestFirst
-                    ? 'Showing Newest logs first'
-                    : 'Showing Oldest logs first',
+  Widget _buildToggleButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: ElevatedButton.icon(
+        onPressed: () {
+          FocusScope.of(context).unfocus();
+          setState(() {
+            _sortNewestFirst = !_sortNewestFirst;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  _sortNewestFirst
+                      ? 'Showing Newest logs first'
+                      : 'Showing Oldest logs first',
+                ),
               ),
-            ),
-          );
-        });
-      },
-      tooltip: _sortNewestFirst ? 'Newest logs first' : 'Oldest logs first',
+            );
+          });
+        },
+        icon: Icon(
+          _sortNewestFirst ? Icons.arrow_downward : Icons.arrow_upward,
+          size: 16,
+        ),
+        label: Text(
+          _sortNewestFirst
+              ? 'Showing Newest Logs First'
+              : 'Showing Oldest Logs First',
+          style: const TextStyle(fontSize: 12),
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          backgroundColor: Colors.deepPurple.withOpacity(0.1),
+          foregroundColor: Colors.deepPurple,
+          elevation: 0,
+        ),
+      ),
     );
   }
 }
