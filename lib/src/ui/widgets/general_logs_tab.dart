@@ -131,6 +131,22 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
     return ['DEBUG', 'INFO', 'ERROR', 'WARNING'];
   }
 
+  /// Get logger level label for display
+  String _getLoggerLevelLabel(String level) {
+    switch (level.toUpperCase()) {
+      case 'DEBUG':
+        return 'logger.d';
+      case 'INFO':
+        return 'logger.i';
+      case 'WARNING':
+        return 'logger.w';
+      case 'ERROR':
+        return 'logger.e';
+      default:
+        return 'logger';
+    }
+  }
+
   void _exportLogs() {
     final filteredLogs = _getFilteredLogs();
     if (filteredLogs.isEmpty) {
@@ -382,14 +398,39 @@ class _GeneralLogsTabState extends State<GeneralLogsTab> {
                               size: 18,
                             ),
                           ),
-                          title: Text(
-                            log.message,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
+                          title: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _getLevelColor(log.level),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  _getLoggerLevelLabel(log.level),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  log.message,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,

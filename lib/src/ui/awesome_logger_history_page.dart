@@ -333,6 +333,28 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     });
   }
 
+  /// Get appropriate label for log type display
+  String _getLogTypeLabel(UnifiedLogEntry log) {
+    if (log.source == LogSource.api) {
+      // For API logs, show the HTTP method
+      return log.httpMethod ?? 'API';
+    } else {
+      // For general logs, show logger.level format
+      switch (log.type) {
+        case UnifiedLogType.debug:
+          return 'logger.d';
+        case UnifiedLogType.info:
+          return 'logger.i';
+        case UnifiedLogType.warning:
+          return 'logger.w';
+        case UnifiedLogType.error:
+          return 'logger.e';
+        default:
+          return 'logger';
+      }
+    }
+  }
+
   /// Handle copy actions for logs
   void _handleCopyAction(String action, UnifiedLogEntry log) {
     String textToCopy = '';
@@ -758,11 +780,11 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: log.source.color,
+                                    color: log.type.color,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
-                                    log.source.displayName,
+                                    _getLogTypeLabel(log),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 10,
