@@ -61,59 +61,8 @@
 
 ### 🖼️ App Screenshots Gallery
 
-<table width="100%">
-  <tr>
-    <td align="center" width="50%">
-      <img 
-        src="https://github.com/user-attachments/assets/83129e99-7e21-400a-a52c-74ecb1ab3492" 
-        alt="Floating Logger Button"
-        width="300"
-      />
-      <br><br>
-      <strong>🎯 Floating Logger Button</strong>
-      <br>
-      <em>Always accessible debug interface</em>
-    </td>
-    <td align="center" width="50%">
-      <img 
-        src="https://github.com/user-attachments/assets/707bd799-f7d6-40ae-9331-bafbf7a58680" 
-        alt="Unified Logger Interface"
-        width="300"
-      />
-      <br><br>
-      <strong>🌐 Unified Logger Interface</strong>
-      <br>
-      <em>All logs in one chronological view with advanced filtering</em>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2"><br></td>
-  </tr>
-  <tr>
-    <td align="center" width="50%">
-      <img 
-        src="https://github.com/user-attachments/assets/61c2606e-f22f-496f-98e9-d39d6da3ccfd" 
-        alt="Smart Filtering System"
-        width="300"
-      />
-      <br><br>
-      <strong>📊 Smart Filtering System</strong>
-      <br>
-      <em>Advanced filters for logger levels and API methods</em>
-    </td>
-    <td align="center" width="50%">
-      <img 
-        src="https://github.com/user-attachments/assets/a6947367-578c-4df4-b73f-eece6a411b14" 
-        alt="Log Details"
-        width="300"
-      />
-      <br><br>
-      <strong>🔍 Log Details</strong>
-      <br>
-      <em>Detailed log inspection with syntax highlighting</em>
-    </td>
-  </tr>
-</table>
+<img width="2196" height="2400" alt="awesome_flutter_logger_1" src="https://github.com/user-attachments/assets/51c14160-9c47-4712-b362-adcf9f032558" />
+<img width="2196" height="2400" alt="awesome_flutter_logger_2" src="https://github.com/user-attachments/assets/b71cf4bc-4dae-480b-873f-70082fae7139" />
 
 </div>
 
