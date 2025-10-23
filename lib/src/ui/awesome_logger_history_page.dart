@@ -35,7 +35,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _refreshTimer;
   String _searchQuery = '';
-  bool _sortNewestFirst = true;
+  bool _sortNewestFirst = false;
   bool _isLoggingPaused = false;
 
   // Filter sets
@@ -45,16 +45,13 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   final Set<String> _selectedMethods = {}; // For API logs
 
   // Main filter section
-  bool _isFilterSectionExpanded = false;
+  bool _isFilterSectionExpanded = true;
 
   // Expanded filter sections
   bool _isLoggerFiltersExpanded = false;
   bool _isApiFiltersExpanded = false;
 
-  // Collapsible sub-sections
-  bool _isLoggerLevelsExpanded = false;
-  bool _isHttpMethodsExpanded = false;
-  bool _isApiStatusExpanded = false;
+  // Removed collapsible sub-sections - now showing directly when main filters are expanded
 
   // Statistics filter
   String? _statsFilter;
@@ -343,6 +340,17 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     return allLogs.where((l) => l.httpMethod == method).length;
   }
 
+  /// Check if any logger sub-filters are selected
+  bool _hasLoggerSubFiltersSelected() {
+    return _selectedTypes.any((type) => type.isGeneralLog);
+  }
+
+  /// Check if any API sub-filters are selected
+  bool _hasApiSubFiltersSelected() {
+    return _selectedTypes.any((type) => type.isApiLog) ||
+        _selectedMethods.isNotEmpty;
+  }
+
   /// Get logger level label for unified log type
   String _getLoggerLevelLabel(UnifiedLogType type) {
     switch (type) {
@@ -387,57 +395,103 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     required bool isSelected,
     required int count,
     required VoidCallback onTap,
+    required bool isExpanded,
+    required VoidCallback onDropdownTap,
+    required bool hasSubFiltersSelected,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.grey[100],
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? color : Colors.grey[300]!,
-            width: 1.5,
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        color: isSelected ? color.withOpacity(0.1) : Colors.grey[100],
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isSelected ? color : Colors.grey[300]!,
+          width: 1.5,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: isSelected ? color : Colors.grey[600],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Main chip content (clickable for selection)
+          InkWell(
+            onTap: onTap,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              bottomLeft: Radius.circular(20),
             ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: isSelected ? color : Colors.grey[700],
-              ),
-            ),
-            if (count > 0) ...[
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: isSelected ? color : Colors.grey[500],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '$count',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+            child: Container(
+              padding:
+                  const EdgeInsets.only(left: 12, top: 8, bottom: 8, right: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 16,
+                    color: isSelected ? color : Colors.grey[600],
                   ),
+                  const SizedBox(width: 6),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: isSelected ? color : Colors.grey[700],
+                    ),
+                  ),
+                  if (count > 0) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isSelected ? color : Colors.grey[500],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '$count',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          // Dropdown arrow (clickable for expanding sub-filters)
+          InkWell(
+            onTap: onDropdownTap,
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+            child: Container(
+              padding:
+                  const EdgeInsets.only(left: 4, right: 8, top: 8, bottom: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+                border: Border.all(
+                  color: hasSubFiltersSelected ? color : Colors.grey[300]!,
+                  width: hasSubFiltersSelected ? 1.5 : 1,
                 ),
               ),
-            ],
-          ],
-        ),
+              child: Icon(
+                isExpanded
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down,
+                size: 16,
+                color: hasSubFiltersSelected ? color : Colors.grey[600],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -488,50 +542,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
           ],
         ),
       ),
-    );
-  }
-
-  /// Build collapsible section with title and expand/collapse functionality
-  Widget _buildCollapsibleSection({
-    required String title,
-    required bool isExpanded,
-    required VoidCallback onToggle,
-    Widget? child,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        InkWell(
-          onTap: onToggle,
-          borderRadius: BorderRadius.circular(4),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  isExpanded ? Icons.expand_less : Icons.expand_more,
-                  size: 16,
-                  color: Colors.grey[600],
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: Colors.grey[700],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (isExpanded && child != null) ...[
-          const SizedBox(height: 4),
-          child,
-        ],
-      ],
     );
   }
 
@@ -738,20 +748,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
               ),
             ),
 
-            // Sort toggle
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  LoggerSortToggle(
-                    sortNewestFirst: _sortNewestFirst,
-                    onToggle: () =>
-                        setState(() => _sortNewestFirst = !_sortNewestFirst),
-                  ),
-                ],
-              ),
-            ),
-
             // Collapsible filter section
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -764,24 +760,24 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                         _isFilterSectionExpanded = !_isFilterSectionExpanded),
                     borderRadius: BorderRadius.circular(8),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(vertical: 0),
                       child: Row(
                         children: [
-                          Icon(
-                            _isFilterSectionExpanded
-                                ? Icons.expand_less
-                                : Icons.expand_more,
-                            size: 20,
-                            color: Colors.grey[700],
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Filter by',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
+                          // Icon(
+                          //   _isFilterSectionExpanded
+                          //       ? Icons.expand_less
+                          //       : Icons.expand_more,
+                          //   size: 20,
+                          //   color: Colors.grey[700],
+                          // ),
+                          // const SizedBox(width: 8),
+                          // const Text(
+                          //   'Filter by',
+                          //   style: TextStyle(
+                          //     fontWeight: FontWeight.w600,
+                          //     fontSize: 14,
+                          //   ),
+                          // ),
                           const Spacer(),
                           // Show active filter count when collapsed
                           if (!_isFilterSectionExpanded &&
@@ -823,9 +819,10 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                           icon: Icons.bug_report,
                           color: Colors.purple,
                           isSelected:
-                              _selectedSources.contains(LogSource.general) ||
-                                  _isLoggerFiltersExpanded,
+                              _selectedSources.contains(LogSource.general),
                           count: _getGeneralLogCount(),
+                          isExpanded: _isLoggerFiltersExpanded,
+                          hasSubFiltersSelected: _hasLoggerSubFiltersSelected(),
                           onTap: () {
                             setState(() {
                               if (_selectedSources
@@ -836,11 +833,15 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                 _selectedTypes
                                     .removeWhere((type) => type.isGeneralLog);
                               } else {
-                                // Select and expand
+                                // Select
                                 _selectedSources.add(LogSource.general);
-                                _isLoggerFiltersExpanded =
-                                    !_isLoggerFiltersExpanded;
                               }
+                            });
+                          },
+                          onDropdownTap: () {
+                            setState(() {
+                              _isLoggerFiltersExpanded =
+                                  !_isLoggerFiltersExpanded;
                             });
                           },
                         ),
@@ -851,10 +852,10 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                           label: 'API Logs',
                           icon: Icons.api,
                           color: Colors.green,
-                          isSelected:
-                              _selectedSources.contains(LogSource.api) ||
-                                  _isApiFiltersExpanded,
+                          isSelected: _selectedSources.contains(LogSource.api),
                           count: _getApiLogCount(),
+                          isExpanded: _isApiFiltersExpanded,
+                          hasSubFiltersSelected: _hasApiSubFiltersSelected(),
                           onTap: () {
                             setState(() {
                               if (_selectedSources.contains(LogSource.api)) {
@@ -865,62 +866,77 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                     .removeWhere((type) => type.isApiLog);
                                 _selectedMethods.clear();
                               } else {
-                                // Select and expand
+                                // Select
                                 _selectedSources.add(LogSource.api);
-                                _isApiFiltersExpanded = !_isApiFiltersExpanded;
                               }
+                            });
+                          },
+                          onDropdownTap: () {
+                            setState(() {
+                              _isApiFiltersExpanded = !_isApiFiltersExpanded;
                             });
                           },
                         ),
                       ],
                     ),
 
-                    // Expandable Logger sub-filters
+                    // Logger sub-filters
                     if (_isLoggerFiltersExpanded) ...[
-                      const SizedBox(height: 12),
-                      _buildCollapsibleSection(
-                        title: 'Logger Levels',
-                        isExpanded: _isLoggerLevelsExpanded,
-                        onToggle: () => setState(() =>
-                            _isLoggerLevelsExpanded = !_isLoggerLevelsExpanded),
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
-                          children: [
-                            UnifiedLogType.debug,
-                            UnifiedLogType.info,
-                            UnifiedLogType.warning,
-                            UnifiedLogType.error,
-                          ]
-                              .map((type) => _buildSubFilterChip(
-                                    label: _getLoggerLevelLabel(type),
-                                    color: type.color,
-                                    isSelected: _selectedTypes.contains(type),
-                                    count: typeCounts[type] ?? 0,
-                                    onTap: () {
-                                      setState(() {
-                                        if (_selectedTypes.contains(type)) {
-                                          _selectedTypes.remove(type);
-                                        } else {
-                                          _selectedTypes.add(type);
-                                        }
-                                      });
-                                    },
-                                  ))
-                              .toList(),
-                        ),
+                      // const SizedBox(height: 12),
+                      // const Text(
+                      //   'Logger Levels:',
+                      //   style: TextStyle(
+                      //     fontWeight: FontWeight.w500,
+                      //     fontSize: 12,
+                      //     color: Colors.grey,
+                      //   ),
+                      // ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          UnifiedLogType.debug,
+                          UnifiedLogType.info,
+                          UnifiedLogType.warning,
+                          UnifiedLogType.error,
+                        ]
+                            .map((type) => _buildSubFilterChip(
+                                  label: _getLoggerLevelLabel(type),
+                                  color: type.color,
+                                  isSelected: _selectedTypes.contains(type),
+                                  count: typeCounts[type] ?? 0,
+                                  onTap: () {
+                                    setState(() {
+                                      if (_selectedTypes.contains(type)) {
+                                        _selectedTypes.remove(type);
+                                      } else {
+                                        _selectedTypes.add(type);
+                                      }
+                                    });
+                                  },
+                                ))
+                            .toList(),
                       ),
                     ],
 
-                    // Expandable API sub-filters
+                    // API sub-filters
                     if (_isApiFiltersExpanded) ...[
                       const SizedBox(height: 12),
-                      _buildCollapsibleSection(
-                        title: 'HTTP Methods',
-                        isExpanded: _isHttpMethodsExpanded,
-                        onToggle: () => setState(() =>
-                            _isHttpMethodsExpanded = !_isHttpMethodsExpanded),
-                        child: Wrap(
+
+                      // HTTP Methods section
+                      if (_getAvailableMethods().isNotEmpty) ...[
+                        // Divider(height: 1),
+                        // const Text(
+                        //   'HTTP Methods:',
+                        //   style: TextStyle(
+                        //     fontWeight: FontWeight.w500,
+                        //     fontSize: 12,
+                        //     color: Colors.grey,
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 8),
+                        Wrap(
                           spacing: 8,
                           runSpacing: 4,
                           children: _getAvailableMethods()
@@ -942,41 +958,46 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                   ))
                               .toList(),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildCollapsibleSection(
-                        title: 'API Status',
-                        isExpanded: _isApiStatusExpanded,
-                        onToggle: () => setState(
-                            () => _isApiStatusExpanded = !_isApiStatusExpanded),
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
-                          children: [
-                            UnifiedLogType.apiSuccess,
-                            UnifiedLogType.apiRedirect,
-                            UnifiedLogType.apiClientError,
-                            UnifiedLogType.apiServerError,
-                            UnifiedLogType.apiNetworkError,
-                            UnifiedLogType.apiPending,
-                          ]
-                              .map((type) => _buildSubFilterChip(
-                                    label: _getApiStatusLabel(type),
-                                    color: type.color,
-                                    isSelected: _selectedTypes.contains(type),
-                                    count: typeCounts[type] ?? 0,
-                                    onTap: () {
-                                      setState(() {
-                                        if (_selectedTypes.contains(type)) {
-                                          _selectedTypes.remove(type);
-                                        } else {
-                                          _selectedTypes.add(type);
-                                        }
-                                      });
-                                    },
-                                  ))
-                              .toList(),
-                        ),
+                        const SizedBox(height: 12),
+                      ],
+
+                      // API Status section
+                      // const Text(
+                      //   'API Status:',
+                      //   style: TextStyle(
+                      //     fontWeight: FontWeight.w500,
+                      //     fontSize: 12,
+                      //     color: Colors.grey,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          UnifiedLogType.apiSuccess,
+                          UnifiedLogType.apiRedirect,
+                          UnifiedLogType.apiClientError,
+                          UnifiedLogType.apiServerError,
+                          UnifiedLogType.apiNetworkError,
+                          UnifiedLogType.apiPending,
+                        ]
+                            .map((type) => _buildSubFilterChip(
+                                  label: _getApiStatusLabel(type),
+                                  color: type.color,
+                                  isSelected: _selectedTypes.contains(type),
+                                  count: typeCounts[type] ?? 0,
+                                  onTap: () {
+                                    setState(() {
+                                      if (_selectedTypes.contains(type)) {
+                                        _selectedTypes.remove(type);
+                                      } else {
+                                        _selectedTypes.add(type);
+                                      }
+                                    });
+                                  },
+                                ))
+                            .toList(),
                       ),
                     ],
 
@@ -1007,9 +1028,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                 _statsFilter = null;
                                 _isLoggerFiltersExpanded = false;
                                 _isApiFiltersExpanded = false;
-                                _isLoggerLevelsExpanded = false;
-                                _isHttpMethodsExpanded = false;
-                                _isApiStatusExpanded = false;
                               });
                             },
                             icon: const Icon(Icons.clear_all, size: 16),
@@ -1033,7 +1051,19 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                 ],
               ),
             ),
-
+            // Sort toggle
+            Padding(
+              padding: const EdgeInsets.only(left: 16, bottom: 8),
+              child: Row(
+                children: [
+                  LoggerSortToggle(
+                    sortNewestFirst: _sortNewestFirst,
+                    onToggle: () =>
+                        setState(() => _sortNewestFirst = !_sortNewestFirst),
+                  ),
+                ],
+              ),
+            ),
             // Logs list
             Expanded(
               child: filteredLogs.isEmpty
@@ -1080,8 +1110,9 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(log.type.icon,
-                                      color: Colors.white, size: 16),
+                                  _buildLogType(log),
+                                  // Icon(log.type.icon,
+                                  //     color: Colors.white, size: 12),
                                   if (log.statusCode != null)
                                     Text(
                                       '${log.statusCode}',
@@ -1095,24 +1126,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                             ),
                             title: Row(
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: log.type.color,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    _getLogTypeLabel(log),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
+                                // _buildLogType(log),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
@@ -1356,6 +1370,29 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                     ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogType(UnifiedLogEntry log) {
+    return FittedBox(
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 6,
+          vertical: 2,
+        ),
+        decoration: BoxDecoration(
+          color: log.type.color,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          _getLogTypeLabel(log),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
