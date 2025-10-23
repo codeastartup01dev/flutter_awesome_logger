@@ -1,6 +1,8 @@
 # Flutter Debugging Made Fun: How I Built 'Flutter Awesome Logger' That Actually Makes Developers Happy 🚀
 
-*Stop playing hide-and-seek with your bugs. Here's how one frustrated developer created the ultimate Flutter logging solution.*
+*A comprehensive Flutter logging package that makes debugging a breeze! Stop playing hide-and-seek with your bugs.*
+
+**Features a floating logger, automatic API logging with Dio interceptor, and a unified beautiful UI for viewing all logs in one place.**
 
 Link to the article: https://medium.com/@codeastartup01dev/flutter-debugging-made-fun-how-i-built-flutter-awesome-logger-that-actually-makes-developers-happy-65006b69380c 
 
@@ -9,14 +11,13 @@ Link to the article: https://medium.com/@codeastartup01dev/flutter-debugging-mad
 - [The Great Flutter Debugging Nightmare 😱](#the-great-flutter-debugging-nightmare-)
 - [The "Aha!" Moment 💡](#the-aha-moment-)
 - [Enter Flutter Awesome Logger: The Hero We Needed 🦸‍♂️](#enter-flutter-awesome-logger-the-hero-we-needed-️)
+- [✨ Features That Make Developers Smile](#-features-that-make-developers-smile)
 - [Screenshots: See It in Action 📸](#screenshots-see-it-in-action-)
-- [How to Actually See Your Logs (The Missing Piece) 📋](#how-to-actually-see-your-logs-the-missing-piece-)
-- [The Features That Make Developers Smile 😊](#the-features-that-make-developers-smile-)
-- [Real-World Impact: The Numbers Don't Lie 📊](#real-world-impact-the-numbers-dont-lie-)
-- [The Technical Magic Behind the Scenes 🔧](#the-technical-magic-behind-the-scenes-)
 - [Getting Started: From Zero to Hero in 60 Seconds ⏱️](#getting-started-from-zero-to-hero-in-60-seconds-️)
-- [The Community Response: Developers Actually Love It ❤️](#the-community-response-developers-actually-love-it-️)
+- [How to Actually See Your Logs (The Missing Piece) 📋](#how-to-actually-see-your-logs-the-missing-piece-)
+- [Configuration Options 🔧](#configuration-options-)
 - [Advanced Features for Power Users 🚀](#advanced-features-for-power-users-)
+- [Real-World Impact: The Numbers Don't Lie 📊](#real-world-impact-the-numbers-dont-lie-)
 - [The Future: What's Coming Next 🔮](#the-future-whats-coming-next-)
 - [Try It Today: Your Future Self Will Thank You 🙏](#try-it-today-your-future-self-will-thank-you-)
 
@@ -84,62 +85,50 @@ MaterialApp(
 
 ---
 
+## ✨ Features That Make Developers Smile
+
+| Feature | Description |
+|---------|-------------|
+| 📱 **Floating Logger Button** | Always accessible debug button that floats over your app - drag to reposition, auto-snaps to edges |
+| 👆 **Long Press Floating Button** | **Tap:** Opens logger UI instantly • **Long Press:** Shows quick actions menu • **Drag:** Repositions button • **Double Tap:** Toggles pause/resume logging |
+| 🤳 **Shake to Toggle** | Shake your device to show/hide the floating logger button - perfect for quick access during testing |
+| 🤳 **Shake to Enable** | Shake your device to enable the logger when disabled - ideal for production builds with hidden debug access |
+| 🌐 **Automatic API Logging** | Built-in Dio interceptor for seamless API logging - captures requests, responses, errors, and timing automatically |
+| 🎨 **Unified Beautiful UI** | Clean, modern interface with syntax highlighting - unified view for all logs, advanced filtering, and intuitive navigation |
+| 📊 **Multiple Log Levels** | Support for debug, info, warning, error, and verbose logs - color-coded with filtering and search capabilities |
+| 💾 **Smart Storage** | Logs stored only when logger is enabled - conserves memory and respects privacy settings |
+| ⏸️ **Pause/Resume Logging** | Temporarily pause all logging with visual indicators - useful for focusing on specific app sections |
+| 🔍 **Search & Filter** | Easily find specific logs with advanced filtering - search by text, level, timestamp, or source file |
+| 🎯 **Simple Configuration** | Single `enabled` property controls both UI and storage - async support for conditional initialization |
+| 📱 **Responsive Design** | Works perfectly on all screen sizes - adaptive layouts for phones, tablets, and different orientations |
+
+---
+
 ## Screenshots: See It in Action 📸
 
 Before we dive into the technical details, let me show you what this beauty looks like in action. Because let's be honest, we're all visual creatures:
 
-<table width="100%">
-  <tr>
-    <td width="50%" align="center">
-      <h3>🎯 The Floating Logger Button</h3>
-      <em>Your new best friend that's always there when you need it</em>
-      <br><br>
-      <img src="https://github.com/user-attachments/assets/83129e99-7e21-400a-a52c-74ecb1ab3492" alt="Floating Logger Button" width="300"/>
-      <br><br>
-      <p>That little purple button? That's your gateway to debugging nirvana. It floats over your app, follows you around like a loyal debugging companion, and gives you instant access to all your logs.</p>
-    </td>
-    <td width="50%" align="center">
-      <h3>🌐 API Logs View</h3>
-      <em>Every HTTP request, beautifully organized</em>
-      <br><br>
-      <img src="https://github.com/user-attachments/assets/707bd799-f7d6-40ae-9331-bafbf7a58680" alt="API Logs View" width="300"/>
-      <br><br>
-      <p>Look at that beautiful interface! Every API call is automatically captured with request details, response data, timing information, and even auto-generated cURL commands. No more manual logging, no more guesswork.</p>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2"><br></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center">
-      <h3>📊 General Logs View</h3>
-      <em>Your application logs with style</em>
-      <br><br>
-      <img src="https://github.com/user-attachments/assets/61c2606e-f22f-496f-98e9-d39d6da3ccfd" alt="General Logs View" width="300"/>
-      <br><br>
-      <p>Color-coded log levels, search functionality, filtering options, and a clean interface that doesn't make your eyes bleed. This is what logging should look like in 2024.</p>
-    </td>
-    <td width="50%" align="center">
-      <h3>🔍 Log Details</h3>
-      <em>Dive deep into any log entry</em>
-      <br><br>
-      <img src="https://github.com/user-attachments/assets/a6947367-578c-4df4-b73f-eece6a411b14" alt="Log Details" width="300"/>
-      <br><br>
-      <p>Expandable log entries with full context, stack traces, source file information, and copy-paste functionality. Everything you need to understand what went wrong (or right!).</p>
-    </td>
-  </tr>
-</table>
+<div align="center">
+
+### 🖼️ App Screenshots Gallery
+
+<img width="650" height="700" alt="awesome_flutter_logger_1" src="https://github.com/user-attachments/assets/51c14160-9c47-4712-b362-adcf9f032558" />
+<img width="650" height="700" alt="awesome_flutter_logger_2" src="https://github.com/user-attachments/assets/b71cf4bc-4dae-480b-873f-70082fae7139" />
+
+</div>
 
 *Pretty neat, right? And this is just the UI. Wait until you see how easy it is to set up...*
 
 ---
 
-### How to Actually See Your Logs (The Missing Piece) 📋
+## How to Actually See Your Logs (The Missing Piece) 📋
 
-Now here's the part most logging packages forget to mention clearly. You've got the floating button, but how do you actually populate it with logs? Let me break it down:
+### 🌐 API Logs
+*For HTTP requests and responses*
 
-#### **For API Logs Tab** 🌐
-Remember those manual curl commands? Forget about them. Add one line to your Dio setup:
+To capture API logs in the unified logger interface, add the Dio interceptor:
+
+**Step 1: Add the interceptor to your Dio instance**
 
 ```dart
 import 'package:dio/dio.dart';
@@ -148,41 +137,135 @@ import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 final dio = Dio();
 dio.interceptors.add(FlutterAwesomeLoggerDioInterceptor());
 
-// Now every API call is automatically logged with:
-// ✅ Request/response details
-// ✅ Timing information  
-// ✅ Auto-generated curl commands
-// ✅ Error details that actually make sense
+// Now all API calls are automatically logged!
 final response = await dio.get('https://api.example.com/data');
 ```
 
-#### **For General Logs Tab** 📊
-Create a logger instance and use it throughout your app:
+**What you get:**
+- ✅ **Automatic capture** - All requests and responses logged automatically
+- ✅ **cURL generation** - Copy-paste ready cURL commands for testing
+- ✅ **Error handling** - Network errors and HTTP errors captured
+- ✅ **Performance timing** - Request duration tracking
+- ✅ **Advanced filtering** - Filter by status code, method, or endpoint
+- ✅ **Search functionality** - Search through URLs, headers, and response content
+
+---
+
+### 📊 General Logs
+*For application logs and debugging*
+
+To capture general logs in the unified logger interface:
+
+**Step 1: Create a logger instance**
+// Create global logger instance (recommended: make a new file eg. my_logger.dart)
+```dart
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+
+final logger = FlutterAwesomeLogger.loggingUsingLogger;
+```
+
+**Step 2: Use the logger throughout your app**
 
 ```dart
-// Create this once (recommended: in a separate file like my_logger.dart)
-import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
-final logger = FlutterAwesomeLogger.loggingUsingLogger;
-
-// Then use it anywhere in your app
 import 'my_logger.dart';
 
 class MyService {
   void performOperation() {
-    logger.d('Starting complex operation...'); // Debug (grey)
-    logger.i('User logged in successfully'); // Info (blue)
-    logger.w('API rate limit approaching'); // Warning (orange)
+    // Debug information (development only)
+    logger.d('Starting complex operation with parameters: $params');
     
+    // General information (important events)
+    logger.i('User logged in successfully');
+    
+    // Warnings (potential issues)
+    logger.w('API rate limit approaching: ${remaining} requests left');
+    
+    // Errors (with full context)
     try {
-      // Your business logic
+      // Your code here
     } catch (e, stackTrace) {
-      logger.e('Operation failed', error: e, stackTrace: stackTrace); // Error (red)
+      logger.e('Failed to process user data', error: e, stackTrace: stackTrace);
     }
   }
 }
 ```
 
-No more guessing what went wrong with your API calls. No more "it works on my machine" moments. Just clear, beautiful logs that tell you exactly what happened.
+**What you get:**
+- ✅ **Multiple log levels** - DEBUG (grey), INFO (blue), WARNING (orange), ERROR (red)
+- ✅ **Stack trace support** - Full error context with file paths and line numbers
+- ✅ **Source tracking** - See exactly which file and method generated each log
+- ✅ **Advanced filtering** - Filter by log level, source file, or search content
+- ✅ **Export capabilities** - Copy individual logs or export entire filtered sets
+- ✅ **Real-time updates** - Logs appear instantly as your app runs
+
+---
+
+## Configuration Options 🔧
+
+### ⚙️ Flexible Configuration System
+
+The `enabled` parameter supports both synchronous and asynchronous initialization:
+
+| **🟢 Immediate Enable** | **🔴 Immediate Disable** | **⏳ Async Enable** |
+|------------------------|-------------------------|-------------------|
+| `enabled: true` | `enabled: false` | `enabled: someFuture()` |
+| Logger starts immediately | Logger is disabled | Waits for Future resolution |
+
+---
+
+#### 📊 **AwesomeLoggerConfig**
+
+*Core logging behavior configuration*
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `maxLogEntries` | `int` | `1000` | Maximum number of log entries to keep in memory |
+| `showFilePaths` | `bool` | `true` | Display file paths in console output |
+| `showEmojis` | `bool` | `true` | Show emojis in console output for better readability |
+| `useColors` | `bool` | `true` | Enable colored console output |
+| `stackTraceLines` | `int` | `0` | Number of stack trace lines to display |
+
+```dart
+const AwesomeLoggerConfig({
+  int maxLogEntries = 1000,
+  bool showFilePaths = true,
+  bool showEmojis = true,
+  bool useColors = true,
+  int stackTraceLines = 0,
+});
+```
+
+---
+
+#### 🎨 **FloatingLoggerConfig**
+
+*Floating button UI and behavior configuration*
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `backgroundColor` | `Color` | `Colors.deepPurple` | Background color of the floating button |
+| `icon` | `IconData` | `Icons.developer_mode` | Icon displayed on the floating button |
+| `showCount` | `bool` | `true` | Display log count badge on button |
+| `enableGestures` | `bool` | `true` | Enable drag gestures for repositioning |
+| `autoSnapToEdges` | `bool` | `true` | Automatically snap button to screen edges |
+| `size` | `double` | `60.0` | Size of the floating button |
+| `enableShakeToShowHideFloatingButton` | `bool` | `true` | Enable shake-to-toggle button visibility |
+| `enableShakeToEnableLogger` | `bool` | `true` | Enable shake-to-enable logger when disabled |
+| `shakeSensitivity` | `int` | `8` | Shake sensitivity (1-15, higher = less sensitive) |
+
+```dart
+const FloatingLoggerConfig({
+  Color backgroundColor = Colors.deepPurple,
+  IconData icon = Icons.developer_mode,
+  bool showCount = true,
+  bool enableGestures = true,
+  bool autoSnapToEdges = true,
+  double size = 60.0,
+  bool enableShakeToShowHideFloatingButton = true,
+  bool enableShakeToEnableLogger = true,
+  int shakeSensitivity = 8,
+});
+```
 
 ---
 
@@ -276,38 +359,63 @@ We kept the dependency list shorter than a Twitter character limit. Your app bun
 
 ## Getting Started: From Zero to Hero in 60 Seconds ⏱️
 
-### Step 1: Add the Package
+### Installation
+
+#### 📦 Add to your `pubspec.yaml`
+
 ```yaml
 dependencies:
   flutter_awesome_logger: ^latest_version
 ```
 
-### Step 2: Wrap Your App
-```dart
-MaterialApp(
-  home: FlutterAwesomeLogger(
-    child: YourHomePage(),
-  ),
-)
+#### 🔄 Install the package
+
+```bash
+# Using Flutter CLI
+flutter pub get
+
+# Or using Dart CLI
+dart pub get
 ```
 
-### Step 3: Add API Logging (Optional but Recommended)
+#### 📱 Import in your Dart code
+
 ```dart
-final dio = Dio();
-dio.interceptors.add(FlutterAwesomeLoggerDioInterceptor());
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 ```
 
-### Step 4: Start Logging Like a Pro
-```dart
-final logger = FlutterAwesomeLogger.loggingUsingLogger;
+### Basic Usage
 
-logger.d('Debug info that actually helps');
-logger.i('Important stuff happened');  
-logger.w('Something seems off...');
-logger.e('Houston, we have a problem', error: e, stackTrace: stackTrace);
+#### ⚡ **Easiest Setup (Just 2 Lines!)**
+
+The absolute simplest way to get started - just wrap your app:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: FlutterAwesomeLogger(
+        child: YourHomePage(), // Your existing home page
+      ),
+    );
+  }
+}
 ```
 
-**Congratulations!** You now have a logging system that would make senior developers weep tears of joy.
+**That's it! 🎉** The logger is now active with default settings. You'll see:
+- 📱 Floating logger button on your screen
+- 🤳 Shake-to-toggle functionality enabled
+- 📊 Unified logger interface ready for all your logs
 
 ---
 
@@ -325,72 +433,93 @@ logger.e('Houston, we have a problem', error: e, stackTrace: stackTrace);
 
 ## Advanced Features for Power Users 🚀
 
-### **Conditional Logger Activation**
+### Accessing Log History
+
 ```dart
-FlutterAwesomeLogger(
-  enabled: _shouldEnableLogger(), // Async function that checks conditions
-  loggerConfig: const AwesomeLoggerConfig(
-    maxLogEntries: 500,
-    showFilePaths: true,
-    showEmojis: true,
-    useColors: true,
-  ),
-  child: YourApp(),
-)
-```
-
-Perfect for enabling logging based on user roles, debug flags, or moon phases.
-
-### **Custom Styling That Matches Your Brand**
-```dart
-FloatingLoggerConfig(
-  backgroundColor: Colors.deepPurple,
-  icon: Icons.developer_mode,
-  showCount: true,
-  enableGestures: true,
-  autoSnapToEdges: true,
-  size: 60.0,
-  enableShakeToShowHideFloatingButton: true,
-  enableShakeToEnableLogger: true,
-  shakeSensitivity: 8, // 1-15, higher = less sensitive
-)
-```
-
-Because even debug tools should look good.
-
-### **Programmatic Control**
-```dart
-// Control logger visibility
-FlutterAwesomeLogger.setVisible(true);
-FlutterAwesomeLogger.toggleVisibility();
-
-// Pause/resume logging
-FlutterAwesomeLogger.setPauseLogging(true);
-bool isPaused = FlutterAwesomeLogger.isPaused;
-
-// Access log history
+// Get all stored logs
 final logs = FlutterAwesomeLogger.getLogs();
+
+// Get logs by level
 final errorLogs = FlutterAwesomeLogger.getLogsByLevel('ERROR');
+
+// Get recent logs
 final recentLogs = FlutterAwesomeLogger.getRecentLogs(
   duration: Duration(minutes: 10),
 );
 
-// Manage API logs
+// Clear all logs
+FlutterAwesomeLogger.clearLogs();
+
+// Export logs as formatted text
+String exportedLogs = FlutterAwesomeLogger.exportLogs();
+```
+
+### Programmatically Show Logger UI
+
+```dart
+// Show the unified logger history page
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => const AwesomeLoggerHistoryPage(),
+  ),
+);
+```
+
+### Pause/Resume Logging
+
+```dart
+// Pause all logging (both console and storage)
+FlutterAwesomeLogger.setPauseLogging(true);
+
+// Resume logging
+FlutterAwesomeLogger.setPauseLogging(false);
+
+// Check if logging is paused
+bool isPaused = FlutterAwesomeLogger.isPaused;
+```
+
+### Control Floating Logger Visibility
+
+```dart
+// Check if floating logger is visible
+bool isVisible = FlutterAwesomeLogger.isVisible();
+
+// Show/hide the floating logger
+FlutterAwesomeLogger.setVisible(true);  // Show
+FlutterAwesomeLogger.setVisible(false); // Hide
+
+// Toggle visibility
+FlutterAwesomeLogger.toggleVisibility();
+```
+
+### Manage API Logs
+
+```dart
+// Get all API logs
 final apiLogs = FlutterAwesomeLogger.getApiLogs();
+
+// Get API logs by type
 final successLogs = FlutterAwesomeLogger.getApiLogsByType(ApiLogType.success);
+final errorLogs = FlutterAwesomeLogger.getApiLogsByType(ApiLogType.serverError);
+
+// Clear API logs
 FlutterAwesomeLogger.clearApiLogs();
 ```
 
-### **Export and Share Debugging Sessions**
-```dart
-// Export logs as formatted text
-String exportedLogs = FlutterAwesomeLogger.exportLogs();
+### Customization
 
-// Clear all logs when needed
-FlutterAwesomeLogger.clearLogs();
-```
+The logger UI is highly customizable. You can:
 
-One tap exports your entire debugging session. Perfect for bug reports, team collaboration, or showing off your debugging skills.
+- Change colors and themes
+- Customize the floating button appearance
+- Configure log display formats
+- Add custom filters and search options
+- Pause/resume logging as needed
+- Control logging behavior with simple configuration
+- Enable/disable shake-to-toggle functionality
+- Enable/disable shake-to-enable functionality for production builds
+- Adjust shake sensitivity for different devices
 
 ---
 
@@ -431,6 +560,45 @@ Ready to transform your Flutter debugging experience? Here's how to get started:
 
 ---
 
+## 🤝 Contributing
+
+**We welcome contributions!** 
+
+Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+[🔧 Contribute](https://github.com/codeastartup01dev/flutter_awesome_logger/fork) • [📋 Issues](https://github.com/codeastartup01dev/flutter_awesome_logger/issues) • [💡 Feature Requests](https://github.com/codeastartup01dev/flutter_awesome_logger/issues/new)
+
+---
+
+## 📝 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🐛 Issues & Support
+
+| **🐛 Bug Reports** | **💡 Feature Requests** | **💬 Discussions** |
+|-------------------|------------------------|-------------------|
+| Found a bug? Let us know! | Have an idea? Share it! | Join the conversation! |
+| [Report Bug](https://github.com/codeastartup01dev/flutter_awesome_logger/issues/new?template=bug_report.md) | [Request Feature](https://github.com/codeastartup01dev/flutter_awesome_logger/issues/new?template=feature_request.md) | [Start Discussion](https://github.com/codeastartup01dev/flutter_awesome_logger/discussions) |
+
+---
+
+## 📞 Connect With Us
+
+| **📧 Email** | **🐦 Twitter** | **💬 Discord** |
+|-------------|---------------|---------------|
+| [codeastartup01dev@gmail.com](mailto:codeastartup01dev@gmail.com) | [@codeastartup01dev](https://twitter.com/codeastartup01dev) | [Join our community](https://discord.gg/codeastartup01dev) |
+
+---
+
+### ⭐ **Show Your Support**
+
+If this package helped you, please consider giving it a ⭐ on GitHub!
+
+---
+
 ## Final Thoughts: From One Developer to Another 💭
 
 Building Flutter Awesome Logger taught me something important: the best tools are the ones that make you forget you're using a tool. They just work, they feel natural, and they make your job easier.
@@ -456,4 +624,4 @@ Your 2 AM debugging sessions will never be the same.
 
 ---
 
-*Follow me for more Flutter tips, tricks, and tools that make mobile development actually enjoyable. Because life's too short for bad developer experiences.*
+<sub>Made with ❤️ by [codeastartup01dev](https://github.com/codeastartup01dev)</sub>

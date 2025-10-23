@@ -147,42 +147,41 @@ class LoggingUsingLogger {
     final frames = traceString.split('\n');
     final formattedFrames = frames
         .where(
-          (frame) =>
-              !frame.contains('awesome_logger.dart') &&
-              !frame.contains('log_entry.dart'),
-        )
+      (frame) =>
+          !frame.contains('awesome_logger.dart') &&
+          !frame.contains('log_entry.dart'),
+    )
         .map((frame) {
-          final match = RegExp(
-            r'(?:#\d+\s+)?(\S+)\s+\((.+?):(\d+):(\d+)\)',
-          ).firstMatch(frame.trim());
-          if (match != null) {
-            final method = match.group(1) ?? '';
-            String filePath = match.group(2) ?? '';
-            final line = match.group(3) ?? '';
-            final column = match.group(4) ?? '';
+      final match = RegExp(
+        r'(?:#\d+\s+)?(\S+)\s+\((.+?):(\d+):(\d+)\)',
+      ).firstMatch(frame.trim());
+      if (match != null) {
+        final method = match.group(1) ?? '';
+        String filePath = match.group(2) ?? '';
+        final line = match.group(3) ?? '';
+        final column = match.group(4) ?? '';
 
-            String relativePath;
-            if (filePath.startsWith('package:')) {
-              final parts = filePath.split('/');
-              relativePath = parts.sublist(1).join('/');
-            } else {
-              final currentDir = path.current;
-              relativePath = path.relative(filePath, from: currentDir);
-            }
+        String relativePath;
+        if (filePath.startsWith('package:')) {
+          final parts = filePath.split('/');
+          relativePath = parts.sublist(1).join('/');
+        } else {
+          final currentDir = path.current;
+          relativePath = path.relative(filePath, from: currentDir);
+        }
 
-            // Ensure the path starts from 'lib'
-            final libIndex = relativePath.indexOf('lib/');
-            if (libIndex != -1) {
-              relativePath = relativePath.substring(libIndex);
-            } else if (!relativePath.startsWith('lib/')) {
-              relativePath = 'lib/$relativePath';
-            }
+        // Ensure the path starts from 'lib'
+        final libIndex = relativePath.indexOf('lib/');
+        if (libIndex != -1) {
+          relativePath = relativePath.substring(libIndex);
+        } else if (!relativePath.startsWith('lib/')) {
+          relativePath = 'lib/$relativePath';
+        }
 
-            return '$method (./$relativePath:$line:$column)';
-          }
-          return frame;
-        })
-        .join('\n');
+        return '$method (./$relativePath:$line:$column)';
+      }
+      return frame;
+    }).join('\n');
 
     return '${error.toString()}\n$formattedFrames';
   }
