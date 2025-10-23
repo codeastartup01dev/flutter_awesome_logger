@@ -178,28 +178,24 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   /// Get statistics for the current logs
   List<StatisticItem> _getStatistics() {
     final allLogs = _getUnifiedLogs();
-    final successCount = allLogs.where((l) => l.type.isSuccess).length;
-    final errorCount = allLogs.where((l) => l.type.isError).length;
+
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
+    final successCount = relevantLogs.where((l) => l.type.isSuccess).length;
+    final errorCount = relevantLogs.where((l) => l.type.isError).length;
 
     return [
       StatisticItem(
         label: 'Total',
-        value: '${allLogs.length}',
+        value: '${relevantLogs.length}',
         color: Colors.blue,
         filterKey: 'total',
       ),
-      // StatisticItem(
-      //   label: 'General',
-      //   value: '$generalCount',
-      //   color: Colors.purple,
-      //   filterKey: 'general',
-      // ),
-      // StatisticItem(
-      //   label: 'API',
-      //   value: '$apiCount',
-      //   color: Colors.green,
-      //   filterKey: 'api',
-      // ),
       StatisticItem(
         label: 'Success',
         value: '$successCount',
@@ -218,8 +214,16 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   /// Get type counts for filter chips
   Map<UnifiedLogType, int> _getTypeCounts() {
     final allLogs = _getUnifiedLogs();
+
+    // Filter logs based on selected main filters for accurate sub-filter counts
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
     final counts = <UnifiedLogType, int>{};
-    for (final log in allLogs) {
+    for (final log in relevantLogs) {
       counts[log.type] = (counts[log.type] ?? 0) + 1;
     }
     return counts;
@@ -228,7 +232,15 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   /// Get available HTTP methods from API logs
   List<String> _getAvailableMethods() {
     final allLogs = _getUnifiedLogs();
-    return allLogs
+
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs
         .where((l) => l.source == LogSource.api && l.httpMethod != null)
         .map((l) => l.httpMethod!)
         .toSet()
@@ -334,7 +346,15 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   /// Get count for specific HTTP method
   int _getMethodCount(String method) {
     final allLogs = _getUnifiedLogs();
-    return allLogs.where((l) => l.httpMethod == method).length;
+
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs.where((l) => l.httpMethod == method).length;
   }
 
   /// Check if any logger sub-filters are selected

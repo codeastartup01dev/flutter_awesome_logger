@@ -206,7 +206,7 @@ class _DemoPageState extends State<DemoPage> {
               const SizedBox(height: 12),
               ElevatedButton.icon(
                 onPressed: () => _makeApiCall(
-                  'https://jsonplaceholder.typicode.com/posts/1',
+                  'https://jsonplaceholder.typicode.com/posts/1/',
                 ),
                 icon: const Icon(Icons.web),
                 label: const Text('Make Successful API Call'),
