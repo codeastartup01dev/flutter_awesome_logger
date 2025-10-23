@@ -73,9 +73,9 @@ class LoggerFilterChips extends StatelessWidget {
                         style: const TextStyle(fontSize: 11),
                       ),
                       backgroundColor: selectedFilters.contains(option.value)
-                          ? option.color?.withOpacity(0.2)
+                          ? option.color?.withValues(alpha: 0.2)
                           : null,
-                      selectedColor: option.color?.withOpacity(0.3),
+                      selectedColor: option.color?.withValues(alpha: 0.3),
                       onSelected: (selected) =>
                           onFilterChanged(option.value, selected),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

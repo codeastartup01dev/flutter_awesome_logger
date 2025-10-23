@@ -80,9 +80,9 @@ class FloatingLoggerConfig {
       edgeMargin: edgeMargin ?? this.edgeMargin,
       enableShakeToShowHideFloatingButton:
           enableShakeToShowHideFloatingButton ??
-          this.enableShakeToShowHideFloatingButton,
+              this.enableShakeToShowHideFloatingButton,
       enableShakeToEnableLogger:
-          enableShakeToEnable ?? this.enableShakeToEnableLogger,
+          enableShakeToEnable ?? enableShakeToEnableLogger,
       shakeSensitivity: shakeSensitivity ?? this.shakeSensitivity,
     );
   }

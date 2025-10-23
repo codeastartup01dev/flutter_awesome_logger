@@ -178,9 +178,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   /// Get statistics for the current logs
   List<StatisticItem> _getStatistics() {
     final allLogs = _getUnifiedLogs();
-    final generalCount =
-        allLogs.where((l) => l.source == LogSource.general).length;
-    final apiCount = allLogs.where((l) => l.source == LogSource.api).length;
     final successCount = allLogs.where((l) => l.type.isSuccess).length;
     final errorCount = allLogs.where((l) => l.type.isError).length;
 
@@ -401,7 +398,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: isSelected ? color.withOpacity(0.1) : Colors.grey[100],
+        color: isSelected ? color.withValues(alpha: 0.1) : Colors.grey[100],
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isSelected ? color : Colors.grey[300]!,
@@ -510,7 +507,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.grey[50],
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.grey[50],
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? color : Colors.grey[300]!,
@@ -786,10 +783,10 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.blue.withOpacity(0.1),
+                                color: Colors.blue.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                    color: Colors.blue.withOpacity(0.3)),
+                                    color: Colors.blue.withValues(alpha: 0.3)),
                               ),
                               child: Text(
                                 '${_getActiveFilterCount()} active',
@@ -1257,8 +1254,8 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            color:
-                                                log.type.color.withOpacity(0.1),
+                                            color: log.type.color
+                                                .withValues(alpha: 0.1),
                                             borderRadius:
                                                 BorderRadius.circular(4),
                                             border: Border.all(

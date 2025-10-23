@@ -186,8 +186,9 @@ class UnifiedLogEntry {
     if (source == LogSource.api && apiLogEntry != null) {
       if (apiLogEntry!.url.toLowerCase().contains(lowerQuery)) return true;
       if (apiLogEntry!.method.toLowerCase().contains(lowerQuery)) return true;
-      if (apiLogEntry!.error?.toLowerCase().contains(lowerQuery) == true)
+      if (apiLogEntry!.error?.toLowerCase().contains(lowerQuery) == true) {
         return true;
+      }
       if (apiLogEntry!.curl.toLowerCase().contains(lowerQuery)) return true;
     }
 
