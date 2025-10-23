@@ -27,7 +27,8 @@ class LoggerStatistics extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.start,
+        spacing: 8,
         children:
             statistics.map((stat) => _buildStatItem(stat, context)).toList(),
       ),
@@ -43,12 +44,16 @@ class LoggerStatistics extends StatelessWidget {
           : null,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: isSelected ? stat.color.withOpacity(0.1) : Colors.transparent,
+          // color: isSelected ? stat.color.withOpacity(0.1) : Colors.grey[100],
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? stat.color : Colors.transparent,
+            color: isSelected
+                ? stat.color
+                : stat.filterKey == 'total'
+                    ? Colors.transparent
+                    : Colors.grey[300]!,
             width: 1.5,
           ),
         ),
@@ -58,7 +63,7 @@ class LoggerStatistics extends StatelessWidget {
             Text(
               stat.value,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: stat.color,
               ),

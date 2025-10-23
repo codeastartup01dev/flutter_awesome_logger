@@ -191,18 +191,18 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
         color: Colors.blue,
         filterKey: 'total',
       ),
-      StatisticItem(
-        label: 'General',
-        value: '$generalCount',
-        color: Colors.purple,
-        filterKey: 'general',
-      ),
-      StatisticItem(
-        label: 'API',
-        value: '$apiCount',
-        color: Colors.green,
-        filterKey: 'api',
-      ),
+      // StatisticItem(
+      //   label: 'General',
+      //   value: '$generalCount',
+      //   color: Colors.purple,
+      //   filterKey: 'general',
+      // ),
+      // StatisticItem(
+      //   label: 'API',
+      //   value: '$apiCount',
+      //   color: Colors.green,
+      //   filterKey: 'api',
+      // ),
       StatisticItem(
         label: 'Success',
         value: '$successCount',
@@ -733,20 +733,20 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
             ),
 
             // Statistics
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: LoggerStatistics(
-                      statistics: statistics,
-                      onStatisticTapped: _onStatisticTapped,
-                      selectedFilter: _statsFilter,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 16),
+            //   child: Row(
+            //     children: [
+            //       Expanded(
+            //         child: LoggerStatistics(
+            //           statistics: statistics,
+            //           onStatisticTapped: _onStatisticTapped,
+            //           selectedFilter: _statsFilter,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // Collapsible filter section
             Container(
@@ -1000,53 +1000,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                             .toList(),
                       ),
                     ],
-
-                    // Clear all filters button
-                    if (_selectedTypes.isNotEmpty ||
-                        _selectedSources.isNotEmpty ||
-                        _selectedClasses.isNotEmpty ||
-                        _selectedMethods.isNotEmpty ||
-                        _statsFilter != null) ...[
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          const Text(
-                            'Active filters:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          TextButton.icon(
-                            onPressed: () {
-                              setState(() {
-                                _selectedTypes.clear();
-                                _selectedSources.clear();
-                                _selectedClasses.clear();
-                                _selectedMethods.clear();
-                                _statsFilter = null;
-                                _isLoggerFiltersExpanded = false;
-                                _isApiFiltersExpanded = false;
-                              });
-                            },
-                            icon: const Icon(Icons.clear_all, size: 16),
-                            label: const Text(
-                              'Clear All',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
                   ], // End of _isFilterSectionExpanded
                 ],
               ),
@@ -1061,9 +1014,66 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                     onToggle: () =>
                         setState(() => _sortNewestFirst = !_sortNewestFirst),
                   ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: LoggerStatistics(
+                      statistics: statistics,
+                      onStatisticTapped: _onStatisticTapped,
+                      selectedFilter: _statsFilter,
+                    ),
+                  ),
                 ],
               ),
             ),
+            // Clear all filters button
+            if (_selectedTypes.isNotEmpty ||
+                _selectedSources.isNotEmpty ||
+                _selectedClasses.isNotEmpty ||
+                _selectedMethods.isNotEmpty ||
+                _statsFilter != null) ...[
+              // const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.only(left: 16, bottom: 8),
+                child: Row(
+                  children: [
+                    const Text(
+                      'Active filters:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _selectedTypes.clear();
+                          _selectedSources.clear();
+                          _selectedClasses.clear();
+                          _selectedMethods.clear();
+                          _statsFilter = null;
+                          _isLoggerFiltersExpanded = false;
+                          _isApiFiltersExpanded = false;
+                        });
+                      },
+                      icon: const Icon(Icons.clear_all, size: 16),
+                      label: const Text(
+                        'Clear All',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             // Logs list
             Expanded(
               child: filteredLogs.isEmpty
