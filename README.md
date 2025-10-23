@@ -61,8 +61,8 @@
 
 ### 🖼️ App Screenshots Gallery
 
-<img width="2196" height="2400" alt="awesome_flutter_logger_1" src="https://github.com/user-attachments/assets/51c14160-9c47-4712-b362-adcf9f032558" />
-<img width="2196" height="2400" alt="awesome_flutter_logger_2" src="https://github.com/user-attachments/assets/b71cf4bc-4dae-480b-873f-70082fae7139" />
+<img width="650" height="700" alt="awesome_flutter_logger_1" src="https://github.com/user-attachments/assets/51c14160-9c47-4712-b362-adcf9f032558" />
+<img width="650" height="700" alt="awesome_flutter_logger_2" src="https://github.com/user-attachments/assets/b71cf4bc-4dae-480b-873f-70082fae7139" />
 
 </div>
 
