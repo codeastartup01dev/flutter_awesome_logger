@@ -119,13 +119,6 @@ class _DemoPageState extends State<DemoPage> {
   void _openLogger() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const LoggerHistoryPage()),
-    );
-  }
-
-  void _openUnifiedLogger() {
-    Navigator.push(
-      context,
       MaterialPageRoute(builder: (context) => const AwesomeLoggerHistoryPage()),
     );
   }
@@ -185,12 +178,13 @@ class _DemoPageState extends State<DemoPage> {
                         '\n🎯 Floating logger button (look for the floating button!)',
                       ),
                       Text(
-                        '\n📊 General logging with different levels using logger.d, logger.i, logger.w, logger.e, logger.v',
+                        '\n📊 General logging with different levels using logger.d, logger.i, logger.w, logger.e',
                       ),
                       Text(
                         '\n🌐 API request/response logging using Dio interceptor (FlutterAwesomeLoggerDioInterceptor)',
                       ),
-                      Text('\n🎨 Clean UI for browsing and searching logs'),
+                      Text(
+                          '\n🎨 Unified UI for browsing and searching all logs in one place'),
                     ],
                   ),
                 ),
@@ -248,17 +242,8 @@ class _DemoPageState extends State<DemoPage> {
               const SizedBox(height: 24),
               OutlinedButton.icon(
                 onPressed: _openLogger,
-                icon: const Icon(Icons.history),
-                label: const Text('Open Logger History'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.all(16),
-                ),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: _openUnifiedLogger,
                 icon: const Icon(Icons.list_alt),
-                label: const Text('Open Unified Logger (NEW!)'),
+                label: const Text('Open Awesome Logger'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
                   backgroundColor: Colors.purple.withValues(alpha: 0.1),

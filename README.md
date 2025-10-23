@@ -10,7 +10,7 @@
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
 
-**Features a floating logger, automatic API logging with Dio interceptor, and a beautiful UI for viewing logs.**
+**Features a floating logger, automatic API logging with Dio interceptor, and a unified beautiful UI for viewing all logs in one place.**
 
 [📖 Documentation](#-getting-started) • [🚀 Installation](#installation) • [💡 Examples](#basic-usage) • [🎨 Customization](#-customization)
 
@@ -23,7 +23,7 @@
 - [🚀 Getting Started](#-getting-started)
   - [Installation](#installation)
   - [Basic Usage](#basic-usage)
-  - [How to Get Logs in Each Tab](#-how-to-get-logs-in-each-tab)
+  - [How to Get Logs in the Unified Interface](#-how-to-get-logs-in-the-unified-interface)
 - [🔧 Configuration Options](#-configuration-options)
 - [📚 Advanced Usage](#-advanced-usage)
 - [🎨 Customization](#-customization)
@@ -45,7 +45,7 @@
 | 🤳 **Shake to Toggle** | Shake your device to show/hide the floating logger button - perfect for quick access during testing |
 | 🤳 **Shake to Enable** | Shake your device to enable the logger when disabled - ideal for production builds with hidden debug access |
 | 🌐 **Automatic API Logging** | Built-in Dio interceptor for seamless API logging - captures requests, responses, errors, and timing automatically |
-| 🎨 **Beautiful UI** | Clean, modern interface with syntax highlighting - dark/light themes, collapsible sections, and intuitive navigation |
+| 🎨 **Unified Beautiful UI** | Clean, modern interface with syntax highlighting - unified view for all logs, advanced filtering, and intuitive navigation |
 | 📊 **Multiple Log Levels** | Support for debug, info, warning, error, and verbose logs - color-coded with filtering and search capabilities |
 | 💾 **Smart Storage** | Logs stored only when logger is enabled - conserves memory and respects privacy settings |
 | ⏸️ **Pause/Resume Logging** | Temporarily pause all logging with visual indicators - useful for focusing on specific app sections |
@@ -77,13 +77,13 @@
     <td align="center" width="50%">
       <img 
         src="https://github.com/user-attachments/assets/707bd799-f7d6-40ae-9331-bafbf7a58680" 
-        alt="API Logs View"
+        alt="Unified Logger Interface"
         width="300"
       />
       <br><br>
-      <strong>🌐 API Logs View</strong>
+      <strong>🌐 Unified Logger Interface</strong>
       <br>
-      <em>Comprehensive API request/response logging</em>
+      <em>All logs in one chronological view with advanced filtering</em>
     </td>
   </tr>
   <tr>
@@ -93,13 +93,13 @@
     <td align="center" width="50%">
       <img 
         src="https://github.com/user-attachments/assets/61c2606e-f22f-496f-98e9-d39d6da3ccfd" 
-        alt="General Logs View"
+        alt="Smart Filtering System"
         width="300"
       />
       <br><br>
-      <strong>📊 General Logs View</strong>
+      <strong>📊 Smart Filtering System</strong>
       <br>
-      <em>Beautiful log interface with filtering</em>
+      <em>Advanced filters for logger levels and API methods</em>
     </td>
     <td align="center" width="50%">
       <img 
@@ -189,16 +189,16 @@ class MyApp extends StatelessWidget {
 **That's it! 🎉** The logger is now active with default settings. You'll see:
 - 📱 Floating logger button on your screen
 - 🤳 Shake-to-toggle functionality enabled
-- 📊 Both API logs and general logs tabs ready
+- 📊 Unified logger interface ready for all your logs
 
 ---
 
-## 📋 How to Get Logs in Each Tab
+## 📋 How to Get Logs in the Unified Interface
 
-### 🌐 API Logs Tab
+### 🌐 API Logs
 *For HTTP requests and responses*
 
-To populate the API Logs tab with your HTTP requests, add the Dio interceptor:
+To capture API logs in the unified logger interface, add the Dio interceptor:
 
 **Step 1: Add the interceptor to your Dio instance**
 
@@ -223,10 +223,10 @@ final response = await dio.get('https://api.example.com/data');
 
 ---
 
-### 📊 General Logs Tab
+### 📊 General Logs
 *For application logs and debugging*
 
-To populate the General Logs tab with your application logs:
+To capture general logs in the unified logger interface:
 
 **Step 1: Create a logger instance**
 // Create global logger instance (recommended: make a new file eg. my_logger.dart)
@@ -500,11 +500,11 @@ String exportedLogs = FlutterAwesomeLogger.exportLogs();
 ### Programmatically Show Logger UI
 
 ```dart
-// Show the logger history page
+// Show the unified logger history page
 Navigator.push(
   context,
   MaterialPageRoute(
-    builder: (context) => const LoggerHistoryPage(),
+    builder: (context) => const AwesomeLoggerHistoryPage(),
   ),
 );
 ```

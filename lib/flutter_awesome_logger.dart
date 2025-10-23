@@ -14,13 +14,9 @@ export 'src/floating_logger/floating_logger_config.dart';
 
 // UI exports
 export 'src/ui/awesome_logger_history_page.dart';
-export 'src/ui/logger_history_page.dart';
-export 'src/ui/widgets/api_logs_tab.dart';
-export 'src/ui/widgets/general_logs_tab.dart';
 
-// Common UI widgets
+// Common UI widgets (for advanced customization)
 export 'src/ui/widgets/common/logger_export_dialog.dart';
-export 'src/ui/widgets/common/logger_filter_chips.dart';
 export 'src/ui/widgets/common/logger_search_bar.dart';
 export 'src/ui/widgets/common/logger_sort_toggle.dart';
 export 'src/ui/widgets/common/logger_statistics.dart';

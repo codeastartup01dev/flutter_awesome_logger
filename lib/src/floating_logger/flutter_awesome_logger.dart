@@ -7,7 +7,7 @@ import '../api_logger/api_log_entry.dart';
 import '../api_logger/api_logger_service.dart';
 import '../core/log_entry.dart';
 import '../core/logging_using_logger.dart';
-import '../ui/logger_history_page.dart';
+import '../ui/awesome_logger_history_page.dart';
 import 'floating_logger_config.dart';
 import 'floating_logger_manager.dart';
 
@@ -766,7 +766,7 @@ return MaterialApp(
 
   void _openLogger(BuildContext context) {
     // Check if logger is already open
-    if (LoggerHistoryPage.isLoggerOpen) {
+    if (AwesomeLoggerHistoryPage.isLoggerOpen) {
       // Show message that logger is already open
       _showLoggerAlreadyOpenMessage(context);
       return;
@@ -794,8 +794,8 @@ return MaterialApp(
     try {
       navigator.push(
         MaterialPageRoute(
-          builder: (context) =>
-              LoggerHistoryPage(showFilePaths: widget.config.showFilePaths),
+          builder: (context) => AwesomeLoggerHistoryPage(
+              showFilePaths: widget.config.showFilePaths),
         ),
       );
     } catch (e) {

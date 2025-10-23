@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] (2024-10-23)
+
+### 🎉 Major UI Overhaul - Unified Logger Experience
+
+This release introduces a completely redesigned logging experience with a unified interface that combines both general and API logs in one seamless view.
+
+### Added
+- 🎯 **Unified Logger Interface** - New `AwesomeLoggerHistoryPage` combines general and API logs in chronological order
+- 🔍 **Advanced Filtering System** - Expandable filter sections with smart sub-filters for logger levels and API methods
+- 📊 **Intelligent Statistics** - Real-time statistics with clickable filtering capabilities
+- 🎨 **Enhanced Visual Design** - Modern card-based layout with improved readability and navigation
+- ⚡ **Smart Filter Management** - Collapsible filter sections with active filter indicators
+- 🔄 **Improved Sorting** - Better sort toggle with visual feedback and intuitive controls
+
+### Changed
+- 🚀 **Simplified API** - Removed separate tab-based UI in favor of unified chronological view
+- 📱 **Better Mobile Experience** - Optimized layout for all screen sizes with responsive design
+- 🎯 **Streamlined Navigation** - Single entry point for all logging functionality
+- 📖 **Updated Documentation** - README and examples now reflect the new unified approach
+
+### Removed
+- ⚠️ **Breaking Change**: Removed `LoggerHistoryPage` - use `AwesomeLoggerHistoryPage` instead
+- ⚠️ **Breaking Change**: Removed separate `ApiLogsTab` and `GeneralLogsTab` widgets
+- 🧹 **Code Cleanup** - Removed unused filter chip components and redundant UI files
+
+### Fixed
+- 🔧 **Flutter Analyze Issues** - Fixed all deprecated `withOpacity` usage, replaced with `withValues`
+- 🐛 **Unused Variable Warnings** - Removed unused local variables in statistics calculation
+- 📝 **Code Style Issues** - Added proper curly braces and removed unnecessary `this.` qualifiers
+
+### Technical
+- 🏗️ **Unified Architecture** - Single page handles all log types with smart filtering
+- 📊 **Performance Improvements** - More efficient log rendering and filtering
+- 🎯 **Better State Management** - Improved filter state handling and UI updates
+- 🧪 **Enhanced Testing** - All tests pass with zero analysis issues
+
+### Migration Guide
+```dart
+// Old way (no longer available)
+Navigator.push(context, MaterialPageRoute(
+  builder: (context) => const LoggerHistoryPage(),
+));
+
+// New way (recommended)
+Navigator.push(context, MaterialPageRoute(
+  builder: (context) => const AwesomeLoggerHistoryPage(),
+));
+```
+
 ## [1.1.2] (2024-10-16)
 - made sort logs toggle button to api and general logs tabs more intuitive and user-friendly
 
