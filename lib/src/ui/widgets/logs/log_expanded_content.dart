@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_json_view/flutter_json_view.dart';
 
 import '../../../api_logger/api_log_entry.dart';
 import '../../../core/unified_log_entry.dart';
@@ -221,13 +224,59 @@ class _ContentSectionState extends State<ContentSection> {
     _isExpanded = !widget.initiallyCollapsed;
   }
 
+  /// Build appropriate widget for content (JSON or text)
+  Widget _buildContentWidget() {
+    const maxLength = 500; // Maximum characters to show initially
+    final shouldTruncate = widget.content.length > maxLength;
+
+    // Always show as text with truncation, JSON will be handled in bottom sheet
+
+    // Fallback to text display for non-JSON content
+    final displayContent = shouldTruncate
+        ? '${widget.content.substring(0, maxLength)}...'
+        : widget.content;
+
+    return shouldTruncate
+        ? RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: widget.content.substring(0, maxLength),
+                  style: TextStyle(
+                    fontSize: widget.isSecondary ? 10 : 11,
+                    fontFamily: 'monospace',
+                    height: 1.4,
+                    color:
+                        widget.isSecondary ? Colors.grey[800] : Colors.black87,
+                  ),
+                ),
+                TextSpan(
+                  text: '...click to view more',
+                  style: TextStyle(
+                    fontSize: widget.isSecondary ? 10 : 11,
+                    fontFamily: 'monospace',
+                    height: 1.4,
+                    color: Colors.blue[700],
+                  ),
+                ),
+              ],
+            ),
+          )
+        : Text(
+            displayContent,
+            style: TextStyle(
+              fontSize: widget.isSecondary ? 10 : 11,
+              fontFamily: 'monospace',
+              height: 1.4,
+              color: widget.isSecondary ? Colors.grey[800] : Colors.black87,
+            ),
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     const maxLength = 500; // Maximum characters to show initially
     final shouldTruncate = widget.content.length > maxLength;
-    final displayContent = shouldTruncate
-        ? '${widget.content.substring(0, maxLength)}...'
-        : widget.content;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,44 +364,7 @@ class _ContentSectionState extends State<ContentSection> {
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(color: Colors.grey[300]!),
               ),
-              child: shouldTruncate
-                  ? RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: widget.content.substring(0, maxLength),
-                            style: TextStyle(
-                              fontSize: widget.isSecondary ? 10 : 11,
-                              fontFamily: 'monospace',
-                              height: 1.4,
-                              color: widget.isSecondary
-                                  ? Colors.grey[800]
-                                  : Colors.black87,
-                            ),
-                          ),
-                          TextSpan(
-                            text: '...click to view more',
-                            style: TextStyle(
-                              fontSize: widget.isSecondary ? 10 : 11,
-                              fontFamily: 'monospace',
-                              height: 1.4,
-                              color: Colors.blue[700],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Text(
-                      displayContent,
-                      style: TextStyle(
-                        fontSize: widget.isSecondary ? 10 : 11,
-                        fontFamily: 'monospace',
-                        height: 1.4,
-                        color: widget.isSecondary
-                            ? Colors.grey[800]
-                            : Colors.black87,
-                      ),
-                    ),
+              child: _buildContentWidget(),
             ),
           ),
         ],
@@ -360,86 +372,233 @@ class _ContentSectionState extends State<ContentSection> {
     );
   }
 
-  /// Show full content in a bottom sheet
+  /// Show full content in a bottom sheet with view switching options
   void _showFullContent(BuildContext context, String title, String content) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.85,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          CopyHandler.copyToClipboard(context, content);
-                        },
-                        icon: const Icon(Icons.copy),
-                        tooltip: 'Copy content',
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      const SizedBox(width: 16),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  content,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'monospace',
-                    height: 1.4,
-                  ),
-                ),
-              ),
-            ),
-          ],
+      builder: (context) => _ContentBottomSheet(
+        title: title,
+        content: content,
+      ),
+    );
+  }
+}
+
+/// Bottom sheet widget for displaying content with view switching options
+class _ContentBottomSheet extends StatefulWidget {
+  final String title;
+  final String content;
+
+  const _ContentBottomSheet({
+    required this.title,
+    required this.content,
+  });
+
+  @override
+  State<_ContentBottomSheet> createState() => _ContentBottomSheetState();
+}
+
+class _ContentBottomSheetState extends State<_ContentBottomSheet> {
+  String _selectedView = 'raw';
+
+  /// Check if content is valid JSON
+  bool _isJson(String content) {
+    try {
+      jsonDecode(content);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Get parsed JSON object if content is valid JSON
+  dynamic _parseJson(String content) {
+    try {
+      return jsonDecode(content);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Build JSON view widget
+  Widget _buildJsonView(dynamic jsonData) {
+    final jsonTheme = JsonViewTheme(
+      keyStyle: const TextStyle(
+        color: Colors.black87,
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+      ),
+      stringStyle: TextStyle(
+        color: Colors.green[700],
+        fontSize: 12,
+      ),
+      intStyle: TextStyle(
+        color: Colors.blue[700],
+        fontSize: 12,
+      ),
+      doubleStyle: TextStyle(
+        color: Colors.blue[700],
+        fontSize: 12,
+      ),
+      boolStyle: TextStyle(
+        color: Colors.purple[700],
+        fontSize: 12,
+      ),
+      closeIcon: Icon(
+        Icons.remove,
+        color: Colors.grey[700],
+        size: 16,
+      ),
+      openIcon: Icon(
+        Icons.add,
+        color: Colors.grey[700],
+        size: 16,
+      ),
+      separator: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: Icon(
+          Icons.arrow_right,
+          size: 14,
+          color: Colors.grey[600],
         ),
       ),
     );
+
+    // Handle different JSON types
+    if (jsonData is Map<String, dynamic>) {
+      return JsonView.map(jsonData, theme: jsonTheme);
+    } else if (jsonData is List) {
+      return JsonView.map({'items': jsonData}, theme: jsonTheme);
+    } else {
+      return JsonView.map({'value': jsonData}, theme: jsonTheme);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isJsonContent = _isJson(widget.content);
+    final jsonData = isJsonContent ? _parseJson(widget.content) : null;
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Header with title and actions
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        CopyHandler.copyToClipboard(context, widget.content);
+                      },
+                      icon: const Icon(Icons.copy),
+                      tooltip: 'Copy content',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const SizedBox(width: 16),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // View selector chips (only show if JSON)
+          if (isJsonContent)
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  _buildViewChip('Raw', 'raw'),
+                  const SizedBox(width: 8),
+                  _buildViewChip('Formatted', 'formatted'),
+                ],
+              ),
+            ),
+          // Content area
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: _buildContent(isJsonContent, jsonData),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build view selector chip
+  Widget _buildViewChip(String label, String viewType) {
+    final isSelected = _selectedView == viewType;
+
+    return FilterChip(
+      selected: isSelected,
+      label: Text(label, style: const TextStyle(fontSize: 12)),
+      onSelected: (selected) {
+        setState(() {
+          _selectedView = selected ? viewType : 'raw';
+        });
+      },
+      backgroundColor: isSelected ? Colors.blue[50] : Colors.grey[100],
+      selectedColor: Colors.blue[100],
+      checkmarkColor: Colors.blue[700],
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+    );
+  }
+
+  /// Build content based on selected view
+  Widget _buildContent(bool isJsonContent, dynamic jsonData) {
+    if (isJsonContent && _selectedView == 'formatted' && jsonData != null) {
+      // Show formatted JSON view
+      return _buildJsonView(jsonData);
+    } else {
+      // Show raw text view
+      return Text(
+        widget.content,
+        style: const TextStyle(
+          fontSize: 12,
+          fontFamily: 'monospace',
+          height: 1.4,
+        ),
+      );
+    }
   }
 }
