@@ -25,3 +25,6 @@ export 'src/ui/widgets/common/logger_export_dialog.dart';
 export 'src/ui/widgets/common/logger_search_bar.dart';
 export 'src/ui/widgets/common/logger_sort_toggle.dart';
 export 'src/ui/widgets/common/logger_statistics.dart';
+
+// JSON widgets (for displaying JSON data)
+export 'src/ui/widgets/json/json_widgets.dart';
