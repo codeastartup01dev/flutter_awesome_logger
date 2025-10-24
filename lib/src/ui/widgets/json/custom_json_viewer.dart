@@ -281,7 +281,8 @@ class _CustomJsonViewerState extends State<CustomJsonViewer> {
 
     return Padding(
       padding: EdgeInsets.only(left: indentLevel * 16.0),
-      child: Row(
+      child: Wrap(
+        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(
               width: 20), // Space for arrow (no arrow for primitives)
@@ -295,16 +296,14 @@ class _CustomJsonViewerState extends State<CustomJsonViewer> {
               ),
             ),
           ],
-          Flexible(
-            child: Text(
-              displayValue,
-              style: TextStyle(
-                color: valueColor,
-                fontSize: 12,
-                fontFamily: 'monospace',
-              ),
-              overflow: TextOverflow.ellipsis,
+          Text(
+            displayValue,
+            style: TextStyle(
+              color: valueColor,
+              fontSize: 12,
+              fontFamily: 'monospace',
             ),
+            softWrap: true,
           ),
         ],
       ),

@@ -401,7 +401,7 @@ class _ContentBottomSheet extends StatefulWidget {
 }
 
 class _ContentBottomSheetState extends State<_ContentBottomSheet> {
-  String _selectedView = 'raw';
+  String _selectedView = 'formatted';
 
   /// Check if content is valid JSON
   bool _isJson(String content) {
