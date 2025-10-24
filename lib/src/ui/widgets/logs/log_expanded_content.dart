@@ -315,19 +315,44 @@ class _ContentSectionState extends State<ContentSection> {
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(color: Colors.grey[300]!),
               ),
-              child: Text(
-                displayContent,
-                style: TextStyle(
-                  fontSize: widget.isSecondary ? 10 : 11,
-                  fontFamily: 'monospace',
-                  height: 1.4,
-                  color: shouldTruncate
-                      ? Colors.blue[700]
-                      : (widget.isSecondary
-                          ? Colors.grey[800]
-                          : Colors.black87),
-                ),
-              ),
+              child: shouldTruncate
+                  ? RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: widget.content.substring(0, maxLength),
+                            style: TextStyle(
+                              fontSize: widget.isSecondary ? 10 : 11,
+                              fontFamily: 'monospace',
+                              height: 1.4,
+                              color: widget.isSecondary
+                                  ? Colors.grey[800]
+                                  : Colors.black87,
+                            ),
+                          ),
+                          TextSpan(
+                            text: '...click to view more',
+                            style: TextStyle(
+                              fontSize: widget.isSecondary ? 10 : 11,
+                              fontFamily: 'monospace',
+                              height: 1.4,
+                              color: Colors.blue[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Text(
+                      displayContent,
+                      style: TextStyle(
+                        fontSize: widget.isSecondary ? 10 : 11,
+                        fontFamily: 'monospace',
+                        height: 1.4,
+                        color: widget.isSecondary
+                            ? Colors.grey[800]
+                            : Colors.black87,
+                      ),
+                    ),
             ),
           ),
         ],
