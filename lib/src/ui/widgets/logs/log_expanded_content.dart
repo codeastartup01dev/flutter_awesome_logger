@@ -570,26 +570,32 @@ class CustomJsonViewer extends StatefulWidget {
 
 class _CustomJsonViewerState extends State<CustomJsonViewer> {
   final Map<String, bool> _expandedStates = {};
+  int _nodeCounter = 0;
 
   @override
   Widget build(BuildContext context) {
-    return _buildJsonNode(widget.data, '', widget.indentLevel);
+    _nodeCounter = 0; // Reset counter for each build
+    return _buildJsonNode(widget.data, '', widget.indentLevel, '');
   }
 
-  Widget _buildJsonNode(dynamic data, String key, int indentLevel) {
+  Widget _buildJsonNode(
+      dynamic data, String key, int indentLevel, String path) {
     if (data is Map<String, dynamic>) {
-      return _buildMapNode(data, key, indentLevel);
+      return _buildMapNode(data, key, indentLevel, path);
     } else if (data is List) {
-      return _buildListNode(data, key, indentLevel);
+      return _buildListNode(data, key, indentLevel, path);
     } else {
       return _buildPrimitiveNode(data, key, indentLevel);
     }
   }
 
-  Widget _buildMapNode(
-      Map<String, dynamic> map, String parentKey, int indentLevel) {
-    final nodeKey = '$parentKey-map-$indentLevel';
-    final isExpanded = _expandedStates[nodeKey] ?? true;
+  Widget _buildMapNode(Map<String, dynamic> map, String parentKey,
+      int indentLevel, String path) {
+    final currentPath = path.isEmpty ? parentKey : '$path.$parentKey';
+    final nodeKey = 'map_${currentPath}_${_nodeCounter++}';
+    // Root level (indentLevel 0) starts expanded, others start collapsed
+    final defaultExpanded = indentLevel == 0;
+    final isExpanded = _expandedStates[nodeKey] ?? defaultExpanded;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -644,7 +650,8 @@ class _CustomJsonViewerState extends State<CustomJsonViewer> {
         if (isExpanded) ...[
           ...map.entries.map((entry) => Padding(
                 padding: const EdgeInsets.only(left: 16),
-                child: _buildJsonNode(entry.value, entry.key, indentLevel + 1),
+                child: _buildJsonNode(
+                    entry.value, entry.key, indentLevel + 1, currentPath),
               )),
           Row(
             children: [
@@ -665,9 +672,13 @@ class _CustomJsonViewerState extends State<CustomJsonViewer> {
     );
   }
 
-  Widget _buildListNode(List list, String parentKey, int indentLevel) {
-    final nodeKey = '$parentKey-list-$indentLevel';
-    final isExpanded = _expandedStates[nodeKey] ?? true;
+  Widget _buildListNode(
+      List list, String parentKey, int indentLevel, String path) {
+    final currentPath = path.isEmpty ? parentKey : '$path.$parentKey';
+    final nodeKey = 'list_${currentPath}_${_nodeCounter++}';
+    // Root level (indentLevel 0) starts expanded, others start collapsed
+    final defaultExpanded = indentLevel == 0;
+    final isExpanded = _expandedStates[nodeKey] ?? defaultExpanded;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -736,7 +747,8 @@ class _CustomJsonViewerState extends State<CustomJsonViewer> {
                       ),
                     ),
                     Expanded(
-                      child: _buildJsonNode(entry.value, '', indentLevel + 1),
+                      child: _buildJsonNode(entry.value, '${entry.key}',
+                          indentLevel + 1, currentPath),
                     ),
                   ],
                 ),
