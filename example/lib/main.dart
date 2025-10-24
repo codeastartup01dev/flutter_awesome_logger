@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
           showFilePaths: true,
           showEmojis: true,
           useColors: true,
+          defaultMainFilter: LogSource.api, // 🎯 Set API Logs as default filter
         ),
 
         // 🔍 BLoC observer configuration (optional) - automatically configures Bloc.observer
@@ -72,6 +73,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-

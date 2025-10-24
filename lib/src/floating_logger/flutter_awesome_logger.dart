@@ -836,7 +836,9 @@ return MaterialApp(
       navigator.push(
         MaterialPageRoute(
           builder: (context) => AwesomeLoggerHistoryPage(
-              showFilePaths: widget.config.showFilePaths),
+            showFilePaths: widget.config.showFilePaths,
+            defaultMainFilter: widget.loggerConfig?.defaultMainFilter,
+          ),
         ),
       );
     } catch (e) {

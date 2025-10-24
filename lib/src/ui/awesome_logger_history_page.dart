@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../core/logging_using_logger.dart';
+import '../core/unified_log_types.dart';
 import 'managers/filter_manager.dart';
 import 'services/log_data_service.dart';
 import 'utils/copy_handler.dart';
@@ -17,13 +18,20 @@ class AwesomeLoggerHistoryPage extends StatefulWidget {
   /// Whether to show file paths in the UI
   final bool showFilePaths;
 
+  /// Default main filter to be selected when opening the logger history page
+  final LogSource? defaultMainFilter;
+
   /// Static flag to track if logger is currently open
   static bool _isLoggerOpen = false;
 
   /// Check if logger is currently open
   static bool get isLoggerOpen => _isLoggerOpen;
 
-  const AwesomeLoggerHistoryPage({super.key, this.showFilePaths = true});
+  const AwesomeLoggerHistoryPage({
+    super.key,
+    this.showFilePaths = true,
+    this.defaultMainFilter,
+  });
 
   @override
   State<AwesomeLoggerHistoryPage> createState() =>
@@ -33,7 +41,7 @@ class AwesomeLoggerHistoryPage extends StatefulWidget {
 class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  final FilterManager _filterManager = FilterManager();
+  late final FilterManager _filterManager;
 
   Timer? _refreshTimer;
   bool _isLoggingPaused = false;
@@ -44,6 +52,9 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     super.initState();
     AwesomeLoggerHistoryPage._isLoggerOpen = true;
     _isLoggingPaused = LoggingUsingLogger.isPaused;
+
+    // Initialize FilterManager with default main filter
+    _filterManager = FilterManager(defaultMainFilter: widget.defaultMainFilter);
 
     // Set up periodic refresh
     _refreshTimer = Timer.periodic(const Duration(seconds: 1), (_) {

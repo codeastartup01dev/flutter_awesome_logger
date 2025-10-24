@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:path/path.dart' as path;
 
 import 'log_entry.dart';
+import 'unified_log_types.dart';
 
 /// Global logger instance - use this for logging throughout your app
 final logger = LoggingUsingLogger();
@@ -25,12 +26,18 @@ class AwesomeLoggerConfig {
   /// Number of stack trace lines to show (0 = none)
   final int stackTraceLines;
 
+  /// Default main filter to be selected when opening the logger history page
+  /// Options: LogSource.general (Logger Logs), LogSource.api (API Logs), LogSource.bloc (BLoC Logs)
+  /// If null, no main filter will be pre-selected (shows all logs)
+  final LogSource? defaultMainFilter;
+
   const AwesomeLoggerConfig({
     this.maxLogEntries = 1000,
     this.showFilePaths = true,
     this.showEmojis = true,
     this.useColors = true,
     this.stackTraceLines = 0,
+    this.defaultMainFilter,
   });
 
   /// Create a copy with updated fields
@@ -40,6 +47,7 @@ class AwesomeLoggerConfig {
     bool? showEmojis,
     bool? useColors,
     int? stackTraceLines,
+    LogSource? defaultMainFilter,
   }) {
     return AwesomeLoggerConfig(
       maxLogEntries: maxLogEntries ?? this.maxLogEntries,
@@ -47,6 +55,7 @@ class AwesomeLoggerConfig {
       showEmojis: showEmojis ?? this.showEmojis,
       useColors: useColors ?? this.useColors,
       stackTraceLines: stackTraceLines ?? this.stackTraceLines,
+      defaultMainFilter: defaultMainFilter ?? this.defaultMainFilter,
     );
   }
 }

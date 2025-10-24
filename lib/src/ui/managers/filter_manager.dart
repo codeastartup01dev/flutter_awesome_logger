@@ -14,6 +14,15 @@ class FilterManager extends ChangeNotifier {
   final Set<String> _selectedEventTypes = {}; // For BLoC logs
   final Set<String> _selectedStateTypes = {}; // For BLoC logs
 
+  /// Constructor that optionally accepts a default main filter
+  FilterManager({LogSource? defaultMainFilter}) {
+    if (defaultMainFilter != null) {
+      _selectedSources.add(defaultMainFilter);
+    } else {
+      _selectedSources.add(LogSource.api);
+    }
+  }
+
   // Main filter section
   bool _isFilterSectionExpanded = true;
 
