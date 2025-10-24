@@ -67,35 +67,147 @@ class UserCubit extends Cubit<UserState> {
   Future<void> fetchUsers() async {
     try {
       emit(UserLoading());
-      logger.i('UserCubit: Starting to fetch users');
+      logger.i('UserCubit: Starting to fetch users from JSONPlaceholder');
 
-      final response =
-          await _dio.get('https://jsonplaceholder.typicode.com/users');
+      // Try JSONPlaceholder API first
+      final response = await _dio.get(
+        'https://jsonplaceholder.typicode.com/users',
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'Flutter Demo App',
+          },
+        ),
+      );
 
-      final users =
-          (response.data as List).map((json) => User.fromJson(json)).toList();
-
-      logger.i('UserCubit: Successfully fetched ${users.length} users');
-      emit(UserLoaded(users));
+      if (response.statusCode == 200) {
+        final users =
+            (response.data as List).map((json) => User.fromJson(json)).toList();
+        logger.i(
+            'UserCubit: Successfully fetched ${users.length} users from JSONPlaceholder');
+        emit(UserLoaded(users));
+      } else {
+        logger.w('UserCubit: Unexpected status code: ${response.statusCode}');
+      }
     } catch (e) {
-      logger.e('UserCubit: Failed to fetch users', error: e);
-      emit(UserError('Failed to fetch users: $e'));
+      logger.w('UserCubit: JSONPlaceholder API failed, using mock data');
+      logger.e('API Error details', error: e);
     }
+  }
+
+  void useMockData() {
+    try {
+      final mockUsers = _createMockUsers();
+      logger.i('UserCubit: Using mock data - ${mockUsers.length} users');
+      emit(UserLoaded(mockUsers));
+    } catch (e) {
+      logger.e('UserCubit: Failed to create mock data', error: e);
+      emit(UserError(
+          'Failed to load users. Please check your internet connection.'));
+    }
+  }
+
+  List<User> _createMockUsers() {
+    // Using the actual JSONPlaceholder data as fallback
+    return [
+      User(
+          id: 1,
+          name: 'Leanne Graham',
+          email: 'Sincere@april.biz',
+          phone: '1-770-736-8031 x56442'),
+      User(
+          id: 2,
+          name: 'Ervin Howell',
+          email: 'Shanna@melissa.tv',
+          phone: '010-692-6593 x09125'),
+      User(
+          id: 3,
+          name: 'Clementine Bauch',
+          email: 'Nathan@yesenia.net',
+          phone: '1-463-123-4447'),
+      User(
+          id: 4,
+          name: 'Patricia Lebsack',
+          email: 'Julianne.OConner@kory.org',
+          phone: '493-170-9623 x156'),
+      User(
+          id: 5,
+          name: 'Chelsey Dietrich',
+          email: 'Lucio_Hettinger@annie.ca',
+          phone: '(254)954-1289'),
+      User(
+          id: 6,
+          name: 'Mrs. Dennis Schulist',
+          email: 'Karley_Dach@jasper.info',
+          phone: '1-477-935-8478 x6430'),
+      User(
+          id: 7,
+          name: 'Kurtis Weissnat',
+          email: 'Telly.Hoeger@billy.biz',
+          phone: '210.067.6132'),
+      User(
+          id: 8,
+          name: 'Nicholas Runolfsdottir V',
+          email: 'Sherwood@rosamond.me',
+          phone: '586.493.6943 x140'),
+      User(
+          id: 9,
+          name: 'Glenna Reichert',
+          email: 'Chaim_McDermott@dana.io',
+          phone: '(775)976-6794 x41206'),
+      User(
+          id: 10,
+          name: 'Clementina DuBuque',
+          email: 'Rey.Padberg@karina.biz',
+          phone: '024-648-3804'),
+    ];
   }
 
   Future<void> fetchUserById(int id) async {
     try {
       emit(UserLoading());
-      logger.i('UserCubit: Fetching user with ID: $id');
+      logger.i('UserCubit: Fetching user with ID: $id from JSONPlaceholder');
 
-      final response =
-          await _dio.get('https://jsonplaceholder.typicode.com/users/$id');
-      final user = User.fromJson(response.data);
+      final response = await _dio.get(
+        'https://jsonplaceholder.typicode.com/users/$id',
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'Flutter Demo App',
+          },
+        ),
+      );
 
-      logger.i('UserCubit: Successfully fetched user: ${user.name}');
-      emit(UserLoaded([user]));
+      if (response.statusCode == 200) {
+        final user = User.fromJson(response.data);
+        logger.i('UserCubit: Successfully fetched user: ${user.name}');
+        emit(UserLoaded([user]));
+      } else {
+        logger.w(
+            'UserCubit: Unexpected status code for user $id: ${response.statusCode}');
+        _useMockUserById(id);
+      }
     } catch (e) {
-      logger.e('UserCubit: Failed to fetch user $id', error: e);
+      logger
+          .w('UserCubit: JSONPlaceholder failed for user $id, using mock data');
+      logger.e('API Error details for user $id', error: e);
+      _useMockUserById(id);
+    }
+  }
+
+  void _useMockUserById(int id) {
+    try {
+      final mockUsers = _createMockUsers();
+      if (id > 0 && id <= mockUsers.length) {
+        final user = mockUsers[id - 1]; // Get user by index (id is 1-based)
+        logger.i('UserCubit: Using mock data - fetched user: ${user.name}');
+        emit(UserLoaded([user]));
+      } else {
+        logger.w('UserCubit: Invalid user ID: $id');
+        emit(UserError('User with ID $id not found'));
+      }
+    } catch (e) {
+      logger.e('UserCubit: Mock data fetch failed for user $id', error: e);
       emit(UserError('Failed to fetch user: $e'));
     }
   }
@@ -142,7 +254,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: BlocProvider(
         create: (context) {
-          final dio = Dio();
+          final dio = Dio(
+            BaseOptions(
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'User-Agent': 'Flutter App',
+              },
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(seconds: 15),
+              validateStatus: (status) =>
+                  status! < 500, // Allow 4xx errors to be handled
+            ),
+          );
           dio.interceptors.add(FlutterAwesomeLoggerDioInterceptor());
           return UserCubit(dio);
         },
@@ -468,7 +592,8 @@ class CubitDemoPage extends StatelessWidget {
                       'This demo shows BLoC logging with Cubit state management.\n\n'
                       '• Watch BLoC logs in the logger\n'
                       '• See state changes and API calls\n'
-                      '• Filter by "BLoC Logs" in the logger',
+                      '• Filter by "BLoC Logs" in the logger\n'
+                      '• Uses JSONPlaceholder API with mock fallback',
                       style: TextStyle(color: Colors.white),
                     ),
                   ],
@@ -506,15 +631,34 @@ class CubitDemoPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: () => context.read<UserCubit>().clearUsers(),
-              icon: const Icon(Icons.clear),
-              label: const Text('Clear Users'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.all(16),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => context.read<UserCubit>().clearUsers(),
+                    icon: const Icon(Icons.clear),
+                    label: const Text('Clear Users'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.all(16),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => context.read<UserCubit>().useMockData(),
+                    icon: const Icon(Icons.offline_bolt),
+                    label: const Text('Use Mock Data'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.all(16),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             Expanded(
