@@ -246,6 +246,55 @@ class ApiLogEntry {
     return buffer.toString();
   }
 
+  /// Get formatted request body only (for primary display)
+  String get formattedRequestBody {
+    if (requestData == null) return '';
+    return _formatData(requestData);
+  }
+
+  /// Get formatted response body only (for primary display)
+  String get formattedResponseBody {
+    if (type == ApiLogType.pending || responseData == null) return '';
+    return _formatData(responseData);
+  }
+
+  /// Get formatted request headers and metadata (for secondary display)
+  String get formattedRequestHeaders {
+    final buffer = StringBuffer();
+    buffer.writeln('Method: $method');
+    buffer.writeln('URL: $url');
+    if (requestHeaders.isNotEmpty) {
+      buffer.writeln('Headers:');
+      requestHeaders.forEach((key, value) {
+        buffer.writeln('  $key: $value');
+      });
+    }
+    return buffer.toString();
+  }
+
+  /// Get formatted response headers and metadata (for secondary display)
+  String get formattedResponseHeaders {
+    if (type == ApiLogType.pending) return '';
+
+    final buffer = StringBuffer();
+    if (statusCode != null) {
+      buffer.writeln('Status: $statusCode');
+    }
+    if (duration != null) {
+      buffer.writeln('Duration: ${duration}ms');
+    }
+    if (responseHeaders != null && responseHeaders!.isNotEmpty) {
+      buffer.writeln('Headers:');
+      responseHeaders!.forEach((key, value) {
+        buffer.writeln('  $key: $value');
+      });
+    }
+    if (error != null) {
+      buffer.writeln('Error: $error');
+    }
+    return buffer.toString();
+  }
+
   /// Get full formatted log including request and response
   String get formattedFull {
     final buffer = StringBuffer();
