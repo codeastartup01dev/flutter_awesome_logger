@@ -1,8 +1,9 @@
 import '../api_logger/api_log_entry.dart';
+import '../bloc_logger/bloc_log_entry.dart';
 import 'log_entry.dart';
 import 'unified_log_types.dart';
 
-/// Unified log entry that can represent both general logs and API logs
+/// Unified log entry that can represent general logs, API logs, and BLoC logs
 class UnifiedLogEntry {
   /// Unique identifier for this log entry
   final String id;
@@ -31,6 +32,9 @@ class UnifiedLogEntry {
   /// Optional general log entry
   final LogEntry? generalLogEntry;
 
+  /// Optional BLoC-specific data
+  final BlocLogEntry? blocLogEntry;
+
   /// Optional duration for API calls
   final int? duration;
 
@@ -43,6 +47,15 @@ class UnifiedLogEntry {
   /// Optional status code for API calls
   final int? statusCode;
 
+  /// Optional BLoC name for BLoC logs
+  final String? blocName;
+
+  /// Optional event type for BLoC logs
+  final String? eventType;
+
+  /// Optional state type for BLoC logs
+  final String? stateType;
+
   const UnifiedLogEntry({
     required this.id,
     required this.message,
@@ -53,10 +66,14 @@ class UnifiedLogEntry {
     this.stackTrace,
     this.apiLogEntry,
     this.generalLogEntry,
+    this.blocLogEntry,
     this.duration,
     this.httpMethod,
     this.url,
     this.statusCode,
+    this.blocName,
+    this.eventType,
+    this.stateType,
   });
 
   /// Create unified log entry from general log entry
@@ -88,6 +105,24 @@ class UnifiedLogEntry {
       httpMethod: apiLog.method,
       url: apiLog.url,
       statusCode: apiLog.statusCode,
+    );
+  }
+
+  /// Create unified log entry from BLoC log entry
+  factory UnifiedLogEntry.fromBlocLog(BlocLogEntry blocLog) {
+    final unifiedType = _mapBlocLogType(blocLog.type);
+    return UnifiedLogEntry(
+      id: blocLog.id,
+      message: blocLog.displayTitle,
+      timestamp: blocLog.timestamp,
+      type: unifiedType,
+      source: LogSource.bloc,
+      blocLogEntry: blocLog,
+      blocName: blocLog.blocName,
+      eventType: blocLog.event?.runtimeType.toString(),
+      stateType: blocLog.nextState?.runtimeType.toString() ??
+          blocLog.currentState?.runtimeType.toString(),
+      stackTrace: blocLog.stackTrace?.toString(),
     );
   }
 
@@ -125,6 +160,24 @@ class UnifiedLogEntry {
     }
   }
 
+  /// Map BLoC log type to unified log type
+  static UnifiedLogType _mapBlocLogType(BlocLogType blocType) {
+    switch (blocType) {
+      case BlocLogType.event:
+        return UnifiedLogType.blocEvent;
+      case BlocLogType.transition:
+        return UnifiedLogType.blocTransition;
+      case BlocLogType.change:
+        return UnifiedLogType.blocChange;
+      case BlocLogType.create:
+        return UnifiedLogType.blocCreate;
+      case BlocLogType.close:
+        return UnifiedLogType.blocClose;
+      case BlocLogType.error:
+        return UnifiedLogType.blocError;
+    }
+  }
+
   /// Get subtitle text for display
   String get subtitle {
     final timeText = timestamp.toIso8601String().substring(11, 19);
@@ -132,6 +185,8 @@ class UnifiedLogEntry {
     if (source == LogSource.api) {
       final durationText = duration != null ? ' in ${duration}ms' : '';
       return '$httpMethod at $timeText$durationText';
+    } else if (source == LogSource.bloc) {
+      return '$blocName at $timeText${eventType != null ? ' • $eventType' : ''}';
     } else {
       return '$timeText${filePath != null ? ' • ${filePath!.split('/').last}' : ''}';
     }
@@ -141,6 +196,8 @@ class UnifiedLogEntry {
   String get detailedDescription {
     if (source == LogSource.api && apiLogEntry != null) {
       return apiLogEntry!.shortDescription;
+    } else if (source == LogSource.bloc && blocLogEntry != null) {
+      return blocLogEntry!.formattedContent;
     } else if (source == LogSource.general) {
       return message;
     }
@@ -151,6 +208,8 @@ class UnifiedLogEntry {
   String get formattedContent {
     if (source == LogSource.api && apiLogEntry != null) {
       return apiLogEntry!.formattedFull;
+    } else if (source == LogSource.bloc && blocLogEntry != null) {
+      return blocLogEntry!.formattedContent;
     } else if (source == LogSource.general && generalLogEntry != null) {
       final buffer = StringBuffer();
       buffer.writeln('=== GENERAL LOG ===');
@@ -190,6 +249,28 @@ class UnifiedLogEntry {
         return true;
       }
       if (apiLogEntry!.curl.toLowerCase().contains(lowerQuery)) return true;
+    }
+
+    // Check BLoC-specific fields
+    if (source == LogSource.bloc && blocLogEntry != null) {
+      if (blocLogEntry!.blocName.toLowerCase().contains(lowerQuery))
+        return true;
+      if (blocLogEntry!.event?.toString().toLowerCase().contains(lowerQuery) ==
+          true) return true;
+      if (blocLogEntry!.currentState
+              ?.toString()
+              .toLowerCase()
+              .contains(lowerQuery) ==
+          true) return true;
+      if (blocLogEntry!.nextState
+              ?.toString()
+              .toLowerCase()
+              .contains(lowerQuery) ==
+          true) return true;
+      if (blocLogEntry!.error?.toString().toLowerCase().contains(lowerQuery) ==
+          true) return true;
+      if (eventType?.toLowerCase().contains(lowerQuery) == true) return true;
+      if (stateType?.toLowerCase().contains(lowerQuery) == true) return true;
     }
 
     return false;

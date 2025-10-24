@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Unified log types that encompass both general logs and API logs
+/// Unified log types that encompass general logs, API logs, and BLoC logs
 enum UnifiedLogType {
   // General log types
   debug,
@@ -15,6 +15,14 @@ enum UnifiedLogType {
   apiServerError,
   apiNetworkError,
   apiPending,
+
+  // BLoC log types
+  blocEvent,
+  blocTransition,
+  blocChange,
+  blocCreate,
+  blocClose,
+  blocError,
 }
 
 /// Extension to provide display names and colors for unified log types
@@ -42,6 +50,18 @@ extension UnifiedLogTypeExtension on UnifiedLogType {
         return 'API Network Error';
       case UnifiedLogType.apiPending:
         return 'API Pending';
+      case UnifiedLogType.blocEvent:
+        return 'BLoC Event';
+      case UnifiedLogType.blocTransition:
+        return 'BLoC Transition';
+      case UnifiedLogType.blocChange:
+        return 'BLoC Change';
+      case UnifiedLogType.blocCreate:
+        return 'BLoC Create';
+      case UnifiedLogType.blocClose:
+        return 'BLoC Close';
+      case UnifiedLogType.blocError:
+        return 'BLoC Error';
     }
   }
 
@@ -68,6 +88,18 @@ extension UnifiedLogTypeExtension on UnifiedLogType {
         return Colors.purple;
       case UnifiedLogType.apiPending:
         return Colors.grey;
+      case UnifiedLogType.blocEvent:
+        return Colors.cyan;
+      case UnifiedLogType.blocTransition:
+        return Colors.teal;
+      case UnifiedLogType.blocChange:
+        return Colors.indigo;
+      case UnifiedLogType.blocCreate:
+        return Colors.green;
+      case UnifiedLogType.blocClose:
+        return Colors.grey;
+      case UnifiedLogType.blocError:
+        return Colors.red;
     }
   }
 
@@ -94,6 +126,18 @@ extension UnifiedLogTypeExtension on UnifiedLogType {
         return Icons.cloud_off;
       case UnifiedLogType.apiPending:
         return Icons.hourglass_empty;
+      case UnifiedLogType.blocEvent:
+        return Icons.input;
+      case UnifiedLogType.blocTransition:
+        return Icons.swap_horiz;
+      case UnifiedLogType.blocChange:
+        return Icons.change_circle;
+      case UnifiedLogType.blocCreate:
+        return Icons.add_circle;
+      case UnifiedLogType.blocClose:
+        return Icons.remove_circle;
+      case UnifiedLogType.blocError:
+        return Icons.error_outline;
     }
   }
 
@@ -112,8 +156,23 @@ extension UnifiedLogTypeExtension on UnifiedLogType {
     }
   }
 
+  /// Check if this is a BLoC log type
+  bool get isBlocLog {
+    switch (this) {
+      case UnifiedLogType.blocEvent:
+      case UnifiedLogType.blocTransition:
+      case UnifiedLogType.blocChange:
+      case UnifiedLogType.blocCreate:
+      case UnifiedLogType.blocClose:
+      case UnifiedLogType.blocError:
+        return true;
+      default:
+        return false;
+    }
+  }
+
   /// Check if this is a general log type
-  bool get isGeneralLog => !isApiLog;
+  bool get isGeneralLog => !isApiLog && !isBlocLog;
 
   /// Check if this represents an error state
   bool get isError {
@@ -122,6 +181,7 @@ extension UnifiedLogTypeExtension on UnifiedLogType {
       case UnifiedLogType.apiClientError:
       case UnifiedLogType.apiServerError:
       case UnifiedLogType.apiNetworkError:
+      case UnifiedLogType.blocError:
         return true;
       default:
         return false;
@@ -134,6 +194,9 @@ extension UnifiedLogTypeExtension on UnifiedLogType {
       case UnifiedLogType.info:
       case UnifiedLogType.apiSuccess:
       case UnifiedLogType.apiRedirect:
+      case UnifiedLogType.blocCreate:
+      case UnifiedLogType.blocTransition:
+      case UnifiedLogType.blocChange:
         return true;
       default:
         return false;
@@ -141,10 +204,11 @@ extension UnifiedLogTypeExtension on UnifiedLogType {
   }
 }
 
-/// Log source to distinguish between general and API logs
+/// Log source to distinguish between general, API, and BLoC logs
 enum LogSource {
   general,
   api,
+  bloc,
 }
 
 /// Extension for LogSource
@@ -155,6 +219,8 @@ extension LogSourceExtension on LogSource {
         return 'General';
       case LogSource.api:
         return 'API';
+      case LogSource.bloc:
+        return 'BLoC';
     }
   }
 
@@ -164,6 +230,8 @@ extension LogSourceExtension on LogSource {
         return Colors.blue;
       case LogSource.api:
         return Colors.green;
+      case LogSource.bloc:
+        return Colors.purple;
     }
   }
 }

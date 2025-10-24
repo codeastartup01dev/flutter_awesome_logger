@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../api_logger/api_log_entry.dart';
 import '../api_logger/api_logger_service.dart';
+import '../bloc_logger/bloc_logger_service.dart';
 import '../core/logging_using_logger.dart';
 import '../core/unified_log_entry.dart';
 import '../core/unified_log_types.dart';
@@ -13,7 +14,7 @@ import 'widgets/common/logger_search_bar.dart';
 import 'widgets/common/logger_sort_toggle.dart';
 import 'widgets/common/logger_statistics.dart';
 
-/// Unified logger history page showing both general and API logs in chronological order
+/// Unified logger history page showing general, API, and BLoC logs in chronological order
 class AwesomeLoggerHistoryPage extends StatefulWidget {
   /// Whether to show file paths in the UI
   final bool showFilePaths;
@@ -44,6 +45,9 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   final Set<LogSource> _selectedSources = {};
   final Set<String> _selectedClasses = {}; // For general logs
   final Set<String> _selectedMethods = {}; // For API logs
+  final Set<String> _selectedBlocNames = {}; // For BLoC logs
+  final Set<String> _selectedEventTypes = {}; // For BLoC logs
+  final Set<String> _selectedStateTypes = {}; // For BLoC logs
 
   // Main filter section
   bool _isFilterSectionExpanded = true;
@@ -51,6 +55,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   // Expanded filter sections
   bool _isLoggerFiltersExpanded = false;
   bool _isApiFiltersExpanded = false;
+  bool _isBlocFiltersExpanded = false;
 
   // Removed collapsible sub-sections - now showing directly when main filters are expanded
 
@@ -111,6 +116,12 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
       unifiedLogs.add(UnifiedLogEntry.fromApiLog(log));
     }
 
+    // Add BLoC logs
+    final blocLogs = BlocLoggerService.getBlocLogs();
+    for (final log in blocLogs) {
+      unifiedLogs.add(UnifiedLogEntry.fromBlocLog(log));
+    }
+
     return unifiedLogs;
   }
 
@@ -148,6 +159,30 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
         }
       }
 
+      // BLoC name filter (for BLoC logs)
+      if (_selectedBlocNames.isNotEmpty && log.source == LogSource.bloc) {
+        if (log.blocName == null ||
+            !_selectedBlocNames.contains(log.blocName!)) {
+          return false;
+        }
+      }
+
+      // Event type filter (for BLoC logs)
+      if (_selectedEventTypes.isNotEmpty && log.source == LogSource.bloc) {
+        if (log.eventType == null ||
+            !_selectedEventTypes.contains(log.eventType!)) {
+          return false;
+        }
+      }
+
+      // State type filter (for BLoC logs)
+      if (_selectedStateTypes.isNotEmpty && log.source == LogSource.bloc) {
+        if (log.stateType == null ||
+            !_selectedStateTypes.contains(log.stateType!)) {
+          return false;
+        }
+      }
+
       // Statistics filter
       if (_statsFilter != null) {
         switch (_statsFilter) {
@@ -162,6 +197,9 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
             break;
           case 'api':
             if (log.source != LogSource.api) return false;
+            break;
+          case 'bloc':
+            if (log.source != LogSource.bloc) return false;
             break;
         }
       }
@@ -304,7 +342,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
       builder: (context) => AlertDialog(
         title: const Text('Clear All Logs'),
         content: const Text(
-            'Are you sure you want to clear all general and API logs?'),
+            'Are you sure you want to clear all general, API, and BLoC logs?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -314,6 +352,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
             onPressed: () {
               LoggingUsingLogger.clearLogs();
               ApiLoggerService.clearApiLogs();
+              BlocLoggerService.clearBlocLogs();
               setState(() {});
               Navigator.pop(context);
             },
@@ -347,6 +386,12 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     return allLogs.where((l) => l.source == LogSource.api).length;
   }
 
+  /// Get count of BLoC logs
+  int _getBlocLogCount() {
+    final allLogs = _getUnifiedLogs();
+    return allLogs.where((l) => l.source == LogSource.bloc).length;
+  }
+
   /// Get count for specific HTTP method
   int _getMethodCount(String method) {
     final allLogs = _getUnifiedLogs();
@@ -361,6 +406,105 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     return relevantLogs.where((l) => l.httpMethod == method).length;
   }
 
+  /// Get available BLoC names from BLoC logs
+  List<String> _getAvailableBlocNames() {
+    final allLogs = _getUnifiedLogs();
+
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs
+        .where((l) => l.source == LogSource.bloc && l.blocName != null)
+        .map((l) => l.blocName!)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  /// Get available event types from BLoC logs
+  List<String> _getAvailableEventTypes() {
+    final allLogs = _getUnifiedLogs();
+
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs
+        .where((l) => l.source == LogSource.bloc && l.eventType != null)
+        .map((l) => l.eventType!)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  /// Get available state types from BLoC logs
+  List<String> _getAvailableStateTypes() {
+    final allLogs = _getUnifiedLogs();
+
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs
+        .where((l) => l.source == LogSource.bloc && l.stateType != null)
+        .map((l) => l.stateType!)
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
+  /// Get count for specific BLoC name
+  int _getBlocNameCount(String blocName) {
+    final allLogs = _getUnifiedLogs();
+
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs.where((l) => l.blocName == blocName).length;
+  }
+
+  /// Get count for specific event type
+  int _getEventTypeCount(String eventType) {
+    final allLogs = _getUnifiedLogs();
+
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs.where((l) => l.eventType == eventType).length;
+  }
+
+  /// Get count for specific state type
+  int _getStateTypeCount(String stateType) {
+    final allLogs = _getUnifiedLogs();
+
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = allLogs;
+    if (_selectedSources.isNotEmpty) {
+      relevantLogs =
+          allLogs.where((l) => _selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs.where((l) => l.stateType == stateType).length;
+  }
+
   /// Check if any logger sub-filters are selected
   bool _hasLoggerSubFiltersSelected() {
     return _selectedTypes.any((type) => type.isGeneralLog);
@@ -370,6 +514,14 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   bool _hasApiSubFiltersSelected() {
     return _selectedTypes.any((type) => type.isApiLog) ||
         _selectedMethods.isNotEmpty;
+  }
+
+  /// Check if any BLoC sub-filters are selected
+  bool _hasBlocSubFiltersSelected() {
+    return _selectedTypes.any((type) => type.isBlocLog) ||
+        _selectedBlocNames.isNotEmpty ||
+        _selectedEventTypes.isNotEmpty ||
+        _selectedStateTypes.isNotEmpty;
   }
 
   /// Get logger level label for unified log type
@@ -405,6 +557,26 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
         return 'Pending';
       default:
         return 'API';
+    }
+  }
+
+  /// Get BLoC status label for unified log type
+  String _getBlocStatusLabel(UnifiedLogType type) {
+    switch (type) {
+      case UnifiedLogType.blocEvent:
+        return 'BLoC\nEvent';
+      case UnifiedLogType.blocTransition:
+        return 'BLoC\nTransition';
+      case UnifiedLogType.blocChange:
+        return 'BLoC\nChange';
+      case UnifiedLogType.blocCreate:
+        return 'BLoC\nCreate';
+      case UnifiedLogType.blocClose:
+        return 'BLoC\nClose';
+      case UnifiedLogType.blocError:
+        return 'BLoC\nError';
+      default:
+        return 'BLoC';
     }
   }
 
@@ -572,6 +744,9 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
         _selectedSources.isNotEmpty ||
         _selectedClasses.isNotEmpty ||
         _selectedMethods.isNotEmpty ||
+        _selectedBlocNames.isNotEmpty ||
+        _selectedEventTypes.isNotEmpty ||
+        _selectedStateTypes.isNotEmpty ||
         _statsFilter != null;
   }
 
@@ -582,6 +757,9 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     count += _selectedSources.length;
     count += _selectedClasses.length;
     count += _selectedMethods.length;
+    count += _selectedBlocNames.length;
+    count += _selectedEventTypes.length;
+    count += _selectedStateTypes.length;
     if (_statsFilter != null) count += 1;
     return count;
   }
@@ -591,6 +769,9 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     if (log.source == LogSource.api) {
       // For API logs, show the HTTP method
       return log.httpMethod ?? 'API';
+    } else if (log.source == LogSource.bloc) {
+      // For BLoC logs, show the BLoC type
+      return _getBlocStatusLabel(log.type);
     } else {
       // For general logs, show logger.level format
       switch (log.type) {
@@ -640,6 +821,31 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
           successMessage = 'Stack trace copied to clipboard';
         }
         break;
+      case 'copy_bloc_command':
+        if (log.source == LogSource.bloc && log.blocLogEntry != null) {
+          textToCopy = log.blocLogEntry!.command;
+          successMessage = 'BLoC command copied to clipboard';
+        }
+        break;
+      case 'copy_bloc_name':
+        if (log.blocName != null) {
+          textToCopy = log.blocName!;
+          successMessage = 'BLoC name copied to clipboard';
+        }
+        break;
+      case 'copy_event_data':
+        if (log.source == LogSource.bloc && log.blocLogEntry?.event != null) {
+          textToCopy = log.blocLogEntry!.event.toString();
+          successMessage = 'Event data copied to clipboard';
+        }
+        break;
+      case 'copy_state_data':
+        if (log.source == LogSource.bloc &&
+            log.blocLogEntry?.nextState != null) {
+          textToCopy = log.blocLogEntry!.nextState.toString();
+          successMessage = 'State data copied to clipboard';
+        }
+        break;
     }
 
     if (textToCopy.isNotEmpty) {
@@ -676,6 +882,30 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     );
   }
 
+  /// Build BLoC view section with chips and content
+  Widget _buildBlocViewSection(UnifiedLogEntry log) {
+    if (log.blocLogEntry == null) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // View selector chips
+        Row(
+          children: [
+            _buildViewChip('Request', 'request', log),
+            const SizedBox(width: 8),
+            _buildViewChip('Response', 'response', log),
+            const SizedBox(width: 8),
+            _buildViewChip('Command', 'command', log),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Content based on selected view
+        if (_selectedExpandedView != null) _buildExpandedContent(log),
+      ],
+    );
+  }
+
   /// Build view selector chip for expanded content
   Widget _buildViewChip(String label, String viewType, UnifiedLogEntry log) {
     final isSelected = _selectedExpandedView == viewType;
@@ -703,20 +933,34 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
 
   /// Build expanded content based on selected view
   Widget _buildExpandedContent(UnifiedLogEntry log) {
-    if (log.apiLogEntry == null) return const SizedBox.shrink();
-
-    switch (_selectedExpandedView) {
-      case 'request':
-        return _buildContentSection(
-            'Request', log.apiLogEntry!.formattedRequest);
-      case 'response':
-        return _buildContentSection(
-            'Response', log.apiLogEntry!.formattedResponse);
-      case 'curl':
-        return _buildContentSection('Curl Command', log.apiLogEntry!.curl);
-      default:
-        return const SizedBox.shrink();
+    if (log.source == LogSource.api && log.apiLogEntry != null) {
+      switch (_selectedExpandedView) {
+        case 'request':
+          return _buildContentSection(
+              'Request', log.apiLogEntry!.formattedRequest);
+        case 'response':
+          return _buildContentSection(
+              'Response', log.apiLogEntry!.formattedResponse);
+        case 'curl':
+          return _buildContentSection('Curl Command', log.apiLogEntry!.curl);
+        default:
+          return const SizedBox.shrink();
+      }
+    } else if (log.source == LogSource.bloc && log.blocLogEntry != null) {
+      switch (_selectedExpandedView) {
+        case 'request':
+          return _buildContentSection(
+              'Request', log.blocLogEntry!.formattedRequest);
+        case 'response':
+          return _buildContentSection(
+              'Response', log.blocLogEntry!.formattedResponse);
+        case 'command':
+          return _buildContentSection('Command', log.blocLogEntry!.command);
+        default:
+          return const SizedBox.shrink();
+      }
     }
+    return const SizedBox.shrink();
   }
 
   /// Build content section with length limits and more button
@@ -1075,73 +1319,114 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                     const SizedBox(height: 8),
 
                     // Main filter categories
-                    Row(
-                      children: [
-                        // Logger Logs filter
-                        _buildMainFilterChip(
-                          label: 'Logger Logs',
-                          icon: Icons.bug_report,
-                          color: Colors.purple,
-                          isSelected:
-                              _selectedSources.contains(LogSource.general),
-                          count: _getGeneralLogCount(),
-                          isExpanded: _isLoggerFiltersExpanded,
-                          hasSubFiltersSelected: _hasLoggerSubFiltersSelected(),
-                          onTap: () {
-                            setState(() {
-                              if (_selectedSources
-                                  .contains(LogSource.general)) {
-                                // If already selected, deselect and collapse
-                                _selectedSources.remove(LogSource.general);
-                                _isLoggerFiltersExpanded = false;
-                                _selectedTypes
-                                    .removeWhere((type) => type.isGeneralLog);
-                              } else {
-                                // Select
-                                _selectedSources.add(LogSource.general);
-                              }
-                            });
-                          },
-                          onDropdownTap: () {
-                            setState(() {
-                              _isLoggerFiltersExpanded =
-                                  !_isLoggerFiltersExpanded;
-                            });
-                          },
-                        ),
-                        const SizedBox(width: 8),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          // Logger Logs filter
+                          _buildMainFilterChip(
+                            label: 'Logger Logs',
+                            icon: Icons.bug_report,
+                            color: Colors.purple,
+                            isSelected:
+                                _selectedSources.contains(LogSource.general),
+                            count: _getGeneralLogCount(),
+                            isExpanded: _isLoggerFiltersExpanded,
+                            hasSubFiltersSelected:
+                                _hasLoggerSubFiltersSelected(),
+                            onTap: () {
+                              setState(() {
+                                if (_selectedSources
+                                    .contains(LogSource.general)) {
+                                  // If already selected, deselect and collapse
+                                  _selectedSources.remove(LogSource.general);
+                                  _isLoggerFiltersExpanded = false;
+                                  _selectedTypes
+                                      .removeWhere((type) => type.isGeneralLog);
+                                } else {
+                                  // Select
+                                  _selectedSources.add(LogSource.general);
+                                }
+                              });
+                            },
+                            onDropdownTap: () {
+                              setState(() {
+                                _isLoggerFiltersExpanded =
+                                    !_isLoggerFiltersExpanded;
+                              });
+                            },
+                          ),
+                          const SizedBox(width: 8),
 
-                        // API Logs filter
-                        _buildMainFilterChip(
-                          label: 'API Logs',
-                          icon: Icons.api,
-                          color: Colors.green,
-                          isSelected: _selectedSources.contains(LogSource.api),
-                          count: _getApiLogCount(),
-                          isExpanded: _isApiFiltersExpanded,
-                          hasSubFiltersSelected: _hasApiSubFiltersSelected(),
-                          onTap: () {
-                            setState(() {
-                              if (_selectedSources.contains(LogSource.api)) {
-                                // If already selected, deselect and collapse
-                                _selectedSources.remove(LogSource.api);
-                                _isApiFiltersExpanded = false;
-                                _selectedTypes
-                                    .removeWhere((type) => type.isApiLog);
-                                _selectedMethods.clear();
-                              } else {
-                                // Select
-                                _selectedSources.add(LogSource.api);
-                              }
-                            });
-                          },
-                          onDropdownTap: () {
-                            setState(() {
-                              _isApiFiltersExpanded = !_isApiFiltersExpanded;
-                            });
-                          },
-                        ),
-                      ],
+                          // API Logs filter
+                          _buildMainFilterChip(
+                            label: 'API Logs',
+                            icon: Icons.api,
+                            color: Colors.green,
+                            isSelected:
+                                _selectedSources.contains(LogSource.api),
+                            count: _getApiLogCount(),
+                            isExpanded: _isApiFiltersExpanded,
+                            hasSubFiltersSelected: _hasApiSubFiltersSelected(),
+                            onTap: () {
+                              setState(() {
+                                if (_selectedSources.contains(LogSource.api)) {
+                                  // If already selected, deselect and collapse
+                                  _selectedSources.remove(LogSource.api);
+                                  _isApiFiltersExpanded = false;
+                                  _selectedTypes
+                                      .removeWhere((type) => type.isApiLog);
+                                  _selectedMethods.clear();
+                                } else {
+                                  // Select
+                                  _selectedSources.add(LogSource.api);
+                                }
+                              });
+                            },
+                            onDropdownTap: () {
+                              setState(() {
+                                _isApiFiltersExpanded = !_isApiFiltersExpanded;
+                              });
+                            },
+                          ),
+                          const SizedBox(width: 8),
+
+                          // BLoC Logs filter
+                          _buildMainFilterChip(
+                            label: 'BLoC Logs',
+                            icon: Icons.account_tree,
+                            color: Colors.purple,
+                            isSelected:
+                                _selectedSources.contains(LogSource.bloc),
+                            count: _getBlocLogCount(),
+                            isExpanded: _isBlocFiltersExpanded,
+                            hasSubFiltersSelected: _hasBlocSubFiltersSelected(),
+                            onTap: () {
+                              setState(() {
+                                if (_selectedSources.contains(LogSource.bloc)) {
+                                  // If already selected, deselect and collapse
+                                  _selectedSources.remove(LogSource.bloc);
+                                  _isBlocFiltersExpanded = false;
+                                  _selectedTypes
+                                      .removeWhere((type) => type.isBlocLog);
+                                  _selectedBlocNames.clear();
+                                  _selectedEventTypes.clear();
+                                  _selectedStateTypes.clear();
+                                } else {
+                                  // Select
+                                  _selectedSources.add(LogSource.bloc);
+                                }
+                              });
+                            },
+                            onDropdownTap: () {
+                              setState(() {
+                                _isBlocFiltersExpanded =
+                                    !_isBlocFiltersExpanded;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
 
                     // Logger sub-filters
@@ -1264,6 +1549,125 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                             .toList(),
                       ),
                     ],
+
+                    // BLoC sub-filters
+                    if (_isBlocFiltersExpanded) ...[
+                      const SizedBox(height: 12),
+
+                      // BLoC Names section
+                      if (_getAvailableBlocNames().isNotEmpty) ...[
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: _getAvailableBlocNames()
+                              .map((blocName) => _buildSubFilterChip(
+                                    label: blocName,
+                                    color: Colors.purple,
+                                    isSelected:
+                                        _selectedBlocNames.contains(blocName),
+                                    count: _getBlocNameCount(blocName),
+                                    onTap: () {
+                                      setState(() {
+                                        if (_selectedBlocNames
+                                            .contains(blocName)) {
+                                          _selectedBlocNames.remove(blocName);
+                                        } else {
+                                          _selectedBlocNames.add(blocName);
+                                        }
+                                      });
+                                    },
+                                  ))
+                              .toList(),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+
+                      // Event Types section
+                      if (_getAvailableEventTypes().isNotEmpty) ...[
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: _getAvailableEventTypes()
+                              .map((eventType) => _buildSubFilterChip(
+                                    label: eventType,
+                                    color: Colors.cyan,
+                                    isSelected:
+                                        _selectedEventTypes.contains(eventType),
+                                    count: _getEventTypeCount(eventType),
+                                    onTap: () {
+                                      setState(() {
+                                        if (_selectedEventTypes
+                                            .contains(eventType)) {
+                                          _selectedEventTypes.remove(eventType);
+                                        } else {
+                                          _selectedEventTypes.add(eventType);
+                                        }
+                                      });
+                                    },
+                                  ))
+                              .toList(),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+
+                      // State Types section
+                      if (_getAvailableStateTypes().isNotEmpty) ...[
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: _getAvailableStateTypes()
+                              .map((stateType) => _buildSubFilterChip(
+                                    label: stateType,
+                                    color: Colors.indigo,
+                                    isSelected:
+                                        _selectedStateTypes.contains(stateType),
+                                    count: _getStateTypeCount(stateType),
+                                    onTap: () {
+                                      setState(() {
+                                        if (_selectedStateTypes
+                                            .contains(stateType)) {
+                                          _selectedStateTypes.remove(stateType);
+                                        } else {
+                                          _selectedStateTypes.add(stateType);
+                                        }
+                                      });
+                                    },
+                                  ))
+                              .toList(),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+
+                      // BLoC Status section
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          UnifiedLogType.blocEvent,
+                          UnifiedLogType.blocTransition,
+                          UnifiedLogType.blocChange,
+                          UnifiedLogType.blocCreate,
+                          UnifiedLogType.blocClose,
+                          UnifiedLogType.blocError,
+                        ]
+                            .map((type) => _buildSubFilterChip(
+                                  label: _getBlocStatusLabel(type),
+                                  color: type.color,
+                                  isSelected: _selectedTypes.contains(type),
+                                  count: typeCounts[type] ?? 0,
+                                  onTap: () {
+                                    setState(() {
+                                      if (_selectedTypes.contains(type)) {
+                                        _selectedTypes.remove(type);
+                                      } else {
+                                        _selectedTypes.add(type);
+                                      }
+                                    });
+                                  },
+                                ))
+                            .toList(),
+                      ),
+                    ],
                   ], // End of _isFilterSectionExpanded
                 ],
               ),
@@ -1294,6 +1698,9 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                 _selectedSources.isNotEmpty ||
                 _selectedClasses.isNotEmpty ||
                 _selectedMethods.isNotEmpty ||
+                _selectedBlocNames.isNotEmpty ||
+                _selectedEventTypes.isNotEmpty ||
+                _selectedStateTypes.isNotEmpty ||
                 _statsFilter != null) ...[
               // const SizedBox(height: 12),
               Padding(
@@ -1315,9 +1722,13 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                           _selectedSources.clear();
                           _selectedClasses.clear();
                           _selectedMethods.clear();
+                          _selectedBlocNames.clear();
+                          _selectedEventTypes.clear();
+                          _selectedStateTypes.clear();
                           _statsFilter = null;
                           _isLoggerFiltersExpanded = false;
                           _isApiFiltersExpanded = false;
+                          _isBlocFiltersExpanded = false;
                         });
                       },
                       icon: const Icon(Icons.clear_all, size: 16),
@@ -1497,6 +1908,54 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                       ],
                                     ),
                                   ),
+                                if (log.source == LogSource.bloc) ...[
+                                  const PopupMenuItem(
+                                    value: 'copy_bloc_command',
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.code, size: 16),
+                                        SizedBox(width: 8),
+                                        Text('Copy Command'),
+                                      ],
+                                    ),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 'copy_bloc_name',
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.account_tree, size: 16),
+                                        SizedBox(width: 8),
+                                        Text('Copy BLoC Name'),
+                                      ],
+                                    ),
+                                  ),
+                                  if (log.blocLogEntry?.event != null)
+                                    const PopupMenuItem(
+                                      value: 'copy_event_data',
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.input, size: 16),
+                                          SizedBox(width: 8),
+                                          Text('Copy Event Data'),
+                                        ],
+                                      ),
+                                    ),
+                                  if (log.blocLogEntry?.nextState != null)
+                                    const PopupMenuItem(
+                                      value: 'copy_state_data',
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.change_circle, size: 16),
+                                          SizedBox(width: 8),
+                                          Text('Copy State Data'),
+                                        ],
+                                      ),
+                                    ),
+                                ],
                               ],
                             ),
                             children: [
@@ -1585,6 +2044,12 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                     if (log.source == LogSource.api) ...[
                                       const SizedBox(height: 12),
                                       _buildApiViewSection(log),
+                                    ],
+
+                                    // BLoC-specific view chips and content
+                                    if (log.source == LogSource.bloc) ...[
+                                      const SizedBox(height: 12),
+                                      _buildBlocViewSection(log),
                                     ],
 
                                     // File path for general logs
