@@ -13,7 +13,7 @@ import 'widgets/filters/filter_section.dart';
 import 'widgets/logs/log_entry_widget.dart';
 
 /// Refactored unified logger history page showing general, API, and BLoC logs in chronological order
-class AwesomeLoggerHistoryPage extends StatefulWidget {
+class AwesomeLoggerHistoryPageRefactored extends StatefulWidget {
   /// Whether to show file paths in the UI
   final bool showFilePaths;
 
@@ -23,14 +23,16 @@ class AwesomeLoggerHistoryPage extends StatefulWidget {
   /// Check if logger is currently open
   static bool get isLoggerOpen => _isLoggerOpen;
 
-  const AwesomeLoggerHistoryPage({super.key, this.showFilePaths = true});
+  const AwesomeLoggerHistoryPageRefactored(
+      {super.key, this.showFilePaths = true});
 
   @override
-  State<AwesomeLoggerHistoryPage> createState() =>
-      _AwesomeLoggerHistoryPageState();
+  State<AwesomeLoggerHistoryPageRefactored> createState() =>
+      _AwesomeLoggerHistoryPageRefactoredState();
 }
 
-class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
+class _AwesomeLoggerHistoryPageRefactoredState
+    extends State<AwesomeLoggerHistoryPageRefactored> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   final FilterManager _filterManager = FilterManager();
@@ -42,7 +44,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
   @override
   void initState() {
     super.initState();
-    AwesomeLoggerHistoryPage._isLoggerOpen = true;
+    AwesomeLoggerHistoryPageRefactored._isLoggerOpen = true;
     _isLoggingPaused = LoggingUsingLogger.isPaused;
 
     // Set up periodic refresh
@@ -62,7 +64,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
 
   @override
   void dispose() {
-    AwesomeLoggerHistoryPage._isLoggerOpen = false;
+    AwesomeLoggerHistoryPageRefactored._isLoggerOpen = false;
     _refreshTimer?.cancel();
     _scrollController.dispose();
     _searchController.dispose();
