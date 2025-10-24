@@ -61,7 +61,12 @@ class _CustomJsonViewerState extends State<CustomJsonViewer> {
   @override
   Widget build(BuildContext context) {
     _nodeCounter = 0; // Reset counter for each build
-    return _buildJsonNode(widget.data, '', widget.indentLevel, '');
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: IntrinsicWidth(
+        child: _buildJsonNode(widget.data, '', widget.indentLevel, ''),
+      ),
+    );
   }
 
   Widget _buildJsonNode(
@@ -281,8 +286,8 @@ class _CustomJsonViewerState extends State<CustomJsonViewer> {
 
     return Padding(
       padding: EdgeInsets.only(left: indentLevel * 16.0),
-      child: Wrap(
-        // crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(
               width: 20), // Space for arrow (no arrow for primitives)
@@ -296,14 +301,16 @@ class _CustomJsonViewerState extends State<CustomJsonViewer> {
               ),
             ),
           ],
-          Text(
-            displayValue,
-            style: TextStyle(
-              color: valueColor,
-              fontSize: 12,
-              fontFamily: 'monospace',
+          Flexible(
+            child: Text(
+              displayValue,
+              style: TextStyle(
+                color: valueColor,
+                fontSize: 12,
+                fontFamily: 'monospace',
+              ),
+              softWrap: false, // Don't wrap, let horizontal scroll handle it
             ),
-            softWrap: true,
           ),
         ],
       ),
