@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
 import 'pages/pages.dart';
@@ -9,20 +8,6 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 /// Main entry point of the application
 void main() {
-  // Configure BLoC observer for logging
-  Bloc.observer = AwesomeBlocObserver(
-    config: AwesomeBlocObserverConfig(
-      logEvents: true,
-      logTransitions: true,
-      logChanges: true,
-      logCreate: true,
-      logClose: true,
-      logErrors: true,
-      printToConsole: true,
-      maxConsoleLength: 200,
-    ),
-  );
-
   runApp(const MyApp());
 }
 
@@ -55,6 +40,18 @@ class MyApp extends StatelessWidget {
           showFilePaths: true,
           showEmojis: true,
           useColors: true,
+        ),
+
+        // 🔍 BLoC observer configuration (optional) - automatically configures Bloc.observer
+        blocObserverConfig: const AwesomeBlocObserverConfig(
+          logEvents: true,
+          logTransitions: true,
+          logChanges: true,
+          logCreate: true,
+          logClose: true,
+          logErrors: true,
+          printToConsole: true,
+          maxConsoleLength: 200,
         ),
 
         // 🎨 Floating logger UI configuration (optional)
