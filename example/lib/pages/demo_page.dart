@@ -223,7 +223,8 @@ class _DemoPageState extends State<DemoPage> {
                 label: const Text('Open Awesome Logger'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
-                  backgroundColor: Colors.purple.withValues(alpha: 0.1),
+                  backgroundColor:
+                      const Color(0x1A9C27B0), // purple with 10% opacity
                   foregroundColor: Colors.purple,
                 ),
               ),

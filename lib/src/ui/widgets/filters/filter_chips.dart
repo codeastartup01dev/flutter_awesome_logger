@@ -32,7 +32,10 @@ class MainFilterChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isSelected ? color.withValues(alpha: 0.1) : Colors.grey[100],
+        color: isSelected
+            ? Color.fromARGB(26, (color.r * 255).round(),
+                (color.g * 255).round(), (color.b * 255).round())
+            : Colors.grey[100], // 10% opacity
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isSelected ? color : Colors.grey[300]!,
@@ -153,7 +156,10 @@ class SubFilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : Colors.grey[50],
+          color: isSelected
+              ? Color.fromARGB(26, (color.r * 255).round(),
+                  (color.g * 255).round(), (color.b * 255).round())
+              : Colors.grey[50], // 10% opacity
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? color : Colors.grey[300]!,

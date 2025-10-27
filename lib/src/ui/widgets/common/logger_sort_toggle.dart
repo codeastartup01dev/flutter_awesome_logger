@@ -51,7 +51,7 @@ class LoggerSortToggle extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: Colors.deepPurple.withValues(alpha: 0.1),
+        backgroundColor: const Color(0x1A673AB7), // deepPurple with 10% opacity
         foregroundColor: Colors.deepPurple,
         elevation: 0,
       ),

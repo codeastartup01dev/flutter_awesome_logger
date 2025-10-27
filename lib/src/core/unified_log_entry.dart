@@ -253,22 +253,31 @@ class UnifiedLogEntry {
 
     // Check BLoC-specific fields
     if (source == LogSource.bloc && blocLogEntry != null) {
-      if (blocLogEntry!.blocName.toLowerCase().contains(lowerQuery))
+      if (blocLogEntry!.blocName.toLowerCase().contains(lowerQuery)) {
         return true;
+      }
       if (blocLogEntry!.event?.toString().toLowerCase().contains(lowerQuery) ==
-          true) return true;
+          true) {
+        return true;
+      }
       if (blocLogEntry!.currentState
               ?.toString()
               .toLowerCase()
               .contains(lowerQuery) ==
-          true) return true;
+          true) {
+        return true;
+      }
       if (blocLogEntry!.nextState
               ?.toString()
               .toLowerCase()
               .contains(lowerQuery) ==
-          true) return true;
+          true) {
+        return true;
+      }
       if (blocLogEntry!.error?.toString().toLowerCase().contains(lowerQuery) ==
-          true) return true;
+          true) {
+        return true;
+      }
       if (eventType?.toLowerCase().contains(lowerQuery) == true) return true;
       if (stateType?.toLowerCase().contains(lowerQuery) == true) return true;
     }

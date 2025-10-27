@@ -588,7 +588,7 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
             : Border.all(color: Colors.grey, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: const Color(0x33000000), // black with 20% opacity
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),

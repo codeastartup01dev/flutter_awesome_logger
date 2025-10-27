@@ -45,10 +45,11 @@ class FilterSection extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withValues(alpha: 0.1),
+                        color: const Color(0x1A2196F3), // blue with 10% opacity
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                            color: Colors.blue.withValues(alpha: 0.3)),
+                            color: const Color(
+                                0x4D2196F3)), // blue with 30% opacity
                       ),
                       child: Text(
                         '${filterManager.getActiveFilterCount()} active',

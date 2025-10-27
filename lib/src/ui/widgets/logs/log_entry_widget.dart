@@ -101,7 +101,12 @@ class _LogEntryWidgetState extends State<LogEntryWidget> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: widget.log.type.color.withValues(alpha: 0.1),
+                        color: Color.fromARGB(
+                            26,
+                            (widget.log.type.color.r * 255).round(),
+                            (widget.log.type.color.g * 255).round(),
+                            (widget.log.type.color.b * 255)
+                                .round()), // 10% opacity
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
                           color: widget.log.type.color,
