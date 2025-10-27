@@ -33,9 +33,9 @@ class MainFilterChip extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isSelected
-            ? Color.fromARGB(26, (color.r * 255).round(),
-                (color.g * 255).round(), (color.b * 255).round())
-            : Colors.grey[100], // 10% opacity
+            // ignore: deprecated_member_use
+            ? color.withOpacity(0.1)
+            : Colors.grey[100],
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isSelected ? color : Colors.grey[300]!,
@@ -157,9 +157,9 @@ class SubFilterChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: isSelected
-              ? Color.fromARGB(26, (color.r * 255).round(),
-                  (color.g * 255).round(), (color.b * 255).round())
-              : Colors.grey[50], // 10% opacity
+              // ignore: deprecated_member_use
+              ? color.withOpacity(0.1)
+              : Colors.grey[50],
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? color : Colors.grey[300]!,

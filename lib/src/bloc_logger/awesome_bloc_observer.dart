@@ -135,8 +135,8 @@ class AwesomeBlocObserver extends BlocObserver {
     if (config.printToConsole) {
       final eventStr =
           _truncateString(event.toString(), config.maxConsoleLength);
-      print(
-          '🔵 BLoC Event: $blocName received ${event.runtimeType}'); // ignore: avoid_print
+      print(// ignore: avoid_print
+          '🔵 BLoC Event: $blocName received ${event.runtimeType}');
       print('   Event Data: $eventStr'); // ignore: avoid_print
     }
   }
@@ -181,8 +181,8 @@ class AwesomeBlocObserver extends BlocObserver {
       print('   Event: ${transition.event.runtimeType}'); // ignore: avoid_print
       print(// ignore: avoid_print
           '   Current: ${transition.currentState.runtimeType} -> $currentStateStr');
-      print(
-          '   Next: ${transition.nextState.runtimeType} -> $nextStateStr'); // ignore: avoid_print
+      print(// ignore: avoid_print
+          '   Next: ${transition.nextState.runtimeType} -> $nextStateStr');
     }
   }
 
@@ -220,8 +220,8 @@ class AwesomeBlocObserver extends BlocObserver {
       print('🔀 BLoC Change: $blocName'); // ignore: avoid_print
       print(// ignore: avoid_print
           '   Current: ${change.currentState.runtimeType} -> $currentStateStr');
-      print(
-          '   Next: ${change.nextState.runtimeType} -> $nextStateStr'); // ignore: avoid_print
+      print(// ignore: avoid_print
+          '   Next: ${change.nextState.runtimeType} -> $nextStateStr');
     }
   }
 

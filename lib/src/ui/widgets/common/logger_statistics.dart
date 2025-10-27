@@ -28,9 +28,11 @@ class LoggerStatistics extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        spacing: 8,
-        children:
-            statistics.map((stat) => _buildStatItem(stat, context)).toList(),
+        children: statistics
+            .map((stat) => _buildStatItem(stat, context))
+            .expand((widget) => [widget, const SizedBox(width: 8)])
+            .toList()
+          ..removeLast(), // Remove the last spacing
       ),
     );
   }
