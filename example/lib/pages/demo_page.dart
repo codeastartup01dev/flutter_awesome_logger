@@ -247,7 +247,7 @@ class _DemoPageState extends State<DemoPage> {
                       Icon(Icons.info, color: Colors.white),
                       SizedBox(height: 8),
                       Text(
-                        'Tap the floating button to access logs quickly!\n\n🤳 Shake your device to show/hide the logger button!\n\n🤳 Shake when logger is disabled to enable it!',
+                        'Tap the floating button to access logs quickly!',
                         style: TextStyle(color: Colors.white),
                         textAlign: TextAlign.center,
                       ),

@@ -42,8 +42,6 @@
 |---------|-------------|
 | 📱 **Floating Logger Button** | Always accessible debug button that floats over your app - drag to reposition, auto-snaps to edges |
 | 👆 **Long Press Floating Button** | **Tap:** Opens logger UI instantly • **Long Press:** Shows quick actions menu • **Drag:** Repositions button • **Double Tap:** Toggles pause/resume logging |
-| 🤳 **Shake to Toggle** | Shake your device to show/hide the floating logger button - perfect for quick access during testing |
-| 🤳 **Shake to Enable** | Shake your device to enable the logger when disabled - ideal for production builds with hidden debug access |
 | 🌐 **Automatic API Logging** | Built-in Dio interceptor for seamless API logging - captures requests, responses, errors, and timing automatically |
 | 🎨 **Unified Beautiful UI** | Clean, modern interface with syntax highlighting - unified view for all logs, advanced filtering, and intuitive navigation |
 | 📊 **Multiple Log Levels** | Support for debug, info, warning, error, and verbose logs - color-coded with filtering and search capabilities |
@@ -137,7 +135,6 @@ class MyApp extends StatelessWidget {
 
 **That's it! 🎉** The logger is now active with default settings. You'll see:
 - 📱 Floating logger button on your screen
-- 🤳 Shake-to-toggle functionality enabled
 - 📊 Unified logger interface ready for all your logs
 
 ---
@@ -388,24 +385,6 @@ const AwesomeLoggerConfig({
 <td><code>60.0</code></td>
 <td>Size of the floating button</td>
 </tr>
-<tr>
-<td><code>enableShakeToShowHideFloatingButton</code></td>
-<td><code>bool</code></td>
-<td><code>true</code></td>
-<td>Enable shake-to-toggle button visibility</td>
-</tr>
-<tr>
-<td><code>enableShakeToEnableLogger</code></td>
-<td><code>bool</code></td>
-<td><code>true</code></td>
-<td>Enable shake-to-enable logger when disabled</td>
-</tr>
-<tr>
-<td><code>shakeSensitivity</code></td>
-<td><code>int</code></td>
-<td><code>8</code></td>
-<td>Shake sensitivity (1-15, higher = less sensitive)</td>
-</tr>
 </tbody>
 </table>
 
@@ -417,9 +396,6 @@ const FloatingLoggerConfig({
   bool enableGestures = true,
   bool autoSnapToEdges = true,
   double size = 60.0,
-  bool enableShakeToShowHideFloatingButton = true,
-  bool enableShakeToEnableLogger = true,
-  int shakeSensitivity = 8,
 });
 ```
 
@@ -509,9 +485,6 @@ The logger UI is highly customizable. You can:
 - Add custom filters and search options
 - Pause/resume logging as needed
 - Control logging behavior with simple configuration
-- Enable/disable shake-to-toggle functionality
-- Enable/disable shake-to-enable functionality for production builds
-- Adjust shake sensitivity for different devices
 
 ---
 

@@ -56,7 +56,6 @@ That's when it hit me: **What if debugging could actually be... enjoyable?**
 
 What if instead of hunting through console logs, I could:
 - 📱 See logs directly on my phone screen
-- 🤳 Shake my device to toggle the logger (because why not?)
 - 🌐 Automatically capture all API requests without extra code
 - 🎨 Have a beautiful UI that even my designer would approve of
 - 📊 Filter and search logs like a pro
@@ -91,8 +90,6 @@ MaterialApp(
 |---------|-------------|
 | 📱 **Floating Logger Button** | Always accessible debug button that floats over your app - drag to reposition, auto-snaps to edges |
 | 👆 **Long Press Floating Button** | **Tap:** Opens logger UI instantly • **Long Press:** Shows quick actions menu • **Drag:** Repositions button • **Double Tap:** Toggles pause/resume logging |
-| 🤳 **Shake to Toggle** | Shake your device to show/hide the floating logger button - perfect for quick access during testing |
-| 🤳 **Shake to Enable** | Shake your device to enable the logger when disabled - ideal for production builds with hidden debug access |
 | 🌐 **Automatic API Logging** | Built-in Dio interceptor for seamless API logging - captures requests, responses, errors, and timing automatically |
 | 🎨 **Unified Beautiful UI** | Clean, modern interface with syntax highlighting - unified view for all logs, advanced filtering, and intuitive navigation |
 | 📊 **Multiple Log Levels** | Support for debug, info, warning, error, and verbose logs - color-coded with filtering and search capabilities |
@@ -249,9 +246,6 @@ const AwesomeLoggerConfig({
 | `enableGestures` | `bool` | `true` | Enable drag gestures for repositioning |
 | `autoSnapToEdges` | `bool` | `true` | Automatically snap button to screen edges |
 | `size` | `double` | `60.0` | Size of the floating button |
-| `enableShakeToShowHideFloatingButton` | `bool` | `true` | Enable shake-to-toggle button visibility |
-| `enableShakeToEnableLogger` | `bool` | `true` | Enable shake-to-enable logger when disabled |
-| `shakeSensitivity` | `int` | `8` | Shake sensitivity (1-15, higher = less sensitive) |
 
 ```dart
 const FloatingLoggerConfig({
@@ -261,9 +255,6 @@ const FloatingLoggerConfig({
   bool enableGestures = true,
   bool autoSnapToEdges = true,
   double size = 60.0,
-  bool enableShakeToShowHideFloatingButton = true,
-  bool enableShakeToEnableLogger = true,
-  int shakeSensitivity = 8,
 });
 ```
 
@@ -292,15 +283,6 @@ Ever tried to find a specific log in a sea of console output? Our search actuall
 ### 4. **The "Copy Everything" Superpower** 📋
 Found the bug? Copy the log, the curl command, or the entire debugging session with one tap. Send it to your team, paste it in your bug report, or frame it on your wall (we don't judge).
 
-### 5. **The "Shake to Debug" Feature (Because We're Not Boring)** 🤳
-
-Here's where it gets fun. Shake your phone, and the logger appears. Shake it again, and it disappears. It's like a magic trick, but for developers.
-
-*"But why shake?"* you ask. Because:
-1. It's intuitive (everyone knows how to shake a phone)
-2. It works even when your app is frozen
-3. It makes you feel like you're casting a debugging spell
-4. Your QA team will think you're a wizard
 
 ---
 
@@ -414,7 +396,6 @@ class MyApp extends StatelessWidget {
 
 **That's it! 🎉** The logger is now active with default settings. You'll see:
 - 📱 Floating logger button on your screen
-- 🤳 Shake-to-toggle functionality enabled
 - 📊 Unified logger interface ready for all your logs
 
 ---
@@ -423,7 +404,6 @@ class MyApp extends StatelessWidget {
 
 *"Finally, a logging package that doesn't make me want to throw my laptop out the window."* - Anonymous Flutter Developer
 
-*"The shake-to-debug feature is genius. My whole team is using it now."* - Sarah, Lead Mobile Developer
 
 *"I showed this to my backend team and now they want a version for Node.js."* - Mike, Full-Stack Developer
 
@@ -517,9 +497,6 @@ The logger UI is highly customizable. You can:
 - Add custom filters and search options
 - Pause/resume logging as needed
 - Control logging behavior with simple configuration
-- Enable/disable shake-to-toggle functionality
-- Enable/disable shake-to-enable functionality for production builds
-- Adjust shake sensitivity for different devices
 
 ---
 
@@ -549,7 +526,7 @@ Ready to transform your Flutter debugging experience? Here's how to get started:
 
 1. **Install the package**: `flutter pub add flutter_awesome_logger`
 2. **Wrap your app**: Add the 2-line setup
-3. **Shake your phone**: Watch the magic happen
+3. **Tap the floating button**: Watch the magic happen
 4. **Debug with a smile**: Enjoy the process for once
 
 **Links:**
@@ -615,7 +592,6 @@ Your 2 AM debugging sessions will never be the same.
 
 ---
 
-*P.S. - Yes, the shake-to-debug feature was inspired by the old "shake to undo" iOS feature. Sometimes the best ideas are hiding in plain sight.*
 
 ---
 

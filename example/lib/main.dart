@@ -62,9 +62,6 @@ class MyApp extends StatelessWidget {
           showCount: true,
           enableGestures: true,
           autoSnapToEdges: true,
-          enableShakeToShowHideFloatingButton: true,
-          enableShakeToEnableLogger: true,
-          shakeSensitivity: 8,
         ),
 
         child: const DemoPage(),

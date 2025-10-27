@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] (2024-10-27)
+
+### Removed
+- 🗑️ **Shake Package Dependency** - Removed shake package (^3.0.0) from dependencies
+- 🤳 **Shake-to-Toggle Functionality** - Removed shake-to-show/hide floating button feature
+- 🤳 **Shake-to-Enable Functionality** - Removed shake-to-enable logger when disabled feature
+- ⚙️ **Shake Configuration Options** - Removed `enableShakeToShowHideFloatingButton`, `enableShakeToEnableLogger`, and `shakeSensitivity` from `FloatingLoggerConfig`
+
+### Changed
+- 📖 **Updated Documentation** - Removed all shake-related references from README.md and example documentation
+- 🧹 **Code Cleanup** - Simplified floating logger configuration without shake-related parameters
+- 📱 **Example App** - Updated example app to use simplified configuration without shake features
+
+### Technical
+- 🏗️ **Reduced Dependencies** - Smaller package footprint by removing shake dependency
+- 🎯 **Simplified Configuration** - Cleaner API surface without shake-related configuration options
+- 📦 **Package Size Optimization** - Reduced overall package size and complexity
+
 ## [1.2.1] (2024-10-23)
 - updated README.md with new screenshots
 

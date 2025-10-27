@@ -95,9 +95,6 @@ config: const FloatingLoggerConfig(
   showCount: true,                     // Show log count on button
   enableGestures: true,                // Enable drag gestures
   autoSnapToEdges: true,               // Auto-snap to screen edges
-  enableShakeToShowHideFloatingButton: true,  // Shake to toggle
-  enableShakeToEnableLogger: true,     // Shake to enable when disabled
-  shakeSensitivity: 8,                 // Shake sensitivity (1-20)
 ),
 ```
 

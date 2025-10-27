@@ -84,7 +84,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.2.1"
+    version: "1.2.2"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -103,11 +103,6 @@ packages:
     version: "5.0.0"
   flutter_test:
     dependency: "direct dev"
-    description: flutter
-    source: sdk
-    version: "0.0.0"
-  flutter_web_plugins:
-    dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -159,14 +154,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.6.2"
-  logging:
-    dependency: transitive
-    description:
-      name: logging
-      sha256: c8245ada5f1717ed44271ed1c26b8ce85ca3228fd2ffdb75468ab01979309d61
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.0"
   matcher:
     dependency: transitive
     description:
@@ -215,14 +202,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
-  plugin_platform_interface:
-    dependency: transitive
-    description:
-      name: plugin_platform_interface
-      sha256: "4820fbfdb9478b1ebae27888254d445073732dae3d6ea81f0b7e06d5dedc3f02"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.8"
   provider:
     dependency: transitive
     description:
@@ -231,30 +210,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.5+1"
-  sensors_plus:
-    dependency: transitive
-    description:
-      name: sensors_plus
-      sha256: "89e2bfc3d883743539ce5774a2b93df61effde40ff958ecad78cd66b1a8b8d52"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.1.2"
-  sensors_plus_platform_interface:
-    dependency: transitive
-    description:
-      name: sensors_plus_platform_interface
-      sha256: "58815d2f5e46c0c41c40fb39375d3f127306f7742efe3b891c0b1c87e2b5cd5d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
-  shake:
-    dependency: transitive
-    description:
-      name: shake
-      sha256: "7bb2bd14e9cd23a0d569f8a286b2b63ba1552ac348914d2d41ec757117ddda4e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -342,4 +297,4 @@ packages:
     version: "1.1.1"
 sdks:
   dart: ">=3.7.0-0 <4.0.0"
-  flutter: ">=3.19.0"
+  flutter: ">=3.18.0-18.0.pre.54"

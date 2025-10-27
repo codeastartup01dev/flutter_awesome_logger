@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shake/shake.dart';
 
 import '../api_logger/api_log_entry.dart';
 import '../api_logger/api_logger_service.dart';
@@ -277,8 +276,6 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   bool _isLoggingPaused = false;
   bool? _isEnabled; // null = waiting for future, true/false = resolved
   Future<bool>? _enabledFuture;
-  ShakeDetector? _shakeDetector;
-  ShakeDetector? _enableShakeDetector; // Separate detector for enabling logger
   bool _showNavigationError = false; // Show navigation error message in widget
 
   @override
@@ -383,94 +380,15 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     // Start stats timer if enabled
     if (enabled) {
       _startStatsTimer();
-      _initializeShakeDetector();
-      _disposeEnableShakeDetector(); // Stop enable detector when logger is active
     } else {
       _statsTimer?.cancel();
       _statsTimer = null;
-      _disposeShakeDetector();
-      _initializeEnableShakeDetector(); // Start enable detector when logger is disabled
-    }
-  }
-
-  /// Initialize shake detector if enabled
-  void _initializeShakeDetector() {
-    if (!widget.config.enableShakeToShowHideFloatingButton) return;
-
-    _shakeDetector = ShakeDetector.autoStart(
-      onPhoneShake: (_) {
-        if (mounted) {
-          _toggleLoggerVisibility();
-        }
-      },
-      minimumShakeCount: 1,
-      shakeSlopTimeMS: 500,
-      shakeCountResetTime: 3000,
-      shakeThresholdGravity: widget.config.shakeSensitivity.toDouble(),
-    );
-  }
-
-  /// Dispose shake detector
-  void _disposeShakeDetector() {
-    _shakeDetector?.stopListening();
-    _shakeDetector = null;
-  }
-
-  /// Initialize shake detector for enabling logger when disabled
-  void _initializeEnableShakeDetector() {
-    if (!widget.config.enableShakeToEnableLogger) return;
-
-    _enableShakeDetector = ShakeDetector.autoStart(
-      onPhoneShake: (_) {
-        if (mounted) {
-          _enableLogger();
-        }
-      },
-      minimumShakeCount: 1,
-      shakeSlopTimeMS: 500,
-      shakeCountResetTime: 3000,
-      shakeThresholdGravity: widget.config.shakeSensitivity.toDouble(),
-    );
-  }
-
-  /// Dispose enable shake detector
-  void _disposeEnableShakeDetector() {
-    _enableShakeDetector?.stopListening();
-    _enableShakeDetector = null;
-  }
-
-  /// Enable logger via shake when disabled
-  void _enableLogger() {
-    setState(() {
-      _setEnabledState(true);
-    });
-
-    debugPrint('FlutterAwesomeLogger: Shake detected - enabling logger');
-
-    // Show a brief message to user
-    if (mounted) {
-      // You could show a snackbar or toast here if needed
-      debugPrint('Logger enabled via shake gesture');
-    }
-  }
-
-  /// Toggle logger visibility with haptic feedback
-  void _toggleLoggerVisibility() {
-    FloatingLoggerManager.toggle();
-
-    // Provide haptic feedback
-    if (mounted) {
-      // Light haptic feedback to confirm shake was detected
-      // Note: HapticFeedback requires additional import, keeping it simple for now
-      debugPrint('FlutterAwesomeLogger: Shake detected - toggling visibility');
     }
   }
 
   @override
   void dispose() {
     _statsTimer?.cancel();
-    _disposeShakeDetector();
-    _disposeEnableShakeDetector();
     FloatingLoggerManager.visibilityNotifier.removeListener(
       _onVisibilityChanged,
     );
