@@ -61,8 +61,8 @@ class ApiLoggerService {
 
     // Find and update the existing pending log entry
     final pendingLogIndex = _apiLogs.toList().indexWhere(
-      (log) => log.id == apiId && log.type == ApiLogType.pending,
-    );
+          (log) => log.id == apiId && log.type == ApiLogType.pending,
+        );
 
     if (pendingLogIndex != -1) {
       // Remove the old pending entry
@@ -104,8 +104,8 @@ class ApiLoggerService {
 
     // Find and update the existing pending log entry
     final pendingLogIndex = _apiLogs.toList().indexWhere(
-      (log) => log.id == apiId && log.type == ApiLogType.pending,
-    );
+          (log) => log.id == apiId && log.type == ApiLogType.pending,
+        );
 
     if (pendingLogIndex != -1) {
       // Remove the old pending entry

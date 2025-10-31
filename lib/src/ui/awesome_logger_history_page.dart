@@ -160,6 +160,75 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     _filterManager.setStatsFilter(filterKey);
   }
 
+  /// Toggle circular buffer setting
+  void _toggleCircularBuffer() {
+    final currentConfig = LoggingUsingLogger.config;
+    final newConfig = currentConfig.copyWith(
+      enableCircularBuffer: !currentConfig.enableCircularBuffer,
+    );
+    LoggingUsingLogger.configure(newConfig);
+    setState(() {});
+  }
+
+  /// Build settings section
+  Widget _buildSettingsSection() {
+    final currentConfig = LoggingUsingLogger.config;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Circular Buffer',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        currentConfig.enableCircularBuffer
+                            ? 'Replacing oldest logs with new ones when maxLogEntries limit reached'
+                            : 'Enable to replace oldest logs with new ones when maxLogEntries limit reached',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch(
+                  value: currentConfig.enableCircularBuffer,
+                  onChanged: (_) => _toggleCircularBuffer(),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final allLogs = LogDataService.getUnifiedLogs();
@@ -251,7 +320,8 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                   ],
                 ),
               ),
-
+            // Settings section
+            _buildSettingsSection(),
             // Search bar
             LoggerSearchBar(
               controller: _searchController,

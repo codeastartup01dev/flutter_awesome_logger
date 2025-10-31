@@ -26,6 +26,11 @@ class AwesomeLoggerConfig {
   /// Number of stack trace lines to show (0 = none)
   final int stackTraceLines;
 
+  /// Whether to enable circular buffer behavior
+  /// When true (default): oldest logs are replaced with new ones when maxLogEntries is reached
+  /// When false: logging stops when maxLogEntries is reached
+  final bool enableCircularBuffer;
+
   /// Default main filter to be selected when opening the logger history page
   /// Options: LogSource.general (Logger Logs), LogSource.api (API Logs), LogSource.flutter (Flutter Error Logs)
   /// If null, no main filter will be pre-selected (shows all logs)
@@ -37,6 +42,7 @@ class AwesomeLoggerConfig {
     this.showEmojis = true,
     this.useColors = true,
     this.stackTraceLines = 0,
+    this.enableCircularBuffer = true,
     this.defaultMainFilter,
   });
 
@@ -47,6 +53,7 @@ class AwesomeLoggerConfig {
     bool? showEmojis,
     bool? useColors,
     int? stackTraceLines,
+    bool? enableCircularBuffer,
     LogSource? defaultMainFilter,
   }) {
     return AwesomeLoggerConfig(
@@ -55,6 +62,7 @@ class AwesomeLoggerConfig {
       showEmojis: showEmojis ?? this.showEmojis,
       useColors: useColors ?? this.useColors,
       stackTraceLines: stackTraceLines ?? this.stackTraceLines,
+      enableCircularBuffer: enableCircularBuffer ?? this.enableCircularBuffer,
       defaultMainFilter: defaultMainFilter ?? this.defaultMainFilter,
     );
   }
@@ -199,6 +207,12 @@ class LoggingUsingLogger {
   void _addLogEntry(String message, String level, {String? stackTrace}) {
     // Only store logs if storage is enabled
     if (!_storageEnabled) return;
+
+    // If circular buffer is disabled and we're at max capacity, don't add new logs
+    if (!_config.enableCircularBuffer &&
+        _logHistory.length >= _config.maxLogEntries) {
+      return;
+    }
 
     final filePath = _getFilePath();
     final entry = LogEntry(

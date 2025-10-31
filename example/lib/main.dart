@@ -32,6 +32,9 @@ class MyApp extends StatelessWidget {
       // ✨ Logger configuration (optional)
       loggerConfig: const AwesomeLoggerConfig(
         maxLogEntries: 500,
+        enableCircularBuffer: true,
+        // enableCircularBuffer: true : replace oldest logs with new ones when limit reached, false : stop logging when limit reached
+        // enableCircularBuffer: false : stop logging when limit reached
         showFilePaths: true,
         showEmojis: true,
         useColors: true,
