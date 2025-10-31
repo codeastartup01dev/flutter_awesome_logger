@@ -116,6 +116,9 @@ The absolute simplest way to get started - just wrap your app:
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
+// Global navigator key for navigation (required for logger history page)
+final navigatorKey = GlobalKey<NavigatorState>();
+
 void main() {
   runApp(const MyApp());
 }
@@ -125,9 +128,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: FlutterAwesomeLogger(
-        child: YourHomePage(), // Your existing home page
+    return FlutterAwesomeLogger(
+      navigatorKey: navigatorKey, // Required if  logger history page does not open on floating button press
+      child: MaterialApp(
+        navigatorKey: navigatorKey, // Required if logger history page does not open on floating button press
+        home: const YourHomePage(),
       ),
     );
   }
@@ -187,7 +192,7 @@ final dio = Dio();
 dio.interceptors.add(FlutterAwesomeLoggerDioInterceptor());
 
 // Now all API calls are automatically logged!
-final response = await dio.get('https://api.example.com/data');
+final response = await dio.get('https://jsonplaceholder.typicode.com/users');
 ```
 
 **What you get:**
