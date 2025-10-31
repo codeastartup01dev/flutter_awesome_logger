@@ -23,38 +23,38 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return FlutterAwesomeLogger(
+      // 🔄 Enable logging after 3 seconds using Future (or use enabled: true for immediate)
+      enabled: _shouldEnableLogger(),
       navigatorKey:
           navigatorKey, // IMPORTANT: Required for logger history page navigation
-      title: 'Awesome Flutter Logger Demo',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: FlutterAwesomeLogger(
-        // 🔄 Enable logging after 3 seconds using Future (or use enabled: true for immediate)
-        enabled: _shouldEnableLogger(),
+
+      // ✨ Logger configuration (optional)
+      loggerConfig: const AwesomeLoggerConfig(
+        maxLogEntries: 500,
+        showFilePaths: true,
+        showEmojis: true,
+        useColors: true,
+        defaultMainFilter: LogSource.api, // 🎯 Set API Logs as default filter
+      ),
+
+      // 🎨 Floating logger UI configuration (optional)
+      config: const FloatingLoggerConfig(
+        backgroundColor: Colors.deepPurple,
+        icon: Icons.developer_mode,
+        showCount: true,
+        enableGestures: true,
+        autoSnapToEdges: true,
+      ),
+
+      child: MaterialApp(
         navigatorKey:
             navigatorKey, // IMPORTANT: Required for logger history page navigation
-
-        // ✨ Logger configuration (optional)
-        loggerConfig: const AwesomeLoggerConfig(
-          maxLogEntries: 500,
-          showFilePaths: true,
-          showEmojis: true,
-          useColors: true,
-          defaultMainFilter: LogSource.api, // 🎯 Set API Logs as default filter
-        ),
-
-        // 🎨 Floating logger UI configuration (optional)
-        config: const FloatingLoggerConfig(
-          backgroundColor: Colors.deepPurple,
-          icon: Icons.developer_mode,
-          showCount: true,
-          enableGestures: true,
-          autoSnapToEdges: true,
-        ),
-
-        child: const DemoPage(),
+        title: 'Awesome Flutter Logger Demo',
+        theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+        home: const DemoPage(),
+        debugShowCheckedModeBanner: false,
       ),
-      debugShowCheckedModeBanner: false,
     );
   }
 }

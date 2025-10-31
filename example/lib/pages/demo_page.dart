@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
+import 'api_demo_page.dart';
+
 /// Global logger instance
 final logger = FlutterAwesomeLogger.loggingUsingLogger;
 
@@ -70,6 +72,13 @@ class _DemoPageState extends State<DemoPage> {
     );
   }
 
+  void _openApiDemo() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ApiDemoPage()),
+    );
+  }
+
   void _toggleLoggerVisibility() {
     FlutterAwesomeLogger.toggleVisibility();
     final isVisible = FlutterAwesomeLogger.isVisible();
@@ -131,6 +140,9 @@ class _DemoPageState extends State<DemoPage> {
                         '\n🌐 API request/response logging using Dio interceptor (FlutterAwesomeLoggerDioInterceptor)',
                       ),
                       Text(
+                        '\n📱 Dedicated API Demo page with user data fetching',
+                      ),
+                      Text(
                           '\n🎨 Unified UI for browsing and searching all logs in one place'),
                     ],
                   ),
@@ -182,6 +194,17 @@ class _DemoPageState extends State<DemoPage> {
                 label: const Text('Make Network Error Call'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(16),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: _openApiDemo,
+                icon: const Icon(Icons.api),
+                label: const Text('Open API Demo Page'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.all(16),
                 ),
