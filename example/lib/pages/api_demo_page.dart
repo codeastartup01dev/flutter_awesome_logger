@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
 /// Global logger instance for API demo
-final _apiLogger = FlutterAwesomeLogger.loggingUsingLogger;
+final logger = FlutterAwesomeLogger.loggingUsingLogger;
 
 /// Model class for User data
 class User {
@@ -53,14 +53,14 @@ class _ApiDemoPageState extends State<ApiDemoPage> {
   void initState() {
     super.initState();
     _setupDio();
-    _apiLogger.i('API Demo Page initialized');
+    logger.i('API Demo Page initialized');
   }
 
   void _setupDio() {
     _dio = Dio();
     // Add the awesome logger interceptor
     _dio.interceptors.add(FlutterAwesomeLoggerDioInterceptor());
-    _apiLogger.d('Dio configured with AwesomeLoggerInterceptor for API demo');
+    logger.d('Dio configured with AwesomeLoggerInterceptor for API demo');
   }
 
   Future<void> _fetchUsers() async {
@@ -70,7 +70,7 @@ class _ApiDemoPageState extends State<ApiDemoPage> {
     });
 
     try {
-      _apiLogger.i('Fetching users from JSONPlaceholder API');
+      logger.i('Fetching users from JSONPlaceholder API');
 
       final response =
           await _dio.get('https://jsonplaceholder.typicode.com/users');
@@ -84,12 +84,12 @@ class _ApiDemoPageState extends State<ApiDemoPage> {
           _isLoading = false;
         });
 
-        _apiLogger.i('Successfully fetched ${users.length} users');
+        logger.i('Successfully fetched ${users.length} users');
       } else {
         throw Exception('Failed to load users: ${response.statusCode}');
       }
     } catch (e, stackTrace) {
-      _apiLogger.e('Failed to fetch users', error: e, stackTrace: stackTrace);
+      logger.e('Failed to fetch users', error: e, stackTrace: stackTrace);
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -104,7 +104,7 @@ class _ApiDemoPageState extends State<ApiDemoPage> {
     });
 
     try {
-      _apiLogger.i('Fetching user with ID: $userId');
+      logger.i('Fetching user with ID: $userId');
 
       final response =
           await _dio.get('https://jsonplaceholder.typicode.com/users/$userId');
@@ -117,12 +117,12 @@ class _ApiDemoPageState extends State<ApiDemoPage> {
           _isLoading = false;
         });
 
-        _apiLogger.i('Successfully fetched user: ${user.name}');
+        logger.i('Successfully fetched user: ${user.name}');
       } else {
         throw Exception('Failed to load user: ${response.statusCode}');
       }
     } catch (e, stackTrace) {
-      _apiLogger.e('Failed to fetch user $userId',
+      logger.e('Failed to fetch user $userId',
           error: e, stackTrace: stackTrace);
       setState(() {
         _error = e.toString();
@@ -138,7 +138,7 @@ class _ApiDemoPageState extends State<ApiDemoPage> {
     });
 
     try {
-      _apiLogger.i('Creating a new user via POST request');
+      logger.i('Creating a new user via POST request');
 
       final newUserData = {
         'name': 'John Doe',
@@ -161,12 +161,12 @@ class _ApiDemoPageState extends State<ApiDemoPage> {
           _isLoading = false;
         });
 
-        _apiLogger.i('Successfully created user: ${createdUser.name}');
+        logger.i('Successfully created user: ${createdUser.name}');
       } else {
         throw Exception('Failed to create user: ${response.statusCode}');
       }
     } catch (e, stackTrace) {
-      _apiLogger.e('Failed to create user', error: e, stackTrace: stackTrace);
+      logger.e('Failed to create user', error: e, stackTrace: stackTrace);
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -181,15 +181,14 @@ class _ApiDemoPageState extends State<ApiDemoPage> {
     });
 
     try {
-      _apiLogger.w('Simulating API error with invalid endpoint');
+      logger.w('Simulating API error with invalid endpoint');
 
       // This will cause a 404 error
       await _dio.get('https://jsonplaceholder.typicode.com/users/invalid');
 
-      _apiLogger.i('Unexpected success - should have failed');
+      logger.i('Unexpected success - should have failed');
     } catch (e, stackTrace) {
-      _apiLogger.e('Expected API error occurred',
-          error: e, stackTrace: stackTrace);
+      logger.e('Expected API error occurred', error: e, stackTrace: stackTrace);
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -202,7 +201,7 @@ class _ApiDemoPageState extends State<ApiDemoPage> {
       _users = [];
       _error = null;
     });
-    _apiLogger.i('Cleared API demo results');
+    logger.i('Cleared API demo results');
   }
 
   Widget _buildUserCard(User user) {
