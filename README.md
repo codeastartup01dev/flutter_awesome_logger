@@ -10,7 +10,7 @@
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
 
-**Features a floating logger, automatic API logging with Dio interceptor, and a unified beautiful UI for viewing all logs in one place.**
+**Features a floating logger, automatic API logging with Dio interceptor, comprehensive API demo page, and a unified beautiful UI for viewing all logs in one place.**
 
 [📖 Documentation](#-getting-started) • [🚀 Installation](#installation) • [💡 Examples](#basic-usage) • [🎨 Customization](#-customization)
 
@@ -43,6 +43,7 @@
 | 📱 **Floating Logger Button** | Always accessible debug button that floats over your app - drag to reposition, auto-snaps to edges |
 | 👆 **Long Press Floating Button** | **Tap:** Opens logger UI instantly • **Long Press:** Shows quick actions menu • **Drag:** Repositions button • **Double Tap:** Toggles pause/resume logging |
 | 🌐 **Automatic API Logging** | Built-in Dio interceptor for seamless API logging - captures requests, responses, errors, and timing automatically |
+| 📱 **API Demo Page** | Comprehensive demo page showcasing GET, POST, and error handling with real API calls and automatic logging |
 | 🎨 **Unified Beautiful UI** | Clean, modern interface with syntax highlighting - unified view for all logs, advanced filtering, and intuitive navigation |
 | 📊 **Multiple Log Levels** | Support for debug, info, warning, error, and verbose logs - color-coded with filtering and search capabilities |
 | 💾 **Smart Storage** | Logs stored only when logger is enabled - conserves memory and respects privacy settings |
@@ -136,6 +137,36 @@ class MyApp extends StatelessWidget {
 **That's it! 🎉** The logger is now active with default settings. You'll see:
 - 📱 Floating logger button on your screen
 - 📊 Unified logger interface ready for all your logs
+
+---
+
+#### 🚀 **API Demo Page (Advanced Example)**
+
+For a comprehensive demonstration of API logging capabilities, check out our example app's dedicated API demo page:
+
+```dart
+// Navigate to API demo page from your app
+Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context) => const ApiDemoPage()),
+);
+```
+
+**What the API demo includes:**
+- ✅ **GET Requests** - Fetch all users and individual users by ID
+- ✅ **POST Requests** - Create new users with sample data
+- ✅ **Error Handling** - Simulate and handle API errors (404, network issues)
+- ✅ **Loading States** - Beautiful loading indicators during requests
+- ✅ **User Cards** - Attractive display of user data with avatars and details
+- ✅ **Auto-logging** - Every request is automatically logged with full details
+- ✅ **cURL Generation** - Copy-paste ready cURL commands for testing
+
+**Features demonstrated:**
+- Real-time API logging with Dio interceptor
+- Error state management and user feedback
+- Professional UI with loading states and error displays
+- Comprehensive user data model with JSON parsing
+- Multiple HTTP methods (GET, POST) with proper error handling
 
 ---
 

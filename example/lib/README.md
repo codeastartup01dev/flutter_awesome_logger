@@ -1,23 +1,19 @@
 # Example App Structure
 
-This example demonstrates the usage of `flutter_awesome_logger` with a well-organized project structure.
+This example demonstrates the usage of `flutter_awesome_logger` with a focus on API logging and the unified logger interface.
 
 ## 📁 Directory Structure
 
 ```
 lib/
 ├── main.dart                 # App entry point and configuration
-├── cubit/                    # BLoC/Cubit state management
-│   ├── cubit.dart           # Barrel export for cubit files
-│   ├── user_cubit.dart      # User management cubit
-│   └── user_state.dart      # User state definitions
 ├── models/                   # Data models
-│   ├── models.dart          # Barrel export for model files
-│   └── user.dart            # User model class
+│   ├── models.dart          # Barrel export for model files (removed)
+│   └── user.dart            # User model class (removed)
 ├── pages/                    # UI pages/screens
 │   ├── pages.dart           # Barrel export for page files
-│   ├── demo_page.dart       # Main demo page
-│   └── cubit_demo_page.dart # BLoC/Cubit demo page
+│   ├── api_demo_page.dart   # API calls demo page (NEW!)
+│   └── demo_page.dart       # Main demo page
 └── README.md                # This file
 ```
 
@@ -35,15 +31,17 @@ lib/
 - Network error handling
 - Custom headers and timeout configuration
 
-### 3. **BLoC Logging** (`user_cubit.dart`)
-- State change logging
-- Event logging
-- Transition logging
-- Error logging in BLoC context
-- Cubit lifecycle logging
+### 3. **API Demo Page** (`api_demo_page.dart`)
+- GET requests (fetch all users, fetch single user)
+- POST requests (create new users)
+- Error handling and simulation
+- Loading states and user feedback
+- Beautiful user cards with detailed information
+- Automatic API logging with Dio interceptor
+- Real-time log updates in unified interface
 
 ### 4. **Unified Logging UI** (`AwesomeLoggerHistoryPage`)
-- Filter by log source (General, API, BLoC)
+- Filter by log source (General, API)
 - Search functionality
 - Copy log details
 - Export capabilities
@@ -69,11 +67,13 @@ lib/
 - **Failing API Call**: Makes a request that returns 500 error
 - **Network Error Call**: Makes a request to a non-existent domain
 
-### BLoC Logging
-- **Fetch All Users**: Demonstrates API call with BLoC state management
-- **Fetch User #1**: Fetches a single user by ID
-- **Clear Users**: Resets the state to initial
-- **Use Mock Data**: Uses local mock data (useful for offline testing)
+### API Demo Page
+- **Open API Demo Page**: Navigate to comprehensive API demo
+- **Fetch All Users**: GET request to retrieve user list
+- **Fetch User #1**: GET request for specific user
+- **Create User**: POST request to add new user
+- **Simulate Error**: Demonstrates error handling
+- **Clear Results**: Reset demo state
 
 ## 🎨 Customization
 
@@ -98,21 +98,32 @@ config: const FloatingLoggerConfig(
 ),
 ```
 
-### BLoC Observer Configuration
+### API Demo Page Features
+
+The API demo page showcases advanced API logging capabilities:
+
 ```dart
-Bloc.observer = AwesomeBlocObserver(
-  config: AwesomeBlocObserverConfig(
-    logEvents: true,           // Log BLoC events
-    logTransitions: true,      // Log BLoC transitions
-    logChanges: true,          // Log BLoC state changes
-    logCreate: true,           // Log BLoC creation
-    logClose: true,            // Log BLoC disposal
-    logErrors: true,           // Log BLoC errors
-    printToConsole: true,      // Also print to console
-    maxConsoleLength: 200,     // Max length for console output
-  ),
-),
+// Example of API logging with Dio interceptor
+final dio = Dio();
+dio.interceptors.add(FlutterAwesomeLoggerDioInterceptor());
+
+// All requests are automatically logged
+final response = await dio.get('https://jsonplaceholder.typicode.com/users');
+
+// View logs in the unified interface
+Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context) => const AwesomeLoggerHistoryPage()),
+);
 ```
+
+**API Demo Features:**
+- Real-time request/response logging
+- cURL command generation for testing
+- Error state management
+- Loading indicators
+- User-friendly data presentation
+- Comprehensive error handling
 
 ## 🔧 Architecture Benefits
 
@@ -135,5 +146,5 @@ Bloc.observer = AwesomeBlocObserver(
 ## 📚 Learn More
 
 - [flutter_awesome_logger Documentation](../README.md)
-- [BLoC Library Documentation](https://bloclibrary.dev)
 - [Dio HTTP Client Documentation](https://pub.dev/packages/dio)
+- [JSONPlaceholder API](https://jsonplaceholder.typicode.com) - Used for demo API calls
