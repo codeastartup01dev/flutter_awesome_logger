@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [2.1.0] (2025-10-31)
+
+### Added
+- 🎛️ **Settings Modal** - Added comprehensive settings modal accessible via app bar settings icon
+- 🔄 **Circular Buffer Configuration** - New `enableCircularBuffer` parameter in `AwesomeLoggerConfig` for controlling log replacement behavior
+- ⚙️ **Runtime Configuration** - All logger settings can now be modified at runtime through the settings modal
+- 📊 **Dynamic Max Log Entries** - Real-time adjustment of maximum log entries limit
+- 🎨 **Console Output Toggles** - Runtime toggles for file paths, emojis, and colors in console output
+- 📈 **Current Stats Display** - Shows current number of stored logs in settings modal
+
+### Changed
+- 🚀 **Improved UX** - Moved configuration from inline UI to dedicated settings modal for cleaner interface
+- 📱 **Better Mobile Experience** - Settings modal handles keyboard and screen sizes gracefully
+- 🎯 **Enhanced Developer Experience** - Immediate feedback on configuration changes
+
+### Technical
+- 🏗️ **Modal Architecture** - Implemented `StatefulBuilder` for proper state management in bottom sheet
+- 📱 **Keyboard Handling** - Proper keyboard dismissal and viewport adjustments
+- 🎨 **Theme Integration** - Full Material 3 theming support in settings modal
+
 ## [2.0.0] (2025-10-31)
 - removed bloc dependency
 

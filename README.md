@@ -25,6 +25,7 @@
   - [Basic Usage](#basic-usage)
   - [How to Get Logs in the Unified Interface](#-how-to-get-logs-in-the-unified-interface)
 - [🔧 Configuration Options](#-configuration-options)
+- [⚙️ Settings Modal](#️-settings-modal)
 - [📚 Advanced Usage](#-advanced-usage)
 - [🎨 Customization](#-customization)
 - [🤝 Contributing](#-contributing)
@@ -50,6 +51,8 @@
 | ⏸️ **Pause/Resume Logging** | Temporarily pause all logging with visual indicators - useful for focusing on specific app sections |
 | 🔍 **Search & Filter** | Easily find specific logs with advanced filtering - search by text, level, timestamp, or source file |
 | 🎯 **Simple Configuration** | Single `enabled` property controls both UI and storage - async support for conditional initialization |
+| ⚙️ **Settings Modal** | Comprehensive runtime configuration via settings modal - adjust all logger options on-the-fly |
+| 🔄 **Circular Buffer** | Configurable log replacement behavior - choose between replacing oldest logs or stopping when limit reached |
 | 📱 **Responsive Design** | Works perfectly on all screen sizes - adaptive layouts for phones, tablets, and different orientations |
 
 </div>
@@ -352,6 +355,12 @@ Waits for Future resolution
 <td><code>0</code></td>
 <td>Number of stack trace lines to display</td>
 </tr>
+<tr>
+<td><code>enableCircularBuffer</code></td>
+<td><code>bool</code></td>
+<td><code>true</code></td>
+<td>Enable circular buffer - replace oldest logs when limit reached, or stop logging</td>
+</tr>
 </tbody>
 </table>
 
@@ -362,6 +371,7 @@ const AwesomeLoggerConfig({
   bool showEmojis = true,
   bool useColors = true,
   int stackTraceLines = 0,
+  bool enableCircularBuffer = true,
 });
 ```
 
@@ -510,6 +520,91 @@ final errorLogs = FlutterAwesomeLogger.getApiLogsByType(ApiLogType.serverError);
 // Clear API logs
 FlutterAwesomeLogger.clearApiLogs();
 ```
+
+---
+
+## ⚙️ Settings Modal
+
+<div align="center">
+
+### 🎛️ Runtime Configuration
+
+*The settings modal provides comprehensive runtime control over all logger behavior*
+
+</div>
+
+#### 🖱️ **Accessing Settings**
+
+- **App Bar Icon**: Tap the settings icon (⚙️) in the logger history page app bar
+- **Modal Interface**: Clean bottom sheet with organized configuration sections
+
+#### 🔧 **Available Settings**
+
+<table width="100%">
+<thead>
+<tr>
+<th width="30%">Setting</th>
+<th width="70%">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>📊 Max Log Entries</strong></td>
+<td>Real-time adjustment of maximum log entries limit. Changes take effect immediately.</td>
+</tr>
+<tr>
+<td><strong>🔄 Circular Buffer</strong></td>
+<td>
+  <strong>ON (default):</strong> Automatically replaces oldest logs when limit reached<br>
+  <strong>OFF:</strong> Stops logging completely when limit reached
+</td>
+</tr>
+<tr>
+<td><strong>📁 Show File Paths</strong></td>
+<td>Toggle display of file paths and line numbers in console output</td>
+</tr>
+<tr>
+<td><strong>😀 Show Emojis</strong></td>
+<td>Toggle emoji indicators in console logs for better readability</td>
+</tr>
+<tr>
+<td><strong>🎨 Use Colors</strong></td>
+<td>Toggle color coding for different log levels in console output</td>
+</tr>
+<tr>
+<td><strong>📈 Current Stats</strong></td>
+<td>Real-time display of currently stored log count</td>
+</tr>
+</tbody>
+</table>
+
+#### 💡 **Usage Tips**
+
+- **Immediate Changes**: All settings take effect instantly - no app restart required
+- **Mobile Friendly**: Modal handles keyboard input and different screen sizes
+- **Visual Feedback**: Current behavior is clearly described for each setting
+- **Live Stats**: See how many logs are currently stored as you adjust limits
+
+#### 📱 **Example Configuration**
+
+```dart
+// Initial configuration
+loggerConfig: const AwesomeLoggerConfig(
+  maxLogEntries: 500,
+  enableCircularBuffer: true, // Replace oldest logs
+  showFilePaths: true,
+  showEmojis: true,
+  useColors: true,
+),
+
+// Runtime changes via settings modal:
+// - Change maxLogEntries to 1000
+// - Toggle enableCircularBuffer to false
+// - Turn off showEmojis
+// All changes apply immediately!
+```
+
+---
 
 ## 🎨 Customization
 
