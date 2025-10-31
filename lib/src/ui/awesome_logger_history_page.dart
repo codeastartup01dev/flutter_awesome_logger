@@ -160,69 +160,317 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     _filterManager.setStatsFilter(filterKey);
   }
 
-  /// Toggle circular buffer setting
-  void _toggleCircularBuffer() {
-    final currentConfig = LoggingUsingLogger.config;
-    final newConfig = currentConfig.copyWith(
-      enableCircularBuffer: !currentConfig.enableCircularBuffer,
+  /// Show settings modal bottom sheet
+  void _showSettingsModal() {
+    final TextEditingController maxLogEntriesController = TextEditingController(
+      text: LoggingUsingLogger.config.maxLogEntries.toString(),
     );
-    LoggingUsingLogger.configure(newConfig);
-    setState(() {});
-  }
 
-  /// Build settings section
-  Widget _buildSettingsSection() {
-    final currentConfig = LoggingUsingLogger.config;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final currentConfig = LoggingUsingLogger.config;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 16,
+                right: 16,
+                top: 16,
               ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
                     children: [
+                      Icon(
+                        Icons.settings,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(width: 12),
                       Text(
-                        'Circular Buffer',
+                        'Logger Settings',
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        currentConfig.enableCircularBuffer
-                            ? 'Replacing oldest logs with new ones when maxLogEntries limit reached'
-                            : 'Enable to replace oldest logs with new ones when maxLogEntries limit reached',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                        tooltip: 'Close',
                       ),
                     ],
                   ),
+                  const SizedBox(height: 20),
+
+                  // Settings content
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Max Log Entries
+                          Text(
+                            'Maximum Log Entries',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: maxLogEntriesController,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: 'Enter maximum log entries',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
+                            ),
+                            onChanged: (value) {
+                              // Update immediately as user types
+                              final intValue = int.tryParse(value);
+                              if (intValue != null && intValue > 0) {
+                                final newConfig = currentConfig.copyWith(
+                                  maxLogEntries: intValue,
+                                );
+                                LoggingUsingLogger.configure(newConfig);
+                                setModalState(() {});
+                                this.setState(() {});
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Circular Buffer Toggle
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceVariant
+                                  .withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outline
+                                    .withOpacity(0.2),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Circular Buffer',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            currentConfig.enableCircularBuffer
+                                                ? 'Oldest logs are automatically replaced with new ones when maxLogEntries limit is reached'
+                                                : 'Logging stops when maxLogEntries limit is reached',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Switch(
+                                      value: currentConfig.enableCircularBuffer,
+                                      onChanged: (value) {
+                                        final newConfig =
+                                            currentConfig.copyWith(
+                                          enableCircularBuffer: value,
+                                        );
+                                        LoggingUsingLogger.configure(newConfig);
+                                        setModalState(() {});
+                                        this.setState(() {});
+                                      },
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Console Output Settings
+                          Text(
+                            'Console Output',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Show File Paths
+                          _buildSettingToggle(
+                            title: 'Show File Paths',
+                            subtitle:
+                                'Display file path and line numbers in console logs',
+                            value: currentConfig.showFilePaths,
+                            onChanged: (value) {
+                              final newConfig =
+                                  currentConfig.copyWith(showFilePaths: value);
+                              LoggingUsingLogger.configure(newConfig);
+                              setModalState(() {});
+                            },
+                          ),
+
+                          // Show Emojis
+                          _buildSettingToggle(
+                            title: 'Show Emojis',
+                            subtitle:
+                                'Display emoji indicators in console logs',
+                            value: currentConfig.showEmojis,
+                            onChanged: (value) {
+                              final newConfig =
+                                  currentConfig.copyWith(showEmojis: value);
+                              LoggingUsingLogger.configure(newConfig);
+                              setModalState(() {});
+                            },
+                          ),
+
+                          // Use Colors
+                          _buildSettingToggle(
+                            title: 'Use Colors',
+                            subtitle:
+                                'Apply color coding to console log levels',
+                            value: currentConfig.useColors,
+                            onChanged: (value) {
+                              final newConfig =
+                                  currentConfig.copyWith(useColors: value);
+                              LoggingUsingLogger.configure(newConfig);
+                              setModalState(() {});
+                            },
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Current Stats
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer
+                                  .withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  size: 20,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Current: ${LogDataService.getUnifiedLogs().length} logs stored',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Build a setting toggle row
+  Widget _buildSettingToggle({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
-                Switch(
-                  value: currentConfig.enableCircularBuffer,
-                  onChanged: (_) => _toggleCircularBuffer(),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
         ],
       ),
@@ -249,6 +497,14 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
             icon: Icon(_isLoggingPaused ? Icons.play_arrow : Icons.pause),
             onPressed: _toggleLoggingPause,
             tooltip: _isLoggingPaused ? 'Resume Logging' : 'Pause Logging',
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.settings,
+              color: Colors.blueAccent,
+            ),
+            onPressed: _showSettingsModal,
+            tooltip: 'Settings',
           ),
           IconButton(
             icon: const Icon(Icons.download),
@@ -320,8 +576,6 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                   ],
                 ),
               ),
-            // Settings section
-            _buildSettingsSection(),
             // Search bar
             LoggerSearchBar(
               controller: _searchController,
