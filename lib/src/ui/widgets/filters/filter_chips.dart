@@ -33,8 +33,8 @@ class MainFilterChip extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isSelected
-            // ignore: deprecated_member_use
-            ? color.withOpacity(0.1)
+            ? const Color(
+                0x1A000000) // Semi-transparent black for selected state
             : Colors.grey[100],
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
@@ -157,8 +157,8 @@ class SubFilterChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: isSelected
-              // ignore: deprecated_member_use
-              ? color.withOpacity(0.1)
+              ? const Color(
+                  0x1A000000) // Semi-transparent black for selected state
               : Colors.grey[50],
           borderRadius: BorderRadius.circular(16),
           border: Border.all(

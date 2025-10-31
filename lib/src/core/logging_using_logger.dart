@@ -26,9 +26,10 @@ class AwesomeLoggerConfig {
   /// Number of stack trace lines to show (0 = none)
   final int stackTraceLines;
 
-  /// Whether to enable circular buffer behavior
-  /// When true (default): oldest logs are replaced with new ones when maxLogEntries is reached
-  /// When false: logging stops when maxLogEntries is reached
+  /// Whether to enable circular buffer behavior.
+  ///
+  /// When true (default): oldest logs are replaced with new ones when maxLogEntries is reached.
+  /// When false: logging stops when maxLogEntries is reached.
   final bool enableCircularBuffer;
 
   /// Default main filter to be selected when opening the logger history page

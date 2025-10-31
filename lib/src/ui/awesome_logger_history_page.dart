@@ -253,7 +253,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                 );
                                 LoggingUsingLogger.configure(newConfig);
                                 setModalState(() {});
-                                this.setState(() {});
+                                setState(() {});
                               }
                             },
                           ),
@@ -263,16 +263,12 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceVariant
-                                  .withOpacity(0.3),
+                              color: const Color(
+                                  0x1F000000), // Semi-transparent black for subtle background
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .outline
-                                    .withOpacity(0.2),
+                                color: const Color(
+                                    0x33000000), // Semi-transparent black for outline
                               ),
                             ),
                             child: Column(
@@ -319,7 +315,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                                         );
                                         LoggingUsingLogger.configure(newConfig);
                                         setModalState(() {});
-                                        this.setState(() {});
+                                        setState(() {});
                                       },
                                       materialTapTargetSize:
                                           MaterialTapTargetSize.shrinkWrap,
@@ -390,10 +386,8 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer
-                                  .withOpacity(0.3),
+                              color: const Color(
+                                  0x1F2196F3), // Semi-transparent blue for primary container background
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
