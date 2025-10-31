@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+import 'package:flutter_awesome_logger_example/service/my_logger.dart';
 
 import 'api_demo_page.dart';
-
-/// Global logger instance
-final logger = FlutterAwesomeLogger.loggingUsingLogger;
 
 /// Main demo page showing various logger features
 class DemoPage extends StatefulWidget {

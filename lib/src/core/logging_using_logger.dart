@@ -127,7 +127,8 @@ class LoggingUsingLogger {
       final frame = frames[i].trim();
       // Skip internal logger files
       if (!frame.contains('awesome_logger.dart') &&
-          !frame.contains('log_entry.dart')) {
+          !frame.contains('log_entry.dart') &&
+          !frame.contains('logging_using_logger.dart')) {
         final match = RegExp(r'(.*) \((.+?):(\d+):(\d+)\)').firstMatch(frame);
         if (match != null) {
           final filePath = match.group(2) ?? '';
@@ -167,7 +168,8 @@ class LoggingUsingLogger {
         .where(
       (frame) =>
           !frame.contains('awesome_logger.dart') &&
-          !frame.contains('log_entry.dart'),
+          !frame.contains('log_entry.dart') &&
+          !frame.contains('logging_using_logger.dart'),
     )
         .map((frame) {
       final match = RegExp(

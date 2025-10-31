@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [2.1.1] (2025-10-31)
+
+### Fixed
+- 🔧 **Source File Path Display** - Fixed incorrect source file path in logger history page showing `logging_using_logger.dart` instead of actual calling file (e.g., `api_demo_page.dart`)
+- 📍 **Stack Trace Filtering** - Improved stack trace filtering to properly exclude internal logger files and show correct source locations
+
 ## [2.1.0] (2025-10-31)
 
 ### Added

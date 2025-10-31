@@ -2,7 +2,7 @@
 
 # Flutter Awesome Logger 🚀
 
-*A comprehensive Flutter logging package that makes debugging a breeze!*
+*A comprehensive Flutter logging package that makes debugging a breeze with **instant source file tracking** - see exactly where your logs come from! 🔍*
 
 [![pub package](https://img.shields.io/pub/v/flutter_awesome_logger.svg?style=for-the-badge)](https://pub.dev/packages/flutter_awesome_logger)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE)
@@ -10,7 +10,8 @@
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
 
-**Features a floating logger, automatic API logging with Dio interceptor, comprehensive API demo page, and a unified beautiful UI for viewing all logs in one place.**
+**Lightweight debugging with floating logger, automatic API logging (using interceptor), Flutter general logging, and a beautiful UI for viewing logs** 
+(with source file path tracking to see exactly from where the log is coming from!)
 
 [📖 Documentation](#-getting-started) • [🚀 Installation](#installation) • [💡 Examples](#basic-usage) • [🎨 Customization](#-customization)
 
@@ -48,6 +49,7 @@
 | 🎨 **Unified Beautiful UI** | Clean, modern interface with syntax highlighting - unified view for all logs, advanced filtering, and intuitive navigation |
 | 📊 **Multiple Log Levels** | Support for debug, info, warning, error, and verbose logs - color-coded with filtering and search capabilities |
 | 💾 **Smart Storage** | Logs stored only when logger is enabled - conserves memory and respects privacy settings |
+| 🔍 **Source File Tracking** | **Easy Debugging**: See exact file paths and line numbers for all logs - instantly identify where issues originate! |
 | ⏸️ **Pause/Resume Logging** | Temporarily pause all logging with visual indicators - useful for focusing on specific app sections |
 | 🔍 **Search & Filter** | Easily find specific logs with advanced filtering - search by text, level, timestamp, or source file |
 | 🎯 **Simple Configuration** | Single `enabled` property controls both UI and storage - async support for conditional initialization |
@@ -250,7 +252,7 @@ class MyService {
 **What you get:**
 - ✅ **Multiple log levels** - DEBUG (grey), INFO (blue), WARNING (orange), ERROR (red)
 - ✅ **Stack trace support** - Full error context with file paths and line numbers
-- ✅ **Source tracking** - See exactly which file and method generated each log
+- ✅ **Source File Tracking** - **🔍 Easy Debugging**: See exact file paths and line numbers for instant issue identification - no more guessing where your code is logging from!
 - ✅ **Advanced filtering** - Filter by log level, source file, or search content
 - ✅ **Export capabilities** - Copy individual logs or export entire filtered sets
 - ✅ **Real-time updates** - Logs appear instantly as your app runs

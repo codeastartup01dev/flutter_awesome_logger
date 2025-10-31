@@ -101,8 +101,8 @@ class _LogEntryWidgetState extends State<LogEntryWidget> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(
-                            0x1A000000), // Semi-transparent black for subtle background
+                        color: Colors
+                            .white, // Semi-transparent black for subtle background
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
                           color: widget.log.type.color,

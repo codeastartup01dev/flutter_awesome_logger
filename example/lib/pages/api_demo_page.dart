@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
-
-/// Global logger instance for API demo
-final logger = FlutterAwesomeLogger.loggingUsingLogger;
+import 'package:flutter_awesome_logger_example/service/my_logger.dart';
 
 /// Model class for User data
 class User {
