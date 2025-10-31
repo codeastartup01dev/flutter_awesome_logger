@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
-
-import '../cubit/user_cubit.dart';
-import 'cubit_demo_page.dart';
 
 /// Global logger instance
 final logger = FlutterAwesomeLogger.loggingUsingLogger;
@@ -86,18 +82,6 @@ class _DemoPageState extends State<DemoPage> {
     }
   }
 
-  void _openCubitDemo() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (context) => UserCubit(_dio),
-          child: const CubitDemoPage(),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,9 +129,6 @@ class _DemoPageState extends State<DemoPage> {
                       ),
                       Text(
                         '\n🌐 API request/response logging using Dio interceptor (FlutterAwesomeLoggerDioInterceptor)',
-                      ),
-                      Text(
-                        '\n🧊 BLoC/Cubit state management logging with AwesomeBlocObserver',
                       ),
                       Text(
                           '\n🎨 Unified UI for browsing and searching all logs in one place'),
@@ -201,17 +182,6 @@ class _DemoPageState extends State<DemoPage> {
                 label: const Text('Make Network Error Call'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.all(16),
-                ),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: () => _openCubitDemo(),
-                icon: const Icon(Icons.account_tree),
-                label: const Text('Example with Cubit (BLoC)'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.all(16),
                 ),

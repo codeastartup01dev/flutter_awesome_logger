@@ -233,34 +233,11 @@ class FilterLabels {
     }
   }
 
-  /// Get BLoC status label for unified log type
-  static String getBlocStatusLabel(UnifiedLogType type) {
-    switch (type) {
-      case UnifiedLogType.blocEvent:
-        return 'BLoC\nEvent';
-      case UnifiedLogType.blocTransition:
-        return 'BLoC\nTransition';
-      case UnifiedLogType.blocChange:
-        return 'BLoC\nChange';
-      case UnifiedLogType.blocCreate:
-        return 'BLoC\nCreate';
-      case UnifiedLogType.blocClose:
-        return 'BLoC\nClose';
-      case UnifiedLogType.blocError:
-        return 'BLoC\nError';
-      default:
-        return 'BLoC';
-    }
-  }
-
   /// Get appropriate label for log type display
   static String getLogTypeLabel(UnifiedLogEntry log) {
     if (log.source == LogSource.api) {
       // For API logs, show the HTTP method
       return log.httpMethod ?? 'API';
-    } else if (log.source == LogSource.bloc) {
-      // For BLoC logs, show the BLoC type
-      return getBlocStatusLabel(log.type);
     } else {
       // For general logs, show logger.level format
       switch (log.type) {

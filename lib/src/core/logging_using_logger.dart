@@ -27,7 +27,7 @@ class AwesomeLoggerConfig {
   final int stackTraceLines;
 
   /// Default main filter to be selected when opening the logger history page
-  /// Options: LogSource.general (Logger Logs), LogSource.api (API Logs), LogSource.bloc (BLoC Logs)
+  /// Options: LogSource.general (Logger Logs), LogSource.api (API Logs), LogSource.flutter (Flutter Error Logs)
   /// If null, no main filter will be pre-selected (shows all logs)
   final LogSource? defaultMainFilter;
 

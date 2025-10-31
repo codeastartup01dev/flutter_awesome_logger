@@ -167,16 +167,6 @@ class _LogEntryWidgetState extends State<LogEntryWidget> {
                   ),
                 ],
 
-                // BLoC-specific view chips and content
-                if (widget.log.source == LogSource.bloc) ...[
-                  const SizedBox(height: 12),
-                  LogExpandedContent(
-                    log: widget.log,
-                    selectedView: widget.selectedExpandedView,
-                    onViewChanged: widget.onExpandedViewChanged,
-                  ),
-                ],
-
                 // File path for general logs
                 if (widget.showFilePaths && widget.log.filePath != null) ...[
                   const SizedBox(height: 12),

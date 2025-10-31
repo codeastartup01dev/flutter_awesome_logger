@@ -10,9 +10,6 @@ class FilterManager extends ChangeNotifier {
   final Set<LogSource> _selectedSources = {};
   final Set<String> _selectedClasses = {}; // For general logs
   final Set<String> _selectedMethods = {}; // For API logs
-  final Set<String> _selectedBlocNames = {}; // For BLoC logs
-  final Set<String> _selectedEventTypes = {}; // For BLoC logs
-  final Set<String> _selectedStateTypes = {}; // For BLoC logs
 
   /// Constructor that optionally accepts a default main filter
   FilterManager({LogSource? defaultMainFilter}) {
@@ -29,7 +26,6 @@ class FilterManager extends ChangeNotifier {
   // Expanded filter sections
   bool _isLoggerFiltersExpanded = false;
   bool _isApiFiltersExpanded = false;
-  bool _isBlocFiltersExpanded = false;
 
   // Statistics filter
   String? _statsFilter;
@@ -45,14 +41,10 @@ class FilterManager extends ChangeNotifier {
   Set<LogSource> get selectedSources => Set.unmodifiable(_selectedSources);
   Set<String> get selectedClasses => Set.unmodifiable(_selectedClasses);
   Set<String> get selectedMethods => Set.unmodifiable(_selectedMethods);
-  Set<String> get selectedBlocNames => Set.unmodifiable(_selectedBlocNames);
-  Set<String> get selectedEventTypes => Set.unmodifiable(_selectedEventTypes);
-  Set<String> get selectedStateTypes => Set.unmodifiable(_selectedStateTypes);
 
   bool get isFilterSectionExpanded => _isFilterSectionExpanded;
   bool get isLoggerFiltersExpanded => _isLoggerFiltersExpanded;
   bool get isApiFiltersExpanded => _isApiFiltersExpanded;
-  bool get isBlocFiltersExpanded => _isBlocFiltersExpanded;
 
   String? get statsFilter => _statsFilter;
   String get searchQuery => _searchQuery;
@@ -73,12 +65,6 @@ class FilterManager extends ChangeNotifier {
   /// Toggle API filters expansion
   void toggleApiFiltersExpanded() {
     _isApiFiltersExpanded = !_isApiFiltersExpanded;
-    notifyListeners();
-  }
-
-  /// Toggle BLoC filters expansion
-  void toggleBlocFiltersExpanded() {
-    _isBlocFiltersExpanded = !_isBlocFiltersExpanded;
     notifyListeners();
   }
 
@@ -110,12 +96,8 @@ class FilterManager extends ChangeNotifier {
           _selectedTypes.removeWhere((type) => type.isApiLog);
           _selectedMethods.clear();
           break;
-        case LogSource.bloc:
-          _isBlocFiltersExpanded = false;
-          _selectedTypes.removeWhere((type) => type.isBlocLog);
-          _selectedBlocNames.clear();
-          _selectedEventTypes.clear();
-          _selectedStateTypes.clear();
+        default:
+          // Handle other sources like flutter
           break;
       }
     } else {
@@ -154,36 +136,6 @@ class FilterManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Toggle BLoC name selection
-  void toggleBlocName(String blocName) {
-    if (_selectedBlocNames.contains(blocName)) {
-      _selectedBlocNames.remove(blocName);
-    } else {
-      _selectedBlocNames.add(blocName);
-    }
-    notifyListeners();
-  }
-
-  /// Toggle event type selection
-  void toggleEventType(String eventType) {
-    if (_selectedEventTypes.contains(eventType)) {
-      _selectedEventTypes.remove(eventType);
-    } else {
-      _selectedEventTypes.add(eventType);
-    }
-    notifyListeners();
-  }
-
-  /// Toggle state type selection
-  void toggleStateType(String stateType) {
-    if (_selectedStateTypes.contains(stateType)) {
-      _selectedStateTypes.remove(stateType);
-    } else {
-      _selectedStateTypes.add(stateType);
-    }
-    notifyListeners();
-  }
-
   /// Set statistics filter
   void setStatsFilter(String? filterKey) {
     if (_statsFilter == filterKey) {
@@ -200,9 +152,6 @@ class FilterManager extends ChangeNotifier {
         _selectedSources.isNotEmpty ||
         _selectedClasses.isNotEmpty ||
         _selectedMethods.isNotEmpty ||
-        _selectedBlocNames.isNotEmpty ||
-        _selectedEventTypes.isNotEmpty ||
-        _selectedStateTypes.isNotEmpty ||
         _statsFilter != null;
   }
 
@@ -213,9 +162,6 @@ class FilterManager extends ChangeNotifier {
     count += _selectedSources.length;
     count += _selectedClasses.length;
     count += _selectedMethods.length;
-    count += _selectedBlocNames.length;
-    count += _selectedEventTypes.length;
-    count += _selectedStateTypes.length;
     if (_statsFilter != null) count += 1;
     return count;
   }
@@ -232,27 +178,15 @@ class FilterManager extends ChangeNotifier {
         _selectedMethods.isNotEmpty;
   }
 
-  /// Check if any BLoC sub-filters are selected
-  bool hasBlocSubFiltersSelected() {
-    return _selectedTypes.any((type) => type.isBlocLog) ||
-        _selectedBlocNames.isNotEmpty ||
-        _selectedEventTypes.isNotEmpty ||
-        _selectedStateTypes.isNotEmpty;
-  }
-
   /// Clear all filters
   void clearAllFilters() {
     _selectedTypes.clear();
     _selectedSources.clear();
     _selectedClasses.clear();
     _selectedMethods.clear();
-    _selectedBlocNames.clear();
-    _selectedEventTypes.clear();
-    _selectedStateTypes.clear();
     _statsFilter = null;
     _isLoggerFiltersExpanded = false;
     _isApiFiltersExpanded = false;
-    _isBlocFiltersExpanded = false;
     notifyListeners();
   }
 
@@ -289,30 +223,6 @@ class FilterManager extends ChangeNotifier {
         }
       }
 
-      // BLoC name filter (for BLoC logs)
-      if (_selectedBlocNames.isNotEmpty && log.source == LogSource.bloc) {
-        if (log.blocName == null ||
-            !_selectedBlocNames.contains(log.blocName!)) {
-          return false;
-        }
-      }
-
-      // Event type filter (for BLoC logs)
-      if (_selectedEventTypes.isNotEmpty && log.source == LogSource.bloc) {
-        if (log.eventType == null ||
-            !_selectedEventTypes.contains(log.eventType!)) {
-          return false;
-        }
-      }
-
-      // State type filter (for BLoC logs)
-      if (_selectedStateTypes.isNotEmpty && log.source == LogSource.bloc) {
-        if (log.stateType == null ||
-            !_selectedStateTypes.contains(log.stateType!)) {
-          return false;
-        }
-      }
-
       // Statistics filter
       if (_statsFilter != null) {
         switch (_statsFilter) {
@@ -327,9 +237,6 @@ class FilterManager extends ChangeNotifier {
             break;
           case 'api':
             if (log.source != LogSource.api) return false;
-            break;
-          case 'bloc':
-            if (log.source != LogSource.bloc) return false;
             break;
         }
       }

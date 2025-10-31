@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../api_logger/api_logger_service.dart';
-import '../../bloc_logger/bloc_logger_service.dart';
 import '../../core/logging_using_logger.dart';
 import '../../core/unified_log_entry.dart';
 import '../../core/unified_log_types.dart';
@@ -23,12 +22,6 @@ class LogDataService {
     final apiLogs = ApiLoggerService.getApiLogs();
     for (final log in apiLogs) {
       unifiedLogs.add(UnifiedLogEntry.fromApiLog(log));
-    }
-
-    // Add BLoC logs
-    final blocLogs = BlocLoggerService.getBlocLogs();
-    for (final log in blocLogs) {
-      unifiedLogs.add(UnifiedLogEntry.fromBlocLog(log));
     }
 
     return unifiedLogs;
@@ -100,11 +93,6 @@ class LogDataService {
     return logs.where((l) => l.source == LogSource.api).length;
   }
 
-  /// Get count of BLoC logs
-  static int getBlocLogCount(List<UnifiedLogEntry> logs) {
-    return logs.where((l) => l.source == LogSource.bloc).length;
-  }
-
   /// Get available HTTP methods from API logs
   static List<String> getAvailableMethods(
     List<UnifiedLogEntry> logs, {
@@ -141,119 +129,10 @@ class LogDataService {
     return relevantLogs.where((l) => l.httpMethod == method).length;
   }
 
-  /// Get available BLoC names from BLoC logs
-  static List<String> getAvailableBlocNames(
-    List<UnifiedLogEntry> logs, {
-    Set<LogSource>? selectedSources,
-  }) {
-    // Filter logs based on selected main filters
-    List<UnifiedLogEntry> relevantLogs = logs;
-    if (selectedSources != null && selectedSources.isNotEmpty) {
-      relevantLogs =
-          logs.where((l) => selectedSources.contains(l.source)).toList();
-    }
-
-    return relevantLogs
-        .where((l) => l.source == LogSource.bloc && l.blocName != null)
-        .map((l) => l.blocName!)
-        .toSet()
-        .toList()
-      ..sort();
-  }
-
-  /// Get available event types from BLoC logs
-  static List<String> getAvailableEventTypes(
-    List<UnifiedLogEntry> logs, {
-    Set<LogSource>? selectedSources,
-  }) {
-    // Filter logs based on selected main filters
-    List<UnifiedLogEntry> relevantLogs = logs;
-    if (selectedSources != null && selectedSources.isNotEmpty) {
-      relevantLogs =
-          logs.where((l) => selectedSources.contains(l.source)).toList();
-    }
-
-    return relevantLogs
-        .where((l) => l.source == LogSource.bloc && l.eventType != null)
-        .map((l) => l.eventType!)
-        .toSet()
-        .toList()
-      ..sort();
-  }
-
-  /// Get available state types from BLoC logs
-  static List<String> getAvailableStateTypes(
-    List<UnifiedLogEntry> logs, {
-    Set<LogSource>? selectedSources,
-  }) {
-    // Filter logs based on selected main filters
-    List<UnifiedLogEntry> relevantLogs = logs;
-    if (selectedSources != null && selectedSources.isNotEmpty) {
-      relevantLogs =
-          logs.where((l) => selectedSources.contains(l.source)).toList();
-    }
-
-    return relevantLogs
-        .where((l) => l.source == LogSource.bloc && l.stateType != null)
-        .map((l) => l.stateType!)
-        .toSet()
-        .toList()
-      ..sort();
-  }
-
-  /// Get count for specific BLoC name
-  static int getBlocNameCount(
-    List<UnifiedLogEntry> logs,
-    String blocName, {
-    Set<LogSource>? selectedSources,
-  }) {
-    // Filter logs based on selected main filters
-    List<UnifiedLogEntry> relevantLogs = logs;
-    if (selectedSources != null && selectedSources.isNotEmpty) {
-      relevantLogs =
-          logs.where((l) => selectedSources.contains(l.source)).toList();
-    }
-
-    return relevantLogs.where((l) => l.blocName == blocName).length;
-  }
-
-  /// Get count for specific event type
-  static int getEventTypeCount(
-    List<UnifiedLogEntry> logs,
-    String eventType, {
-    Set<LogSource>? selectedSources,
-  }) {
-    // Filter logs based on selected main filters
-    List<UnifiedLogEntry> relevantLogs = logs;
-    if (selectedSources != null && selectedSources.isNotEmpty) {
-      relevantLogs =
-          logs.where((l) => selectedSources.contains(l.source)).toList();
-    }
-
-    return relevantLogs.where((l) => l.eventType == eventType).length;
-  }
-
-  /// Get count for specific state type
-  static int getStateTypeCount(
-    List<UnifiedLogEntry> logs,
-    String stateType, {
-    Set<LogSource>? selectedSources,
-  }) {
-    // Filter logs based on selected main filters
-    List<UnifiedLogEntry> relevantLogs = logs;
-    if (selectedSources != null && selectedSources.isNotEmpty) {
-      relevantLogs =
-          logs.where((l) => selectedSources.contains(l.source)).toList();
-    }
-
-    return relevantLogs.where((l) => l.stateType == stateType).length;
-  }
-
   /// Clear all logs from all sources
   static void clearAllLogs() {
     LoggingUsingLogger.clearLogs();
     ApiLoggerService.clearApiLogs();
-    BlocLoggerService.clearBlocLogs();
   }
 
   /// Export all logs to a formatted string

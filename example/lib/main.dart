@@ -43,18 +43,6 @@ class MyApp extends StatelessWidget {
           defaultMainFilter: LogSource.api, // 🎯 Set API Logs as default filter
         ),
 
-        // 🔍 BLoC observer configuration (optional) - automatically configures Bloc.observer
-        blocObserverConfig: const AwesomeBlocObserverConfig(
-          logEvents: true,
-          logTransitions: true,
-          logChanges: true,
-          logCreate: true,
-          logClose: true,
-          logErrors: true,
-          printToConsole: true,
-          maxConsoleLength: 200,
-        ),
-
         // 🎨 Floating logger UI configuration (optional)
         config: const FloatingLoggerConfig(
           backgroundColor: Colors.deepPurple,

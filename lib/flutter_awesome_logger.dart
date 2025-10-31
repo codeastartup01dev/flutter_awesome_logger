@@ -8,11 +8,6 @@ export 'src/core/unified_log_types.dart';
 export 'src/api_logger/api_log_entry.dart';
 export 'src/api_logger/dio_interceptor.dart';
 
-// BLoC logger exports
-export 'src/bloc_logger/awesome_bloc_observer.dart';
-export 'src/bloc_logger/bloc_log_entry.dart';
-export 'src/bloc_logger/bloc_logger_service.dart';
-
 // Floating logger exports
 export 'src/floating_logger/flutter_awesome_logger.dart';
 export 'src/floating_logger/floating_logger_config.dart';

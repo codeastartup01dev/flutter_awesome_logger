@@ -25,8 +25,6 @@ class LogExpandedContent extends StatelessWidget {
   Widget build(BuildContext context) {
     if (log.source == LogSource.api && log.apiLogEntry != null) {
       return _buildApiViewSection(context);
-    } else if (log.source == LogSource.bloc && log.blocLogEntry != null) {
-      return _buildBlocViewSection(context);
     }
     return const SizedBox.shrink();
   }
@@ -46,28 +44,6 @@ class LogExpandedContent extends StatelessWidget {
             if (log.apiLogEntry!.type != ApiLogType.pending)
               const SizedBox(width: 8),
             _buildViewChip('Curl', 'curl'),
-          ],
-        ),
-        const SizedBox(height: 12),
-        // Content based on selected view
-        if (selectedView != null) _buildExpandedContent(context),
-      ],
-    );
-  }
-
-  /// Build BLoC view section with chips and content
-  Widget _buildBlocViewSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // View selector chips
-        Row(
-          children: [
-            _buildViewChip('Request', 'request'),
-            const SizedBox(width: 8),
-            _buildViewChip('Response', 'response'),
-            const SizedBox(width: 8),
-            _buildViewChip('Command', 'command'),
           ],
         ),
         const SizedBox(height: 12),
@@ -112,26 +88,6 @@ class LogExpandedContent extends StatelessWidget {
           return ContentSection(
             title: 'Curl Command',
             content: log.apiLogEntry!.curl,
-          );
-        default:
-          return const SizedBox.shrink();
-      }
-    } else if (log.source == LogSource.bloc && log.blocLogEntry != null) {
-      switch (selectedView) {
-        case 'request':
-          return ContentSection(
-            title: 'Request',
-            content: log.blocLogEntry!.formattedRequest,
-          );
-        case 'response':
-          return ContentSection(
-            title: 'Response',
-            content: log.blocLogEntry!.formattedResponse,
-          );
-        case 'command':
-          return ContentSection(
-            title: 'Command',
-            content: log.blocLogEntry!.command,
           );
         default:
           return const SizedBox.shrink();

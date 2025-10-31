@@ -1,11 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../api_logger/api_log_entry.dart';
 import '../api_logger/api_logger_service.dart';
-import '../bloc_logger/awesome_bloc_observer.dart';
 import '../core/log_entry.dart';
 import '../core/logging_using_logger.dart';
 import '../ui/awesome_logger_history_page.dart';
@@ -248,10 +246,6 @@ class FlutterAwesomeLogger extends StatefulWidget {
   /// This eliminates the need to call LoggingUsingLogger.configure() manually
   final AwesomeLoggerConfig? loggerConfig;
 
-  /// Optional BLoC observer configuration - if provided, will auto-configure Bloc.observer
-  /// This eliminates the need to set Bloc.observer manually in main()
-  final AwesomeBlocObserverConfig? blocObserverConfig;
-
   const FlutterAwesomeLogger({
     super.key,
     required this.child,
@@ -259,7 +253,6 @@ class FlutterAwesomeLogger extends StatefulWidget {
     this.config = const FloatingLoggerConfig(),
     this.navigatorKey,
     this.loggerConfig,
-    this.blocObserverConfig,
   });
 
   @override
@@ -285,11 +278,6 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
     // Auto-configure logger if config is provided
     if (widget.loggerConfig != null) {
       LoggingUsingLogger.configure(widget.loggerConfig!);
-    }
-
-    // Auto-configure BLoC observer if config is provided
-    if (widget.blocObserverConfig != null) {
-      _configureBlocObserver(widget.blocObserverConfig!);
     }
 
     // Handle enabled parameter (FutureOr<bool>)
@@ -344,34 +332,6 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
   }
 
   /// Configures the BLoC observer with proper handling of existing observers
-  void _configureBlocObserver(AwesomeBlocObserverConfig config) {
-    final currentObserver = Bloc.observer;
-
-    // Check if we already have an AwesomeBlocObserver configured
-    if (currentObserver is AwesomeBlocObserver) {
-      debugPrint(
-        'FlutterAwesomeLogger: AwesomeBlocObserver already configured, skipping auto-configuration',
-      );
-      return;
-    }
-
-    // Warn if there's already a custom observer
-    if (currentObserver.runtimeType != BlocObserver) {
-      debugPrint(
-        'FlutterAwesomeLogger: Warning - Existing BlocObserver detected (${currentObserver.runtimeType}). '
-        'Auto-configuring AwesomeBlocObserver will override it. '
-        'Consider removing blocObserverConfig from FlutterAwesomeLogger if you want to keep your custom observer.',
-      );
-    }
-
-    // Configure the AwesomeBlocObserver
-    Bloc.observer = AwesomeBlocObserver(config: config);
-
-    debugPrint(
-      'FlutterAwesomeLogger: AwesomeBlocObserver configured automatically',
-    );
-  }
-
   /// Sets the enabled state and updates dependent services
   void _setEnabledState(bool enabled) {
     _isEnabled = enabled;

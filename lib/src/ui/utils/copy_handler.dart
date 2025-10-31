@@ -43,31 +43,6 @@ class CopyHandler {
           successMessage = 'Stack trace copied to clipboard';
         }
         break;
-      case 'copy_bloc_command':
-        if (log.source == LogSource.bloc && log.blocLogEntry != null) {
-          textToCopy = log.blocLogEntry!.command;
-          successMessage = 'BLoC command copied to clipboard';
-        }
-        break;
-      case 'copy_bloc_name':
-        if (log.blocName != null) {
-          textToCopy = log.blocName!;
-          successMessage = 'BLoC name copied to clipboard';
-        }
-        break;
-      case 'copy_event_data':
-        if (log.source == LogSource.bloc && log.blocLogEntry?.event != null) {
-          textToCopy = log.blocLogEntry!.event.toString();
-          successMessage = 'Event data copied to clipboard';
-        }
-        break;
-      case 'copy_state_data':
-        if (log.source == LogSource.bloc &&
-            log.blocLogEntry?.nextState != null) {
-          textToCopy = log.blocLogEntry!.nextState.toString();
-          successMessage = 'State data copied to clipboard';
-        }
-        break;
     }
 
     if (textToCopy.isNotEmpty) {
@@ -178,66 +153,6 @@ class CopyHandler {
           ),
         ),
       );
-    }
-
-    // Add BLoC-specific menu items
-    if (log.source == LogSource.bloc) {
-      items.addAll([
-        const PopupMenuItem(
-          value: 'copy_bloc_command',
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.code, size: 16),
-              SizedBox(width: 8),
-              Text('Copy Command'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'copy_bloc_name',
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.account_tree, size: 16),
-              SizedBox(width: 8),
-              Text('Copy BLoC Name'),
-            ],
-          ),
-        ),
-      ]);
-
-      if (log.blocLogEntry?.event != null) {
-        items.add(
-          const PopupMenuItem(
-            value: 'copy_event_data',
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.input, size: 16),
-                SizedBox(width: 8),
-                Text('Copy Event Data'),
-              ],
-            ),
-          ),
-        );
-      }
-
-      if (log.blocLogEntry?.nextState != null) {
-        items.add(
-          const PopupMenuItem(
-            value: 'copy_state_data',
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.change_circle, size: 16),
-                SizedBox(width: 8),
-                Text('Copy State Data'),
-              ],
-            ),
-          ),
-        );
-      }
     }
 
     return items;
