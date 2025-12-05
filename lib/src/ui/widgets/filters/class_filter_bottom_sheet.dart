@@ -315,7 +315,9 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.search_off,
+                              _searchQuery.isNotEmpty
+                                  ? Icons.search_off
+                                  : Icons.class_outlined,
                               size: 48,
                               color: Colors.grey[400],
                             ),
@@ -323,13 +325,24 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                             Text(
                               _searchQuery.isNotEmpty
                                   ? 'No classes matching "$_searchQuery"'
-                                  : 'No classes available',
+                                  : 'No classes found in logs',
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 14,
                               ),
                               textAlign: TextAlign.center,
                             ),
+                            if (_searchQuery.isEmpty) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                'Class filtering helps you focus on logs from specific parts of your app. Classes are extracted from file paths in your logs.\n Select Logger Logs to see available classes.',
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 12,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ],
                         ),
                       )

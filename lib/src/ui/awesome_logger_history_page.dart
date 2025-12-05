@@ -478,6 +478,13 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     final selectedCount = _filterManager.selectedClasses.length;
     final hasSelection = selectedCount > 0;
 
+    // Check if there are any available classes
+    final availableClasses = LogDataService.getAvailableClasses(
+      allLogs,
+      selectedSources: _filterManager.selectedSources,
+    );
+    final hasAvailableClasses = availableClasses.isNotEmpty;
+
     return ElevatedButton.icon(
       onPressed: () {
         FocusScope.of(context).unfocus();
@@ -487,23 +494,38 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
           allLogs: allLogs,
         );
       },
-      icon: const Icon(Icons.class_outlined, size: 16),
+      icon: Icon(
+        Icons.class_outlined,
+        size: 16,
+        color: hasAvailableClasses ? null : Colors.grey[400],
+      ),
       label: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('Classes', style: TextStyle(fontSize: 12)),
+          Text(
+            'Classes',
+            style: TextStyle(
+              fontSize: 12,
+              color: hasAvailableClasses ? null : Colors.grey[400],
+            ),
+          ),
           if (hasSelection) ...[
             const SizedBox(width: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: hasAvailableClasses
+                    ? Colors.white.withOpacity(0.3)
+                    : Colors.grey[300]!.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
                 '$selectedCount',
-                style:
-                    const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: hasAvailableClasses ? null : Colors.grey[600],
+                ),
               ),
             ),
           ],
@@ -513,10 +535,14 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: hasSelection
+        backgroundColor: hasSelection && hasAvailableClasses
             ? Colors.purple
-            : const Color(0x1A9C27B0), // purple with 10% opacity
-        foregroundColor: hasSelection ? Colors.white : Colors.purple,
+            : hasAvailableClasses
+                ? const Color(0x1A9C27B0) // purple with 10% opacity
+                : Colors.grey[200], // grey background when no classes
+        foregroundColor: hasAvailableClasses
+            ? (hasSelection ? Colors.white : Colors.purple)
+            : Colors.grey[500], // grey text when disabled
         elevation: 0,
       ),
     );
