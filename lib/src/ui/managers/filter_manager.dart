@@ -18,6 +18,9 @@ class FilterManager extends ChangeNotifier {
     } else {
       _selectedSources.add(LogSource.api);
     }
+
+    // Set 'total' as the default stats filter
+    _statsFilter = 'total';
   }
 
   // Main filter section
@@ -141,7 +144,7 @@ class FilterManager extends ChangeNotifier {
     if (_statsFilter == filterKey) {
       _statsFilter = null; // Toggle off if already selected
     } else {
-      _statsFilter = filterKey == 'total' ? null : filterKey;
+      _statsFilter = filterKey;
     }
     notifyListeners();
   }
@@ -152,7 +155,7 @@ class FilterManager extends ChangeNotifier {
         _selectedSources.isNotEmpty ||
         _selectedClasses.isNotEmpty ||
         _selectedMethods.isNotEmpty ||
-        _statsFilter != null;
+        (_statsFilter != null && _statsFilter != 'total');
   }
 
   /// Get count of active filters
@@ -162,7 +165,7 @@ class FilterManager extends ChangeNotifier {
     count += _selectedSources.length;
     count += _selectedClasses.length;
     count += _selectedMethods.length;
-    if (_statsFilter != null) count += 1;
+    if (_statsFilter != null && _statsFilter != 'total') count += 1;
     return count;
   }
 
@@ -184,7 +187,7 @@ class FilterManager extends ChangeNotifier {
     _selectedSources.clear();
     _selectedClasses.clear();
     _selectedMethods.clear();
-    _statsFilter = null;
+    _statsFilter = 'total'; // Reset to default 'total' filter
     _isLoggerFiltersExpanded = false;
     _isApiFiltersExpanded = false;
     notifyListeners();

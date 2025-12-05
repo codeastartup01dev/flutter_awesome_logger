@@ -51,11 +51,7 @@ class LoggerStatistics extends StatelessWidget {
           // color: isSelected ? stat.color.withOpacity(0.1) : Colors.grey[100],
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected
-                ? stat.color
-                : stat.filterKey == 'total'
-                    ? Colors.transparent
-                    : Colors.grey[300]!,
+            color: isSelected ? stat.color : Colors.transparent,
             width: 1.5,
           ),
         ),
