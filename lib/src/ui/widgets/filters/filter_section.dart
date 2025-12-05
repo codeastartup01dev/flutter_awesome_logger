@@ -106,6 +106,21 @@ class FilterSection extends StatelessWidget {
                     onTap: () => filterManager.toggleLogSource(LogSource.api),
                     onDropdownTap: filterManager.toggleApiFiltersExpanded,
                   ),
+                  const SizedBox(width: 8),
+
+                  // Clear all filters button (only show if there are active filters)
+                  if (filterManager.hasActiveFilters())
+                    IconButton(
+                      onPressed: filterManager.clearAllFilters,
+                      icon: const Icon(Icons.clear_all, size: 20),
+                      tooltip: 'Clear all filters',
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints(),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.grey[100],
+                        foregroundColor: Colors.grey[700],
+                      ),
+                    ),
                 ],
               ),
             ),

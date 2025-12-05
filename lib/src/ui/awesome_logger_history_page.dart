@@ -510,6 +510,9 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Pause banner
             if (_isLoggingPaused)
@@ -595,56 +598,32 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
               padding: const EdgeInsets.only(left: 16, bottom: 8),
               child: Row(
                 children: [
-                  LoggerSortToggle(
-                    sortNewestFirst: _filterManager.sortNewestFirst,
-                    onToggle: _filterManager.toggleSortOrder,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: LoggerStatistics(
-                      statistics: statistics,
-                      onStatisticTapped: _onStatisticTapped,
-                      selectedFilter: _filterManager.statsFilter,
-                    ),
+                  // LoggerSortToggle(
+                  //   sortNewestFirst: _filterManager.sortNewestFirst,
+                  //   onToggle: _filterManager.toggleSortOrder,
+                  // ),
+                  // const SizedBox(width: 16),
+                  LoggerStatistics(
+                    statistics: statistics,
+                    onStatisticTapped: _onStatisticTapped,
+                    selectedFilter: _filterManager.statsFilter,
                   ),
                 ],
               ),
             ),
 
-            // Clear all filters button
-            if (_filterManager.hasActiveFilters()) ...[
-              Padding(
-                padding: const EdgeInsets.only(left: 16, bottom: 8),
-                child: Row(
-                  children: [
-                    const Text(
-                      'Active filters:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    TextButton.icon(
-                      onPressed: _filterManager.clearAllFilters,
-                      icon: const Icon(Icons.clear_all, size: 16),
-                      label: const Text(
-                        'Clear All',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    ),
-                  ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: 16),
+                LoggerSortToggle(
+                  sortNewestFirst: _filterManager.sortNewestFirst,
+                  onToggle: _filterManager.toggleSortOrder,
                 ),
-              ),
-            ],
+              ],
+            ),
 
             // Logs list
             Expanded(

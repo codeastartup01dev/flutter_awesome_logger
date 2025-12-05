@@ -30,8 +30,8 @@ class LoggerSortToggle extends StatelessWidget {
           SnackBar(
             content: Text(
               sortNewestFirst
-                  ? newestFirstLabel ?? 'Showing Newest logs first'
-                  : oldestFirstLabel ?? 'Showing Oldest logs first',
+                  ? newestFirstLabel ?? 'Newest logs first'
+                  : oldestFirstLabel ?? 'Oldest logs first',
             ),
             duration: const Duration(seconds: 2),
           ),
@@ -43,8 +43,8 @@ class LoggerSortToggle extends StatelessWidget {
       ),
       label: Text(
         sortNewestFirst
-            ? newestFirstLabel ?? 'Showing Newest Logs First'
-            : oldestFirstLabel ?? 'Showing Oldest Logs First',
+            ? newestFirstLabel ?? 'Newest Logs First'
+            : oldestFirstLabel ?? 'Oldest Logs First',
         style: const TextStyle(fontSize: 12),
       ),
       style: ElevatedButton.styleFrom(
