@@ -2,16 +2,13 @@
 
 # Flutter Awesome Logger 🚀
 
-*A comprehensive Flutter logging package that makes debugging a breeze with **instant source file tracking** - see exactly where your logs come from! 🔍*
-
 [![pub package](https://img.shields.io/pub/v/flutter_awesome_logger.svg?style=for-the-badge)](https://pub.dev/packages/flutter_awesome_logger)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 
 
-**Lightweight debugging with floating logger, automatic API logging (using interceptor), Flutter general logging, and a beautiful UI for viewing logs** 
-(with source file path tracking to see exactly from where the log is coming from!)
+**Lightweight debugging with floating logger, automatic API logging (using interceptor), Flutter general logging, and a beautiful UI for viewing logs**
 
 [📖 Documentation](#-getting-started) • [🚀 Installation](#installation) • [💡 Examples](#basic-usage) • [🎨 Customization](#-customization)
 
@@ -134,9 +131,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlutterAwesomeLogger(
-      navigatorKey: navigatorKey, // Required if  logger history page does not open on floating button press
+      navigatorKey: navigatorKey, // Required if logger history page does not open on floating button press
       child: MaterialApp(
-        navigatorKey: navigatorKey, // Required if logger history page does not open on floating button press
+        navigatorKey: navigatorKey,
         home: const YourHomePage(),
       ),
     );
@@ -216,8 +213,8 @@ final response = await dio.get('https://jsonplaceholder.typicode.com/users');
 To capture general logs in the unified logger interface:
 
 **Step 1: Create a logger instance**
-// Create global logger instance (recommended: make a new file eg. my_logger.dart)
 ```dart
+// Create global logger instance (recommended: make a new file eg. my_logger.dart)
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
 final logger = FlutterAwesomeLogger.loggingUsingLogger;
