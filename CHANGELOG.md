@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [2.1.2] (2025-12-06)
+
+### Added
+- 🎯 **Class-Based Filtering** - New "Classes" button in logger history page for filtering logs by class names
+- 📱 **Class Filter Bottom Sheet** - Dedicated bottom sheet for class selection with multi-select functionality
+- 🔄 **Dual View Modes** - Toggle between list view and compact chip view for class selection
+- 📊 **Class Statistics** - Shows log count per class with visual indicators
+- 🎨 **Smart Button Styling** - Classes button appears grey when no classes are available, purple when active
+- 🔍 **Class Search** - Search and filter through available classes in the bottom sheet
+- 📋 **Selected Classes Display** - Horizontal chip list showing currently selected classes
+- 💡 **Educational Content** - Informative message explaining class filtering when no classes exist
+
+### Enhanced
+- 🎛️ **Advanced Filtering** - Expanded filtering capabilities beyond log levels and API methods
+- 📱 **Better UX** - Improved filter section with more granular control options
+- 🎯 **Source-Aware Filtering** - Class filtering only applies to general logs, respects main source filters
+
+### Technical
+- 🏗️ **FilterManager Enhancement** - Added `selectedClasses` state management and class filtering logic
+- 📊 **LogDataService Updates** - New methods for extracting and counting classes from logs
+- 🎨 **UI Components** - New `ClassFilterBottomSheet` and `ClassChipTile` widgets with responsive design
+- 📱 **Material Design 3** - Full theming support for the new filter components
+
+
 ## [2.1.1] (2025-10-31)
 
 ### Fixed

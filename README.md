@@ -49,6 +49,8 @@
 | 🔍 **Source File Tracking** | **Easy Debugging**: See exact file paths and line numbers for all logs - instantly identify where issues originate! |
 | ⏸️ **Pause/Resume Logging** | Temporarily pause all logging with visual indicators - useful for focusing on specific app sections |
 | 🔍 **Search & Filter** | Easily find specific logs with advanced filtering - search by text, level, timestamp, or source file |
+| 🏷️ **Class-Based Filtering** | Filter logs by class names extracted from file paths - focus on specific parts of your app |
+| 🔄 **Dual View Filtering** | Toggle between list and compact chip views for class selection with search capabilities |
 | 🎯 **Simple Configuration** | Single `enabled` property controls both UI and storage - async support for conditional initialization |
 | ⚙️ **Settings Modal** | Comprehensive runtime configuration via settings modal - adjust all logger options on-the-fly |
 | 🔄 **Circular Buffer** | Configurable log replacement behavior - choose between replacing oldest logs or stopping when limit reached |
@@ -253,6 +255,45 @@ class MyService {
 - ✅ **Advanced filtering** - Filter by log level, source file, or search content
 - ✅ **Export capabilities** - Copy individual logs or export entire filtered sets
 - ✅ **Real-time updates** - Logs appear instantly as your app runs
+
+---
+
+## 🏷️ Class-Based Filtering
+
+### 🎯 **Focus on Specific App Components**
+
+Class filtering helps you narrow down logs to specific parts of your application by filtering based on class names extracted from file paths.
+
+#### 🖱️ **How to Use Class Filtering**
+
+1. **Open Logger History**: Tap the floating logger button to access the unified logger interface
+2. **Click Classes Button**: Look for the "Classes" button in the filter section (appears purple when classes are available, grey when none exist)
+3. **Select Classes**: Choose from available class names in the bottom sheet
+4. **View Toggle**: Switch between list view and compact chip view using the toggle button
+5. **Search Classes**: Use the search field to quickly find specific classes
+6. **Apply Filters**: Selected classes will be highlighted and logs filtered accordingly
+
+#### 🎨 **Visual Indicators**
+- **Purple Button**: Classes are available for filtering
+- **Grey Button**: No classes found in current logs (still clickable to learn about the feature)
+- **Selected Classes**: Purple background with white text and count badges
+- **Compact View**: Space-efficient chip layout for quick selection
+
+#### 💡 **What Classes Are Available?**
+- **Automatic Detection**: Classes are extracted from general log file paths
+- **File-Based**: Class names come from `.dart` file names (e.g., `home_page.dart` → `home_page`)
+- **Real-time Updates**: Available classes update as you use different parts of your app
+- **Smart Filtering**: Only shows classes that have generated logs
+
+#### 🔍 **Advanced Class Filtering**
+```dart
+// Programmatic access to class filtering
+final availableClasses = FlutterAwesomeLogger.getAvailableClasses();
+final classCounts = FlutterAwesomeLogger.getClassCounts();
+
+// Classes are automatically extracted from logs like:
+logger.d('User tapped login button'); // Creates 'my_widget' class filter
+```
 
 ---
 
