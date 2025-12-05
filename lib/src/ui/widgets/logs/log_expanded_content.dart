@@ -34,6 +34,9 @@ class LogExpandedContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Full API URL display
+        _buildApiUrlSection(),
+        const SizedBox(height: 12),
         // View selector chips
         Row(
           children: [
@@ -120,6 +123,35 @@ class LogExpandedContent extends StatelessWidget {
             isSecondary: true,
           ),
       ],
+    );
+  }
+
+  /// Build API URL section
+  Widget _buildApiUrlSection() {
+    final url = log.url ?? log.apiLogEntry!.url;
+    return Builder(
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.blue[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.blue[200]!),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SelectableText(
+              url,
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'monospace',
+                color: Colors.black87,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -31,6 +31,13 @@ class _LogEntryWidgetState extends State<LogEntryWidget> {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(
+          color: widget.log.type.color.withOpacity(0.5),
+          width: 2,
+        ),
+      ),
       child: ExpansionTile(
         onExpansionChanged: (expanded) {
           FocusScope.of(context).unfocus();
@@ -238,7 +245,15 @@ class _LogEntryWidgetState extends State<LogEntryWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildLogTypeLabel(),
+          // Show icon for errors, otherwise show text label
+          if (widget.log.type.isError)
+            Icon(
+              widget.log.type.icon,
+              color: Colors.white,
+              size: 20,
+            )
+          else
+            _buildLogTypeLabel(),
           if (widget.log.statusCode != null)
             Text(
               '${widget.log.statusCode}',
