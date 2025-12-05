@@ -1,0 +1,357 @@
+import 'package:flutter/material.dart';
+
+import '../../../core/unified_log_entry.dart';
+import '../../managers/filter_manager.dart';
+import '../../services/log_data_service.dart';
+
+/// Bottom sheet for filtering logs by class names
+class ClassFilterBottomSheet extends StatefulWidget {
+  /// The filter manager instance
+  final FilterManager filterManager;
+
+  /// All available logs to extract class names from
+  final List<UnifiedLogEntry> allLogs;
+
+  const ClassFilterBottomSheet({
+    super.key,
+    required this.filterManager,
+    required this.allLogs,
+  });
+
+  /// Show the class filter bottom sheet
+  static void show({
+    required BuildContext context,
+    required FilterManager filterManager,
+    required List<UnifiedLogEntry> allLogs,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => ClassFilterBottomSheet(
+        filterManager: filterManager,
+        allLogs: allLogs,
+      ),
+    );
+  }
+
+  @override
+  State<ClassFilterBottomSheet> createState() => _ClassFilterBottomSheetState();
+}
+
+class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.filterManager.addListener(_onFilterChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.filterManager.removeListener(_onFilterChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onFilterChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Get available classes with their counts
+    final classData = LogDataService.getAvailableClasses(
+      widget.allLogs,
+      selectedSources: widget.filterManager.selectedSources,
+    );
+
+    // Filter classes based on search query
+    final filteredClasses = classData.entries.where((entry) {
+      if (_searchQuery.isEmpty) return true;
+      return entry.key.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
+
+    // Sort by count (descending) then by name
+    filteredClasses.sort((a, b) {
+      final countCompare = b.value.compareTo(a.value);
+      if (countCompare != 0) return countCompare;
+      return a.key.compareTo(b.key);
+    });
+
+    final selectedClasses = widget.filterManager.selectedClasses;
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.3,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (context, scrollController) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Icon(
+                    Icons.class_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Filter by Class',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        if (selectedClasses.isNotEmpty)
+                          Text(
+                            '${selectedClasses.length} selected',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (selectedClasses.isNotEmpty)
+                    TextButton(
+                      onPressed: () {
+                        widget.filterManager.clearClassFilters();
+                      },
+                      child: const Text('Clear'),
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                    tooltip: 'Close',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Search field
+              TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search classes...',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, size: 20),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchQuery = '';
+                            });
+                          },
+                        )
+                      : null,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  filled: true,
+                  fillColor: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withOpacity(0.5),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Class count info
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  '${filteredClasses.length} ${filteredClasses.length == 1 ? 'class' : 'classes'} found',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+
+              // Class list
+              Expanded(
+                child: filteredClasses.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_off,
+                              size: 48,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              _searchQuery.isNotEmpty
+                                  ? 'No classes matching "$_searchQuery"'
+                                  : 'No classes available',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: scrollController,
+                        itemCount: filteredClasses.length,
+                        itemBuilder: (context, index) {
+                          final entry = filteredClasses[index];
+                          final className = entry.key;
+                          final count = entry.value;
+                          final isSelected =
+                              selectedClasses.contains(className);
+
+                          return _ClassFilterTile(
+                            className: className,
+                            count: count,
+                            isSelected: isSelected,
+                            onTap: () {
+                              widget.filterManager.toggleClass(className);
+                            },
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Individual tile for a class in the filter list
+class _ClassFilterTile extends StatelessWidget {
+  final String className;
+  final int count;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ClassFilterTile({
+    required this.className,
+    required this.count,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.only(bottom: 4),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected
+              ? Border.all(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                )
+              : null,
+        ),
+        child: Row(
+          children: [
+            // Checkbox indicator
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(
+                      Icons.check,
+                      size: 16,
+                      color: Colors.white,
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+
+            // Class name
+            Expanded(
+              child: Text(
+                className,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+
+            // Count badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                    : Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '$count',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

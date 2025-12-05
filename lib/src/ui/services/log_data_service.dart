@@ -129,6 +129,45 @@ class LogDataService {
     return relevantLogs.where((l) => l.httpMethod == method).length;
   }
 
+  /// Get available class names from general logs with their counts
+  static Map<String, int> getAvailableClasses(
+    List<UnifiedLogEntry> logs, {
+    Set<LogSource>? selectedSources,
+  }) {
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = logs;
+    if (selectedSources != null && selectedSources.isNotEmpty) {
+      relevantLogs =
+          logs.where((l) => selectedSources.contains(l.source)).toList();
+    }
+
+    final classCounts = <String, int>{};
+    for (final log in relevantLogs) {
+      if (log.source == LogSource.general && log.className != null) {
+        classCounts[log.className!] = (classCounts[log.className!] ?? 0) + 1;
+      }
+    }
+    return classCounts;
+  }
+
+  /// Get count for a specific class
+  static int getClassCount(
+    List<UnifiedLogEntry> logs,
+    String className, {
+    Set<LogSource>? selectedSources,
+  }) {
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = logs;
+    if (selectedSources != null && selectedSources.isNotEmpty) {
+      relevantLogs =
+          logs.where((l) => selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs
+        .where((l) => l.source == LogSource.general && l.className == className)
+        .length;
+  }
+
   /// Clear all logs from all sources
   static void clearAllLogs() {
     LoggingUsingLogger.clearLogs();

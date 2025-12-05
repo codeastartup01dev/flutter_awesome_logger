@@ -193,6 +193,12 @@ class FilterManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Clear only class filters
+  void clearClassFilters() {
+    _selectedClasses.clear();
+    notifyListeners();
+  }
+
   /// Apply filters to a list of logs
   List<UnifiedLogEntry> applyFilters(List<UnifiedLogEntry> logs) {
     final filteredLogs = logs.where((log) {

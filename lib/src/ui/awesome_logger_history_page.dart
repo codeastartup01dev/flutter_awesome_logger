@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../core/logging_using_logger.dart';
+import '../core/unified_log_entry.dart';
 import '../core/unified_log_types.dart';
 import 'managers/filter_manager.dart';
 import 'services/log_data_service.dart';
@@ -10,6 +11,7 @@ import 'utils/copy_handler.dart';
 import 'widgets/common/logger_search_bar.dart';
 import 'widgets/common/logger_sort_toggle.dart';
 import 'widgets/common/logger_statistics.dart';
+import 'widgets/filters/class_filter_bottom_sheet.dart';
 import 'widgets/filters/filter_section.dart';
 import 'widgets/logs/log_entry_widget.dart';
 
@@ -471,6 +473,55 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
     );
   }
 
+  /// Build the classes filter button
+  Widget _buildClassesFilterButton(List<UnifiedLogEntry> allLogs) {
+    final selectedCount = _filterManager.selectedClasses.length;
+    final hasSelection = selectedCount > 0;
+
+    return ElevatedButton.icon(
+      onPressed: () {
+        FocusScope.of(context).unfocus();
+        ClassFilterBottomSheet.show(
+          context: context,
+          filterManager: _filterManager,
+          allLogs: allLogs,
+        );
+      },
+      icon: const Icon(Icons.class_outlined, size: 16),
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('Classes', style: TextStyle(fontSize: 12)),
+          if (hasSelection) ...[
+            const SizedBox(width: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$selectedCount',
+                style:
+                    const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ],
+      ),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        backgroundColor: hasSelection
+            ? Colors.purple
+            : const Color(0x1A9C27B0), // purple with 10% opacity
+        foregroundColor: hasSelection ? Colors.white : Colors.purple,
+        elevation: 0,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final allLogs = LogDataService.getUnifiedLogs();
@@ -617,11 +668,15 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 LoggerSortToggle(
+                  oldestFirstLabel: 'Oldest logs first',
+                  newestFirstLabel: 'Newest logs first',
                   sortNewestFirst: _filterManager.sortNewestFirst,
                   onToggle: _filterManager.toggleSortOrder,
                 ),
+                const SizedBox(width: 8),
+                _buildClassesFilterButton(allLogs),
               ],
             ),
 
