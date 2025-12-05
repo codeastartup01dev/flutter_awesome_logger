@@ -45,6 +45,7 @@ class ClassFilterBottomSheet extends StatefulWidget {
 class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  bool _isCompactView = true; // false = list view, true = compact chip view
 
   @override
   void initState() {
@@ -136,41 +137,64 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
               ),
               const SizedBox(height: 16),
 
-              // Search field
-              TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search classes...',
-                  prefixIcon: const Icon(Icons.search, size: 20),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, size: 20),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() {
-                              _searchQuery = '';
-                            });
-                          },
-                        )
-                      : null,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+              // Search field and view toggle button
+              Row(
+                children: [
+                  // Search field
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search classes...',
+                        prefixIcon: const Icon(Icons.search, size: 20),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 20),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest
+                            .withOpacity(0.5),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                    ),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+                  const SizedBox(width: 8),
+                  // View toggle button
+                  IconButton(
+                    icon: Icon(
+                      _isCompactView ? Icons.list : Icons.grid_view,
+                      size: 20,
+                    ),
+                    tooltip: _isCompactView
+                        ? 'Switch to list view'
+                        : 'Switch to compact view',
+                    onPressed: () {
+                      setState(() {
+                        _isCompactView = !_isCompactView;
+                      });
+                    },
                   ),
-                  filled: true,
-                  fillColor: Theme.of(context)
-                      .colorScheme
-                      .surfaceContainerHighest
-                      .withOpacity(0.5),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
+                ],
               ),
 
               // Selected classes chips (only show if there are selected classes)
@@ -309,26 +333,53 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                           ],
                         ),
                       )
-                    : ListView.builder(
-                        controller: scrollController,
-                        itemCount: filteredClasses.length,
-                        itemBuilder: (context, index) {
-                          final entry = filteredClasses[index];
-                          final className = entry.key;
-                          final count = entry.value;
-                          final isSelected =
-                              selectedClasses.contains(className);
+                    : _isCompactView
+                        ? SingleChildScrollView(
+                            controller: scrollController,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: filteredClasses.map((entry) {
+                                  final className = entry.key;
+                                  final count = entry.value;
+                                  final isSelected =
+                                      selectedClasses.contains(className);
 
-                          return _ClassFilterTile(
-                            className: className,
-                            count: count,
-                            isSelected: isSelected,
-                            onTap: () {
-                              widget.filterManager.toggleClass(className);
+                                  return _ClassChipTile(
+                                    className: className,
+                                    count: count,
+                                    isSelected: isSelected,
+                                    onTap: () {
+                                      widget.filterManager
+                                          .toggleClass(className);
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            itemCount: filteredClasses.length,
+                            itemBuilder: (context, index) {
+                              final entry = filteredClasses[index];
+                              final className = entry.key;
+                              final count = entry.value;
+                              final isSelected =
+                                  selectedClasses.contains(className);
+
+                              return _ClassFilterTile(
+                                className: className,
+                                count: count,
+                                isSelected: isSelected,
+                                onTap: () {
+                                  widget.filterManager.toggleClass(className);
+                                },
+                              );
                             },
-                          );
-                        },
-                      ),
+                          ),
               ),
             ],
           ),
@@ -424,6 +475,84 @@ class _ClassFilterTile extends StatelessWidget {
                 '$count',
                 style: TextStyle(
                   fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Compact chip tile for a class in the filter grid view
+class _ClassChipTile extends StatelessWidget {
+  final String className;
+  final int count;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ClassChipTile({
+    required this.className,
+    required this.count,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
+              : Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withOpacity(0.5),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Class name
+            Text(
+              className,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+
+            const SizedBox(width: 6),
+
+            // Count badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                    : Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '$count',
+                style: TextStyle(
+                  fontSize: 10,
                   fontWeight: FontWeight.w500,
                   color: isSelected
                       ? Theme.of(context).colorScheme.primary
