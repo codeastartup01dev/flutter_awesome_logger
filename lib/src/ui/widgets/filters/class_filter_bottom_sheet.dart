@@ -124,24 +124,9 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
-                        if (selectedClasses.isNotEmpty)
-                          Text(
-                            '${selectedClasses.length} selected',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
                       ],
                     ),
                   ),
-                  if (selectedClasses.isNotEmpty)
-                    TextButton(
-                      onPressed: () {
-                        widget.filterManager.clearClassFilters();
-                      },
-                      child: const Text('Clear'),
-                    ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
@@ -187,11 +172,108 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                   });
                 },
               ),
-              const SizedBox(height: 16),
+
+              // Selected classes chips (only show if there are selected classes)
+              if (selectedClasses.isNotEmpty) ...[
+                Row(
+                  children: [
+                    Text(
+                      '${selectedClasses.length} selected',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        widget.filterManager.clearClassFilters();
+                      },
+                      child: const Text('Clear'),
+                    ),
+                  ],
+                ),
+                Container(
+                  height: 36,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: selectedClasses.length,
+                    itemBuilder: (context, index) {
+                      final className = selectedClasses.elementAt(index);
+                      final count = LogDataService.getClassCount(
+                        widget.allLogs,
+                        className,
+                        selectedSources: widget.filterManager.selectedSources,
+                      );
+
+                      return Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        child: Chip(
+                          label: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                className,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  '$count',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          deleteIcon: const Icon(Icons.close, size: 14),
+                          onDeleted: () =>
+                              widget.filterManager.toggleClass(className),
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .primaryContainer
+                              .withOpacity(0.3),
+                          side: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.5),
+                            width: 1,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          labelPadding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          padding: EdgeInsets.zero,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
 
               // Class count info
               Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 8, top: 8),
                 child: Text(
                   '${filteredClasses.length} ${filteredClasses.length == 1 ? 'class' : 'classes'} found',
                   style: TextStyle(
