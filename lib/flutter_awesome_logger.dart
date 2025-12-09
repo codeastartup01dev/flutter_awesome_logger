@@ -1,6 +1,12 @@
 // Core logger exports
 export 'src/core/log_entry.dart';
-export 'src/core/logging_using_logger.dart' show AwesomeLoggerConfig;
+export 'src/core/logging_using_logger.dart'
+    show
+        AwesomeLoggerConfig,
+        LoggingUsingLogger,
+        ScopedLogger,
+        AwesomeLoggerMixin,
+        logger;
 export 'src/core/unified_log_entry.dart';
 export 'src/core/unified_log_types.dart';
 
