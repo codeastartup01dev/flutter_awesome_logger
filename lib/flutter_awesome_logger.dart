@@ -5,8 +5,7 @@ export 'src/core/logging_using_logger.dart'
         AwesomeLoggerConfig,
         LoggingUsingLogger,
         ScopedLogger,
-        AwesomeLoggerMixin,
-        logger;
+        AwesomeLoggerMixin;
 export 'src/core/unified_log_entry.dart';
 export 'src/core/unified_log_types.dart';
 

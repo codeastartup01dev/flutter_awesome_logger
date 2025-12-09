@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.0.1] (2025-12-09)
+
+### 🐛 Bug Fixes
+- 🔧 **Import Conflict Resolution** - Fixed naming conflicts between global logger and mixin's logger getter
+- 📦 **Cleaner Exports** - Removed global `logger` from package exports to prevent shadowing issues
+- 🎯 **Better Mixin Experience** - AwesomeLoggerMixin now works seamlessly without requiring `this.logger`
+
+### 📚 Documentation
+- 📖 **Improved Examples** - Updated demo files and documentation for cleaner mixin usage
+- 💡 **Better Migration Guide** - Clearer instructions for avoiding import conflicts
+
+---
+
 ## [3.0.0] (2025-12-09)
 
 ### 🎉 Major Release - Scoped Logger & Mixin Support
@@ -17,12 +30,19 @@ This release introduces powerful new ways to add automatic source tracking to yo
   - Simply add `with AwesomeLoggerMixin` to any class
   - Use `logger.d()`, `logger.i()`, `logger.w()`, `logger.e()` - source is automatically set to class name
   - Perfect for Cubits, Blocs, Services, Repositories, and any class
+  - No need for `this.logger` - just use `logger` directly!
 - 🎯 **ScopedLogger** - New scoped logger class with pre-configured source identifier
   - All logs automatically include the source name
   - Same API as regular logger (`d`, `i`, `w`, `e` methods)
 - 🔧 **`logger.scoped()` Method** - Create scoped logger instances with custom source names
   - `final _logger = logger.scoped('MyClassName')` for manual source control
   - `late final _logger = logger.scoped(runtimeType.toString())` for automatic class name
+
+### Changed
+- ⚠️ **Breaking Change**: Removed global `logger` from package exports
+  - Users should create their own `logger` instance via `FlutterAwesomeLogger.loggingUsingLogger`
+  - This prevents naming conflicts with the mixin's `logger` getter
+  - Migration: Create a `my_logger.dart` file with `final logger = FlutterAwesomeLogger.loggingUsingLogger;`
 
 ### Usage Examples
 

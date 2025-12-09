@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 import 'package:flutter_awesome_logger_example/service/my_logger.dart';
+import 'package:flutter_awesome_logger_example/service/demo_mixin_example.dart';
 
 import 'api_demo_page.dart';
 
@@ -203,6 +204,17 @@ class _DemoPageState extends State<DemoPage> {
                 label: const Text('Open API Demo Page'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.purple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.all(16),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: runMixinExamples,
+                icon: const Icon(Icons.science),
+                label: const Text('Run AwesomeLoggerMixin Examples'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.all(16),
                 ),

@@ -218,10 +218,15 @@ final response = await dio.get('https://jsonplaceholder.typicode.com/users');
 To capture general logs in the unified logger interface:
 
 **Step 1: Create a logger instance**
+
+Create a `my_logger.dart` file (or any name you prefer):
+
 ```dart
-// Create global logger instance (recommended: make a new file eg. my_logger.dart)
+// my_logger.dart
 import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
 
+/// Global logger instance for use throughout the app.
+/// Use this in files where you DON'T use AwesomeLoggerMixin.
 final logger = FlutterAwesomeLogger.loggingUsingLogger;
 ```
 
@@ -423,9 +428,17 @@ class MyService {
 
 #### 💡 **Tips**
 
-- **Mixin + Global Logger**: When you use `AwesomeLoggerMixin`, the mixin's `logger` getter shadows your imported global `logger` only within that class. Outside the class, the global logger works normally.
+- **No Import Conflicts**: Don't import `my_logger.dart` in files where you use `AwesomeLoggerMixin`. The mixin provides its own `logger` getter.
+- **Use `logger.source`**: Access the source name with `logger.source` (returns the class name)
 - **Production Ready**: Uses `runtimeType` which is available in both debug and release builds
 - **Filtering**: All logs with source are filterable in the logger UI using the Classes filter
+
+#### 📝 **Import Guide**
+
+| File Type | What to Import |
+|-----------|----------------|
+| Files **with** `AwesomeLoggerMixin` | Only `import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';` |
+| Files **without** mixin | `import 'my_logger.dart';` to use global logger |
 
 ---
 
