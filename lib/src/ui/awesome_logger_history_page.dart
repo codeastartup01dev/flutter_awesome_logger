@@ -475,15 +475,29 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
 
   /// Build the classes filter button
   Widget _buildClassesFilterButton(List<UnifiedLogEntry> allLogs) {
-    final selectedCount = _filterManager.selectedClasses.length;
+    // Count all selections (classes, source names, and file paths)
+    final classCount = _filterManager.selectedClasses.length;
+    final sourceNameCount = _filterManager.selectedSourceNames.length;
+    final filePathCount = _filterManager.selectedFilePaths.length;
+    final selectedCount = classCount + sourceNameCount + filePathCount;
     final hasSelection = selectedCount > 0;
 
-    // Check if there are any available classes
+    // Check if there are any available sources or file paths
     final availableClasses = LogDataService.getAvailableClasses(
       allLogs,
       selectedSources: _filterManager.selectedSources,
     );
-    final hasAvailableClasses = availableClasses.isNotEmpty;
+    final availableSources = LogDataService.getAvailableSources(
+      allLogs,
+      selectedSources: _filterManager.selectedSources,
+    );
+    final availableFilePaths = LogDataService.getAvailableFilePaths(
+      allLogs,
+      selectedSources: _filterManager.selectedSources,
+    );
+    final hasAvailableItems = availableClasses.isNotEmpty ||
+        availableSources.isNotEmpty ||
+        availableFilePaths.isNotEmpty;
 
     return ElevatedButton.icon(
       onPressed: () {
@@ -495,18 +509,18 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
         );
       },
       icon: Icon(
-        Icons.class_outlined,
+        Icons.filter_list,
         size: 16,
-        color: hasAvailableClasses ? null : Colors.grey[400],
+        color: hasAvailableItems ? null : Colors.grey[400],
       ),
       label: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Classes',
+            'Source',
             style: TextStyle(
               fontSize: 12,
-              color: hasAvailableClasses ? null : Colors.grey[400],
+              color: hasAvailableItems ? null : Colors.grey[400],
             ),
           ),
           if (hasSelection) ...[
@@ -514,7 +528,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: hasAvailableClasses
+                color: hasAvailableItems
                     ? Colors.white.withOpacity(0.3)
                     : Colors.grey[300]!.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(10),
@@ -524,7 +538,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: hasAvailableClasses ? null : Colors.grey[600],
+                  color: hasAvailableItems ? null : Colors.grey[600],
                 ),
               ),
             ),
@@ -535,12 +549,12 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: hasSelection && hasAvailableClasses
+        backgroundColor: hasSelection && hasAvailableItems
             ? Colors.purple
-            : hasAvailableClasses
+            : hasAvailableItems
                 ? const Color(0x1A9C27B0) // purple with 10% opacity
-                : Colors.grey[200], // grey background when no classes
-        foregroundColor: hasAvailableClasses
+                : Colors.grey[200], // grey background when no items
+        foregroundColor: hasAvailableItems
             ? (hasSelection ? Colors.white : Colors.purple)
             : Colors.grey[500], // grey text when disabled
         elevation: 0,
@@ -692,7 +706,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(width: 16),
                 LoggerSortToggle(
@@ -703,6 +717,22 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                 ),
                 const SizedBox(width: 8),
                 _buildClassesFilterButton(allLogs),
+                // Clear source filters button (only show when there are selections)
+                if (_filterManager.selectedClasses.isNotEmpty ||
+                    _filterManager.selectedSourceNames.isNotEmpty ||
+                    _filterManager.selectedFilePaths.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.clear, size: 18),
+                    onPressed: () {
+                      _filterManager.clearAllSourceFilters();
+                    },
+                    tooltip: 'Clear source filters',
+                    padding: const EdgeInsets.all(0),
+                    constraints: const BoxConstraints(),
+                    style: IconButton.styleFrom(
+                      foregroundColor: Colors.purple,
+                    ),
+                  ),
               ],
             ),
 

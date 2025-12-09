@@ -19,8 +19,11 @@ class UnifiedLogEntry {
   /// Source of the log (general or API)
   final LogSource source;
 
-  /// Optional file path for general logs
+  /// Optional file path for general logs (for terminal navigation)
   final String? filePath;
+
+  /// Optional explicit source name (e.g., class name passed via source parameter)
+  final String? sourceName;
 
   /// Optional stack trace for error logs
   final String? stackTrace;
@@ -50,6 +53,7 @@ class UnifiedLogEntry {
     required this.type,
     required this.source,
     this.filePath,
+    this.sourceName,
     this.stackTrace,
     this.apiLogEntry,
     this.generalLogEntry,
@@ -69,6 +73,7 @@ class UnifiedLogEntry {
       type: unifiedType,
       source: LogSource.general,
       filePath: generalLog.filePath,
+      sourceName: generalLog.source, // Explicit source name if provided
       stackTrace: generalLog.stackTrace,
       generalLogEntry: generalLog,
     );
@@ -133,7 +138,13 @@ class UnifiedLogEntry {
       final durationText = duration != null ? ' in ${duration}ms' : '';
       return '$httpMethod at $timeText$durationText';
     } else {
-      return '$timeText${filePath != null ? ' • ${filePath!.split('/').last}' : ''}';
+      // Show source name if available, otherwise show filename from path
+      final sourceInfo = sourceName != null
+          ? ' • $sourceName'
+          : (filePath != null
+              ? ' • ${filePath!.split('/').last.split(':').first}'
+              : '');
+      return '$timeText$sourceInfo';
     }
   }
 
@@ -156,6 +167,9 @@ class UnifiedLogEntry {
       buffer.writeln('=== GENERAL LOG ===');
       buffer.writeln('Level: ${generalLogEntry!.level}');
       buffer.writeln('Time: ${generalLogEntry!.timestamp}');
+      if (generalLogEntry!.source != null) {
+        buffer.writeln('Source: ${generalLogEntry!.source}');
+      }
       buffer.writeln('File: ${generalLogEntry!.filePath}');
       buffer.writeln('Message: ${generalLogEntry!.message}');
       if (generalLogEntry!.stackTrace != null) {
@@ -176,6 +190,9 @@ class UnifiedLogEntry {
     // Check message
     if (message.toLowerCase().contains(lowerQuery)) return true;
 
+    // Check source name for general logs
+    if (sourceName?.toLowerCase().contains(lowerQuery) == true) return true;
+
     // Check file path for general logs
     if (filePath?.toLowerCase().contains(lowerQuery) == true) return true;
 
@@ -195,10 +212,16 @@ class UnifiedLogEntry {
     return false;
   }
 
-  /// Get class name for general logs (for filtering)
+  /// Get class name for general logs (for filtering in "All" mode)
+  /// Returns sourceName if available, otherwise extracts from filePath
   String? get className {
-    if (source == LogSource.general && filePath != null) {
-      return filePath!.split('/').last.split('.').first;
+    if (source == LogSource.general) {
+      // Prefer explicit source name
+      if (sourceName != null) return sourceName;
+      // Fall back to extracting from file path
+      if (filePath != null) {
+        return filePath!.split('/').last.split('.').first.split(':').first;
+      }
     }
     return null;
   }

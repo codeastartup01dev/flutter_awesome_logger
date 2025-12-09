@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/unified_log_entry.dart';
 import '../../../core/unified_log_types.dart';
+import '../../services/log_data_service.dart';
 import '../../utils/copy_handler.dart';
 import '../filters/filter_chips.dart';
 import 'log_expanded_content.dart';
@@ -174,25 +175,12 @@ class _LogEntryWidgetState extends State<LogEntryWidget> {
                   ),
                 ],
 
-                // File path for general logs
-                if (widget.showFilePaths && widget.log.filePath != null) ...[
+                // Source and/or File path for general logs
+                if (widget.showFilePaths &&
+                    (widget.log.filePath != null ||
+                        widget.log.sourceName != null)) ...[
                   const SizedBox(height: 12),
-                  const Text(
-                    'Source:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  SelectableText(
-                    widget.log.filePath!,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 11,
-                      color: Colors.blue,
-                    ),
-                  ),
+                  _buildSourceInfoSection(),
                 ],
 
                 // Stack trace for error logs
@@ -230,6 +218,89 @@ class _LogEntryWidgetState extends State<LogEntryWidget> {
           ),
         ],
       ),
+    );
+  }
+
+  /// Build source info section showing both source name and file path when available
+  Widget _buildSourceInfoSection() {
+    final log = widget.log;
+    final hasSource = LogDataService.hasExplicitSource(log);
+    final hasPath = LogDataService.hasFilePath(log);
+    final filePath = log.filePath;
+    final sourceName = log.sourceName;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Show explicit source name (passed via source: parameter in logger)
+        if (hasSource) ...[
+          Row(
+            children: [
+              Icon(Icons.class_outlined, size: 14, color: Colors.grey[600]),
+              const SizedBox(width: 4),
+              const Text(
+                'Source:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          SelectableText(
+            sourceName!,
+            style: const TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 11,
+              color: Colors.purple,
+            ),
+          ),
+          if (hasPath) const SizedBox(height: 8),
+        ],
+        // Show file path for terminal navigation (always show if available)
+        if (hasPath) ...[
+          Row(
+            children: [
+              Icon(Icons.folder_outlined, size: 14, color: Colors.grey[600]),
+              const SizedBox(width: 4),
+              const Text(
+                'File:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          SelectableText(
+            filePath!,
+            style: const TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 11,
+              color: Colors.blue,
+            ),
+          ),
+        ],
+        // Show "unknown" in grey if no source and no valid file path
+        if (!hasSource && !hasPath && filePath == 'unknown') ...[
+          Row(
+            children: [
+              Icon(Icons.help_outline, size: 14, color: Colors.grey[400]),
+              const SizedBox(width: 4),
+              Text(
+                'Source: unknown (release build)',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey[400],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
     );
   }
 

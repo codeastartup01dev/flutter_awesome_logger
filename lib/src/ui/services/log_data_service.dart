@@ -129,7 +129,55 @@ class LogDataService {
     return relevantLogs.where((l) => l.httpMethod == method).length;
   }
 
-  /// Get available class names from general logs with their counts
+  /// Check if a log has an explicit source name (passed via source: parameter)
+  static bool hasExplicitSource(UnifiedLogEntry log) {
+    return log.sourceName != null && log.sourceName!.isNotEmpty;
+  }
+
+  /// Check if a log has a valid file path (auto-detected from stack trace)
+  static bool hasFilePath(UnifiedLogEntry log) {
+    return log.filePath != null &&
+        log.filePath!.isNotEmpty &&
+        log.filePath!.contains('/') &&
+        log.filePath != 'unknown';
+  }
+
+  /// Legacy helper - check if a string looks like an explicit source (not a file path)
+  /// Used for backward compatibility
+  static bool isExplicitSource(String? value) {
+    if (value == null || value.isEmpty) return false;
+    return !value.contains('/') && value != 'unknown';
+  }
+
+  /// Legacy helper - check if a string looks like a file path
+  /// Used for backward compatibility
+  static bool isFilePath(String? value) {
+    if (value == null || value.isEmpty) return false;
+    return value.contains('/');
+  }
+
+  /// Get available explicit sources (where source parameter was passed) with their counts
+  static Map<String, int> getAvailableSources(
+    List<UnifiedLogEntry> logs, {
+    Set<LogSource>? selectedSources,
+  }) {
+    List<UnifiedLogEntry> relevantLogs = logs;
+    if (selectedSources != null && selectedSources.isNotEmpty) {
+      relevantLogs =
+          logs.where((l) => selectedSources.contains(l.source)).toList();
+    }
+
+    final sourceCounts = <String, int>{};
+    for (final log in relevantLogs) {
+      if (log.source == LogSource.general && hasExplicitSource(log)) {
+        sourceCounts[log.sourceName!] =
+            (sourceCounts[log.sourceName!] ?? 0) + 1;
+      }
+    }
+    return sourceCounts;
+  }
+
+  /// Get available class names from general logs with their counts (legacy - for "All" mode)
   static Map<String, int> getAvailableClasses(
     List<UnifiedLogEntry> logs, {
     Set<LogSource>? selectedSources,
@@ -165,6 +213,64 @@ class LogDataService {
 
     return relevantLogs
         .where((l) => l.source == LogSource.general && l.className == className)
+        .length;
+  }
+
+  /// Get available file paths (actual file paths, not explicit sources) with their counts
+  static Map<String, int> getAvailableFilePaths(
+    List<UnifiedLogEntry> logs, {
+    Set<LogSource>? selectedSources,
+  }) {
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = logs;
+    if (selectedSources != null && selectedSources.isNotEmpty) {
+      relevantLogs =
+          logs.where((l) => selectedSources.contains(l.source)).toList();
+    }
+
+    final filePathCounts = <String, int>{};
+    for (final log in relevantLogs) {
+      if (log.source == LogSource.general && hasFilePath(log)) {
+        filePathCounts[log.filePath!] =
+            (filePathCounts[log.filePath!] ?? 0) + 1;
+      }
+    }
+    return filePathCounts;
+  }
+
+  /// Get count for a specific file path
+  static int getFilePathCount(
+    List<UnifiedLogEntry> logs,
+    String filePath, {
+    Set<LogSource>? selectedSources,
+  }) {
+    // Filter logs based on selected main filters
+    List<UnifiedLogEntry> relevantLogs = logs;
+    if (selectedSources != null && selectedSources.isNotEmpty) {
+      relevantLogs =
+          logs.where((l) => selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs
+        .where((l) => l.source == LogSource.general && l.filePath == filePath)
+        .length;
+  }
+
+  /// Get count for a specific explicit source
+  static int getSourceCount(
+    List<UnifiedLogEntry> logs,
+    String sourceName, {
+    Set<LogSource>? selectedSources,
+  }) {
+    List<UnifiedLogEntry> relevantLogs = logs;
+    if (selectedSources != null && selectedSources.isNotEmpty) {
+      relevantLogs =
+          logs.where((l) => selectedSources.contains(l.source)).toList();
+    }
+
+    return relevantLogs
+        .where(
+            (l) => l.source == LogSource.general && l.sourceName == sourceName)
         .length;
   }
 

@@ -4,6 +4,13 @@ import '../../../core/unified_log_entry.dart';
 import '../../managers/filter_manager.dart';
 import '../../services/log_data_service.dart';
 
+/// Enum for class filter mode
+enum ClassFilterMode {
+  all, // Shows both sources and file paths combined
+  source, // Only explicit source parameter logs
+  filePath, // Only file path logs
+}
+
 /// Bottom sheet for filtering logs by class names
 class ClassFilterBottomSheet extends StatefulWidget {
   /// The filter manager instance
@@ -46,6 +53,7 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   bool _isCompactView = true; // false = list view, true = compact chip view
+  ClassFilterMode _filterMode = ClassFilterMode.all; // default to all
 
   @override
   void initState() {
@@ -68,26 +76,54 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // Get available classes with their counts
-    final classData = LogDataService.getAvailableClasses(
-      widget.allLogs,
-      selectedSources: widget.filterManager.selectedSources,
-    );
+    // Get available data based on filter mode
+    final Map<String, int> filterData;
+    final Set<String> selectedItems;
+    final String itemLabel;
+    final String searchHint;
 
-    // Filter classes based on search query
-    final filteredClasses = classData.entries.where((entry) {
+    switch (_filterMode) {
+      case ClassFilterMode.all:
+        filterData = LogDataService.getAvailableClasses(
+          widget.allLogs,
+          selectedSources: widget.filterManager.selectedSources,
+        );
+        selectedItems = widget.filterManager.selectedClasses;
+        itemLabel = 'item';
+        searchHint = 'Search all...';
+        break;
+      case ClassFilterMode.source:
+        filterData = LogDataService.getAvailableSources(
+          widget.allLogs,
+          selectedSources: widget.filterManager.selectedSources,
+        );
+        selectedItems = widget.filterManager.selectedSourceNames;
+        itemLabel = 'source';
+        searchHint = 'Search sources...';
+        break;
+      case ClassFilterMode.filePath:
+        filterData = LogDataService.getAvailableFilePaths(
+          widget.allLogs,
+          selectedSources: widget.filterManager.selectedSources,
+        );
+        selectedItems = widget.filterManager.selectedFilePaths;
+        itemLabel = 'file path';
+        searchHint = 'Search file paths...';
+        break;
+    }
+
+    // Filter based on search query
+    final filteredItems = filterData.entries.where((entry) {
       if (_searchQuery.isEmpty) return true;
       return entry.key.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
 
     // Sort by count (descending) then by name
-    filteredClasses.sort((a, b) {
+    filteredItems.sort((a, b) {
       final countCompare = b.value.compareTo(a.value);
       if (countCompare != 0) return countCompare;
       return a.key.compareTo(b.key);
     });
-
-    final selectedClasses = widget.filterManager.selectedClasses;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
@@ -109,7 +145,11 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
               Row(
                 children: [
                   Icon(
-                    Icons.class_outlined,
+                    _filterMode == ClassFilterMode.all
+                        ? Icons.filter_list
+                        : _filterMode == ClassFilterMode.source
+                            ? Icons.class_outlined
+                            : Icons.folder_outlined,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                   const SizedBox(width: 12),
@@ -118,7 +158,11 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Filter by Class',
+                          _filterMode == ClassFilterMode.all
+                              ? 'Filter Logs'
+                              : _filterMode == ClassFilterMode.source
+                                  ? 'Filter by Source'
+                                  : 'Filter by File Path',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -135,6 +179,174 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+
+              // Filter mode toggle (3 options)
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    // All option
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _filterMode = ClassFilterMode.all;
+                            _searchQuery = '';
+                            _searchController.clear();
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _filterMode == ClassFilterMode.all
+                                ? Theme.of(context).colorScheme.primaryContainer
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.filter_list,
+                                size: 16,
+                                color: _filterMode == ClassFilterMode.all
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'All',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: _filterMode == ClassFilterMode.all
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                                  color: _filterMode == ClassFilterMode.all
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Source option
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _filterMode = ClassFilterMode.source;
+                            _searchQuery = '';
+                            _searchController.clear();
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _filterMode == ClassFilterMode.source
+                                ? Theme.of(context).colorScheme.primaryContainer
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.class_outlined,
+                                size: 16,
+                                color: _filterMode == ClassFilterMode.source
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Source',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight:
+                                      _filterMode == ClassFilterMode.source
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                  color: _filterMode == ClassFilterMode.source
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // File Path option
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _filterMode = ClassFilterMode.filePath;
+                            _searchQuery = '';
+                            _searchController.clear();
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _filterMode == ClassFilterMode.filePath
+                                ? Theme.of(context).colorScheme.primaryContainer
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.folder_outlined,
+                                size: 16,
+                                color: _filterMode == ClassFilterMode.filePath
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Path',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight:
+                                      _filterMode == ClassFilterMode.filePath
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                  color: _filterMode == ClassFilterMode.filePath
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 16),
 
               // Search field and view toggle button
@@ -145,7 +357,7 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText: 'Search classes...',
+                        hintText: searchHint,
                         prefixIcon: const Icon(Icons.search, size: 20),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
@@ -197,12 +409,12 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                 ],
               ),
 
-              // Selected classes chips (only show if there are selected classes)
-              if (selectedClasses.isNotEmpty) ...[
+              // Selected items chips (only show if there are selected items)
+              if (selectedItems.isNotEmpty) ...[
                 Row(
                   children: [
                     Text(
-                      '${selectedClasses.length} selected',
+                      '${selectedItems.length} selected',
                       style: TextStyle(
                         fontSize: 12,
                         color: Theme.of(context).colorScheme.primary,
@@ -210,7 +422,17 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                     ),
                     TextButton(
                       onPressed: () {
-                        widget.filterManager.clearClassFilters();
+                        switch (_filterMode) {
+                          case ClassFilterMode.all:
+                            widget.filterManager.clearClassFilters();
+                            break;
+                          case ClassFilterMode.source:
+                            widget.filterManager.clearSourceNameFilters();
+                            break;
+                          case ClassFilterMode.filePath:
+                            widget.filterManager.clearFilePathFilters();
+                            break;
+                        }
                       },
                       child: const Text('Clear'),
                     ),
@@ -220,14 +442,42 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                   height: 36,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: selectedClasses.length,
+                    itemCount: selectedItems.length,
                     itemBuilder: (context, index) {
-                      final className = selectedClasses.elementAt(index);
-                      final count = LogDataService.getClassCount(
-                        widget.allLogs,
-                        className,
-                        selectedSources: widget.filterManager.selectedSources,
-                      );
+                      final item = selectedItems.elementAt(index);
+                      int count;
+                      switch (_filterMode) {
+                        case ClassFilterMode.all:
+                          count = LogDataService.getClassCount(
+                            widget.allLogs,
+                            item,
+                            selectedSources:
+                                widget.filterManager.selectedSources,
+                          );
+                          break;
+                        case ClassFilterMode.source:
+                          count = LogDataService.getSourceCount(
+                            widget.allLogs,
+                            item,
+                            selectedSources:
+                                widget.filterManager.selectedSources,
+                          );
+                          break;
+                        case ClassFilterMode.filePath:
+                          count = LogDataService.getFilePathCount(
+                            widget.allLogs,
+                            item,
+                            selectedSources:
+                                widget.filterManager.selectedSources,
+                          );
+                          break;
+                      }
+
+                      // Display name - for file paths, show just the filename
+                      final displayName =
+                          _filterMode == ClassFilterMode.filePath
+                              ? item.split('/').last.split(':').first
+                              : item;
 
                       return Container(
                         margin: const EdgeInsets.only(right: 8),
@@ -236,7 +486,7 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                className,
+                                displayName,
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
@@ -266,8 +516,19 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                             ],
                           ),
                           deleteIcon: const Icon(Icons.close, size: 14),
-                          onDeleted: () =>
-                              widget.filterManager.toggleClass(className),
+                          onDeleted: () {
+                            switch (_filterMode) {
+                              case ClassFilterMode.all:
+                                widget.filterManager.toggleClass(item);
+                                break;
+                              case ClassFilterMode.source:
+                                widget.filterManager.toggleSourceName(item);
+                                break;
+                              case ClassFilterMode.filePath:
+                                widget.filterManager.toggleFilePath(item);
+                                break;
+                            }
+                          },
                           backgroundColor: Theme.of(context)
                               .colorScheme
                               .primaryContainer
@@ -295,11 +556,11 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                 const SizedBox(height: 12),
               ],
 
-              // Class count info
+              // Item count info
               Padding(
                 padding: const EdgeInsets.only(bottom: 8, top: 8),
                 child: Text(
-                  '${filteredClasses.length} ${filteredClasses.length == 1 ? 'class' : 'classes'} found',
+                  '${filteredItems.length} ${filteredItems.length == 1 ? itemLabel : '${itemLabel}s'} found',
                   style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -307,9 +568,9 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                 ),
               ),
 
-              // Class list
+              // Item list
               Expanded(
-                child: filteredClasses.isEmpty
+                child: filteredItems.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -317,15 +578,17 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                             Icon(
                               _searchQuery.isNotEmpty
                                   ? Icons.search_off
-                                  : Icons.class_outlined,
+                                  : _filterMode == ClassFilterMode.source
+                                      ? Icons.class_outlined
+                                      : Icons.folder_outlined,
                               size: 48,
                               color: Colors.grey[400],
                             ),
                             const SizedBox(height: 12),
                             Text(
                               _searchQuery.isNotEmpty
-                                  ? 'No classes matching "$_searchQuery"'
-                                  : 'No classes found in logs',
+                                  ? 'No ${itemLabel}s matching "$_searchQuery"'
+                                  : 'No ${itemLabel}s found in logs',
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 14,
@@ -335,7 +598,11 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                             if (_searchQuery.isEmpty) ...[
                               const SizedBox(height: 8),
                               Text(
-                                'Class filtering helps you focus on logs from specific parts of your app. Classes are extracted from file paths in your logs.\n Select Logger Logs to see available classes.',
+                                _filterMode == ClassFilterMode.all
+                                    ? 'Shows all log sources (both explicit sources and file paths combined).\nSelect Logger Logs to see available items.'
+                                    : _filterMode == ClassFilterMode.source
+                                        ? 'Source filtering shows logs where the source parameter was explicitly passed.\nExample: logger.d("msg", source: "MyClass")'
+                                        : 'File path filtering shows logs from specific files in your app (auto-detected in debug builds).',
                                 style: TextStyle(
                                   color: Colors.grey[500],
                                   fontSize: 12,
@@ -354,19 +621,41 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                               child: Wrap(
                                 spacing: 8,
                                 runSpacing: 8,
-                                children: filteredClasses.map((entry) {
-                                  final className = entry.key;
+                                children: filteredItems.map((entry) {
+                                  final itemName = entry.key;
                                   final count = entry.value;
                                   final isSelected =
-                                      selectedClasses.contains(className);
+                                      selectedItems.contains(itemName);
+
+                                  // Display name - for file paths, show just the filename
+                                  final displayName =
+                                      _filterMode == ClassFilterMode.filePath
+                                          ? itemName
+                                              .split('/')
+                                              .last
+                                              .split(':')
+                                              .first
+                                          : itemName;
 
                                   return _ClassChipTile(
-                                    className: className,
+                                    className: displayName,
                                     count: count,
                                     isSelected: isSelected,
                                     onTap: () {
-                                      widget.filterManager
-                                          .toggleClass(className);
+                                      switch (_filterMode) {
+                                        case ClassFilterMode.all:
+                                          widget.filterManager
+                                              .toggleClass(itemName);
+                                          break;
+                                        case ClassFilterMode.source:
+                                          widget.filterManager
+                                              .toggleSourceName(itemName);
+                                          break;
+                                        case ClassFilterMode.filePath:
+                                          widget.filterManager
+                                              .toggleFilePath(itemName);
+                                          break;
+                                      }
                                     },
                                   );
                                 }).toList(),
@@ -375,20 +664,39 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                           )
                         : ListView.builder(
                             controller: scrollController,
-                            itemCount: filteredClasses.length,
+                            itemCount: filteredItems.length,
                             itemBuilder: (context, index) {
-                              final entry = filteredClasses[index];
-                              final className = entry.key;
+                              final entry = filteredItems[index];
+                              final itemName = entry.key;
                               final count = entry.value;
                               final isSelected =
-                                  selectedClasses.contains(className);
+                                  selectedItems.contains(itemName);
+
+                              // Display name - for file paths in list view, show full path
+                              final displayName =
+                                  _filterMode == ClassFilterMode.filePath
+                                      ? itemName
+                                      : itemName;
 
                               return _ClassFilterTile(
-                                className: className,
+                                className: displayName,
                                 count: count,
                                 isSelected: isSelected,
                                 onTap: () {
-                                  widget.filterManager.toggleClass(className);
+                                  switch (_filterMode) {
+                                    case ClassFilterMode.all:
+                                      widget.filterManager
+                                          .toggleClass(itemName);
+                                      break;
+                                    case ClassFilterMode.source:
+                                      widget.filterManager
+                                          .toggleSourceName(itemName);
+                                      break;
+                                    case ClassFilterMode.filePath:
+                                      widget.filterManager
+                                          .toggleFilePath(itemName);
+                                      break;
+                                  }
                                 },
                               );
                             },

@@ -218,11 +218,13 @@ class LoggingUsingLogger {
       return;
     }
 
-    // Use provided source or try to extract from stack trace
-    final filePath = source ?? _getFilePath();
+    // Always get file path for terminal navigation
+    final filePath = _getFilePath();
+
     final entry = LogEntry(
       message: message,
       filePath: filePath,
+      source: source, // Explicit source name (if provided)
       level: level,
       timestamp: DateTime.now(),
       stackTrace: stackTrace,
@@ -237,57 +239,63 @@ class LoggingUsingLogger {
   /// Log debug message
   ///
   /// [message] - The log message
-  /// [source] - Optional source identifier (e.g., class name or file path).
-  ///            Useful in release builds where stack traces are not available.
+  /// [source] - Optional source identifier (e.g., class name).
+  ///            Useful for filtering logs by component/feature.
   ///            Example: `logger.d('Loading data', source: 'HomeScreen')`
   void d(String message, {String? source}) {
     if (_pauseLogging) return;
 
-    final filePath = source ?? _getFilePath();
-    _addLogEntry(message, 'DEBUG', source: filePath);
+    final filePath = _getFilePath();
+    _addLogEntry(message, 'DEBUG', source: source);
 
     if (_config.showFilePaths) {
-      _loggerInstance.d('$message\n[$filePath]');
+      final sourceInfo = source != null ? '[$source] ' : '';
+      _loggerInstance.d('$sourceInfo$message\n[$filePath]');
     } else {
-      _loggerInstance.d(message);
+      final sourceInfo = source != null ? '[$source] ' : '';
+      _loggerInstance.d('$sourceInfo$message');
     }
   }
 
   /// Log info message
   ///
   /// [message] - The log message
-  /// [source] - Optional source identifier (e.g., class name or file path).
-  ///            Useful in release builds where stack traces are not available.
+  /// [source] - Optional source identifier (e.g., class name).
+  ///            Useful for filtering logs by component/feature.
   ///            Example: `logger.i('User logged in', source: 'AuthService')`
   void i(String message, {String? source}) {
     if (_pauseLogging) return;
 
-    final filePath = source ?? _getFilePath();
-    _addLogEntry(message, 'INFO', source: filePath);
+    final filePath = _getFilePath();
+    _addLogEntry(message, 'INFO', source: source);
 
     if (_config.showFilePaths) {
-      _loggerInstance.i('$message\n[$filePath]');
+      final sourceInfo = source != null ? '[$source] ' : '';
+      _loggerInstance.i('$sourceInfo$message\n[$filePath]');
     } else {
-      _loggerInstance.i(message);
+      final sourceInfo = source != null ? '[$source] ' : '';
+      _loggerInstance.i('$sourceInfo$message');
     }
   }
 
   /// Log warning message
   ///
   /// [message] - The log message
-  /// [source] - Optional source identifier (e.g., class name or file path).
-  ///            Useful in release builds where stack traces are not available.
+  /// [source] - Optional source identifier (e.g., class name).
+  ///            Useful for filtering logs by component/feature.
   ///            Example: `logger.w('Cache miss', source: 'CacheManager')`
   void w(String message, {String? source}) {
     if (_pauseLogging) return;
 
-    final filePath = source ?? _getFilePath();
-    _addLogEntry(message, 'WARNING', source: filePath);
+    final filePath = _getFilePath();
+    _addLogEntry(message, 'WARNING', source: source);
 
     if (_config.showFilePaths) {
-      _loggerInstance.w('$message\n[$filePath]');
+      final sourceInfo = source != null ? '[$source] ' : '';
+      _loggerInstance.w('$sourceInfo$message\n[$filePath]');
     } else {
-      _loggerInstance.w(message);
+      final sourceInfo = source != null ? '[$source] ' : '';
+      _loggerInstance.w('$sourceInfo$message');
     }
   }
 
@@ -296,33 +304,34 @@ class LoggingUsingLogger {
   /// [message] - The log message
   /// [error] - Optional error object
   /// [stackTrace] - Optional stack trace
-  /// [source] - Optional source identifier (e.g., class name or file path).
-  ///            Useful in release builds where stack traces are not available.
+  /// [source] - Optional source identifier (e.g., class name).
+  ///            Useful for filtering logs by component/feature.
   ///            Example: `logger.e('Failed to load', error: e, source: 'DataRepo')`
   void e(String message,
       {Object? error, StackTrace? stackTrace, String? source}) {
     if (_pauseLogging) return;
 
-    final filePath = source ?? _getFilePath();
+    final filePath = _getFilePath();
     String? formattedError;
+    final sourceInfo = source != null ? '[$source] ' : '';
 
     if (error != null) {
       formattedError = _formatErrorStackTrace(error, stackTrace);
       _addLogEntry(message, 'ERROR',
-          stackTrace: formattedError, source: filePath);
+          stackTrace: formattedError, source: source);
 
       if (_config.showFilePaths) {
-        _loggerInstance.e('$message\n[$filePath]\n$formattedError');
+        _loggerInstance.e('$sourceInfo$message\n[$filePath]\n$formattedError');
       } else {
-        _loggerInstance.e('$message: ${error.toString()}');
+        _loggerInstance.e('$sourceInfo$message: ${error.toString()}');
       }
     } else {
-      _addLogEntry(message, 'ERROR', source: filePath);
+      _addLogEntry(message, 'ERROR', source: source);
 
       if (_config.showFilePaths) {
-        _loggerInstance.e('$message\n[$filePath]');
+        _loggerInstance.e('$sourceInfo$message\n[$filePath]');
       } else {
-        _loggerInstance.e(message);
+        _loggerInstance.e('$sourceInfo$message');
       }
     }
   }

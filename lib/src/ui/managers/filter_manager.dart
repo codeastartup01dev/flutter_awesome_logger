@@ -8,7 +8,12 @@ class FilterManager extends ChangeNotifier {
   // Filter sets
   final Set<UnifiedLogType> _selectedTypes = {};
   final Set<LogSource> _selectedSources = {};
-  final Set<String> _selectedClasses = {}; // For general logs
+  final Set<String> _selectedClasses =
+      {}; // For general logs (class name from "All" mode)
+  final Set<String> _selectedSourceNames =
+      {}; // For general logs (explicit source parameter)
+  final Set<String> _selectedFilePaths =
+      {}; // For general logs (full file path)
   final Set<String> _selectedMethods = {}; // For API logs
 
   /// Constructor that optionally accepts a default main filter
@@ -43,6 +48,8 @@ class FilterManager extends ChangeNotifier {
   Set<UnifiedLogType> get selectedTypes => Set.unmodifiable(_selectedTypes);
   Set<LogSource> get selectedSources => Set.unmodifiable(_selectedSources);
   Set<String> get selectedClasses => Set.unmodifiable(_selectedClasses);
+  Set<String> get selectedSourceNames => Set.unmodifiable(_selectedSourceNames);
+  Set<String> get selectedFilePaths => Set.unmodifiable(_selectedFilePaths);
   Set<String> get selectedMethods => Set.unmodifiable(_selectedMethods);
 
   bool get isFilterSectionExpanded => _isFilterSectionExpanded;
@@ -93,6 +100,8 @@ class FilterManager extends ChangeNotifier {
           _isLoggerFiltersExpanded = false;
           _selectedTypes.removeWhere((type) => type.isGeneralLog);
           _selectedClasses.clear();
+          _selectedSourceNames.clear();
+          _selectedFilePaths.clear();
           break;
         case LogSource.api:
           _isApiFiltersExpanded = false;
@@ -119,12 +128,32 @@ class FilterManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Toggle class selection (for general logs)
+  /// Toggle class selection (for general logs - "All" mode)
   void toggleClass(String className) {
     if (_selectedClasses.contains(className)) {
       _selectedClasses.remove(className);
     } else {
       _selectedClasses.add(className);
+    }
+    notifyListeners();
+  }
+
+  /// Toggle source name selection (for explicit source parameter logs)
+  void toggleSourceName(String sourceName) {
+    if (_selectedSourceNames.contains(sourceName)) {
+      _selectedSourceNames.remove(sourceName);
+    } else {
+      _selectedSourceNames.add(sourceName);
+    }
+    notifyListeners();
+  }
+
+  /// Toggle file path selection (for general logs)
+  void toggleFilePath(String filePath) {
+    if (_selectedFilePaths.contains(filePath)) {
+      _selectedFilePaths.remove(filePath);
+    } else {
+      _selectedFilePaths.add(filePath);
     }
     notifyListeners();
   }
@@ -154,6 +183,8 @@ class FilterManager extends ChangeNotifier {
     return _selectedTypes.isNotEmpty ||
         _selectedSources.isNotEmpty ||
         _selectedClasses.isNotEmpty ||
+        _selectedSourceNames.isNotEmpty ||
+        _selectedFilePaths.isNotEmpty ||
         _selectedMethods.isNotEmpty ||
         (_statsFilter != null && _statsFilter != 'total');
   }
@@ -164,6 +195,8 @@ class FilterManager extends ChangeNotifier {
     count += _selectedTypes.length;
     count += _selectedSources.length;
     count += _selectedClasses.length;
+    count += _selectedSourceNames.length;
+    count += _selectedFilePaths.length;
     count += _selectedMethods.length;
     if (_statsFilter != null && _statsFilter != 'total') count += 1;
     return count;
@@ -172,7 +205,9 @@ class FilterManager extends ChangeNotifier {
   /// Check if any logger sub-filters are selected
   bool hasLoggerSubFiltersSelected() {
     return _selectedTypes.any((type) => type.isGeneralLog) ||
-        _selectedClasses.isNotEmpty;
+        _selectedClasses.isNotEmpty ||
+        _selectedSourceNames.isNotEmpty ||
+        _selectedFilePaths.isNotEmpty;
   }
 
   /// Check if any API sub-filters are selected
@@ -186,6 +221,8 @@ class FilterManager extends ChangeNotifier {
     _selectedTypes.clear();
     _selectedSources.clear();
     _selectedClasses.clear();
+    _selectedSourceNames.clear();
+    _selectedFilePaths.clear();
     _selectedMethods.clear();
     _statsFilter = 'total'; // Reset to default 'total' filter
     _isLoggerFiltersExpanded = false;
@@ -193,9 +230,29 @@ class FilterManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Clear only class filters
+  /// Clear only class filters ("All" mode)
   void clearClassFilters() {
     _selectedClasses.clear();
+    notifyListeners();
+  }
+
+  /// Clear only source name filters (explicit source mode)
+  void clearSourceNameFilters() {
+    _selectedSourceNames.clear();
+    notifyListeners();
+  }
+
+  /// Clear only file path filters
+  void clearFilePathFilters() {
+    _selectedFilePaths.clear();
+    notifyListeners();
+  }
+
+  /// Clear all source/class/filepath filters
+  void clearAllSourceFilters() {
+    _selectedClasses.clear();
+    _selectedSourceNames.clear();
+    _selectedFilePaths.clear();
     notifyListeners();
   }
 
@@ -216,10 +273,26 @@ class FilterManager extends ChangeNotifier {
         return false;
       }
 
-      // Class filter (for general logs)
+      // Class filter (for general logs - "All" mode)
       if (_selectedClasses.isNotEmpty && log.source == LogSource.general) {
         final className = log.className;
         if (className == null || !_selectedClasses.contains(className)) {
+          return false;
+        }
+      }
+
+      // Source name filter (for explicit source parameter logs)
+      if (_selectedSourceNames.isNotEmpty && log.source == LogSource.general) {
+        final sourceName = log.sourceName;
+        if (sourceName == null || !_selectedSourceNames.contains(sourceName)) {
+          return false;
+        }
+      }
+
+      // File path filter (for general logs - file path mode)
+      if (_selectedFilePaths.isNotEmpty && log.source == LogSource.general) {
+        final filePath = log.filePath;
+        if (filePath == null || !_selectedFilePaths.contains(filePath)) {
           return false;
         }
       }
