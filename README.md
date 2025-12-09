@@ -22,6 +22,7 @@
   - [Installation](#installation)
   - [Basic Usage](#basic-usage)
   - [How to Get Logs in the Unified Interface](#-how-to-get-logs-in-the-unified-interface)
+- [🏷️ AwesomeLoggerMixin & Scoped Logger](#️-awesomeloggermixin--scoped-logger)
 - [🔧 Configuration Options](#-configuration-options)
 - [⚙️ Settings Modal](#️-settings-modal)
 - [📚 Advanced Usage](#-advanced-usage)
@@ -50,6 +51,8 @@
 | ⏸️ **Pause/Resume Logging** | Temporarily pause all logging with visual indicators - useful for focusing on specific app sections |
 | 🔍 **Search & Filter** | Easily find specific logs with advanced filtering - search by text, level, timestamp, or source file |
 | 🏷️ **Class-Based Filtering** | Filter logs by class names extracted from file paths - focus on specific parts of your app |
+| 🎭 **AwesomeLoggerMixin** | Add `with AwesomeLoggerMixin` to any class for automatic source tracking - zero boilerplate! |
+| 🎯 **Scoped Logger** | Create scoped logger instances with `logger.scoped('ClassName')` for pre-configured source |
 | 🔄 **Dual View Filtering** | Toggle between list and compact chip views for class selection with search capabilities |
 | 🎯 **Simple Configuration** | Single `enabled` property controls both UI and storage - async support for conditional initialization |
 | ⚙️ **Settings Modal** | Comprehensive runtime configuration via settings modal - adjust all logger options on-the-fly |
@@ -285,6 +288,44 @@ logger.e('Failed to fetch data', error: e, source: 'ApiRepository');
 
 ### 🎯 **Best Practice for Production Apps**
 
+**Option 1: Using `AwesomeLoggerMixin` (Recommended)**
+
+```dart
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+
+class UserRepository with AwesomeLoggerMixin {
+  // logger.d(), logger.i(), etc. automatically use 'UserRepository' as source!
+  
+  Future<User> fetchUser(String id) async {
+    logger.d('Fetching user: $id'); // source: 'UserRepository'
+    try {
+      final user = await api.getUser(id);
+      logger.i('User fetched successfully'); // source: 'UserRepository'
+      return user;
+    } catch (e, stack) {
+      logger.e('Failed to fetch user', error: e, stackTrace: stack); // source: 'UserRepository'
+      rethrow;
+    }
+  }
+}
+```
+
+**Option 2: Using Scoped Logger**
+
+```dart
+class UserRepository {
+  final _logger = logger.scoped('UserRepository');
+  // Or: late final _logger = logger.scoped(runtimeType.toString());
+  
+  Future<User> fetchUser(String id) async {
+    _logger.d('Fetching user: $id'); // source: 'UserRepository'
+    // ...
+  }
+}
+```
+
+**Option 3: Manual source parameter**
+
 ```dart
 class UserRepository {
   static const _source = 'UserRepository'; // Define once per class
@@ -310,6 +351,81 @@ When file paths show as `unknown` in release builds:
 - **Class filtering** won't work since classes are extracted from file paths
 
 **Solution**: Always use the `source` parameter in production apps to enable full filtering capabilities!
+
+---
+
+## 🏷️ AwesomeLoggerMixin & Scoped Logger
+
+### 🎯 **Automatic Source Tracking for Classes**
+
+The easiest way to add class-based source tracking to all your logs. No more manually passing `source` to every log call!
+
+#### 🔧 **Option 1: AwesomeLoggerMixin (Recommended)**
+
+Simply add the mixin to your class - all logs will automatically use the class name as source:
+
+```dart
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+
+// Works with Cubits, Blocs, Services, Repositories, Widgets - any class!
+class CubitAppConfig extends Cubit<StateAppConfig> with AwesomeLoggerMixin {
+  CubitAppConfig() : super(const StateAppConfig()) {
+    logger.d('Instance created, hashCode: $hashCode'); 
+    // ↑ Logs with source: 'CubitAppConfig' automatically!
+  }
+
+  void loadConfig() {
+    logger.i('Loading config...');  // source: 'CubitAppConfig'
+    logger.w('Cache expired');      // source: 'CubitAppConfig'
+  }
+  
+  void handleError(Object error, StackTrace stack) {
+    logger.e('Failed to load', error: error, stackTrace: stack); 
+    // ↑ source: 'CubitAppConfig'
+  }
+}
+```
+
+**How it works:**
+- The mixin provides a `logger` getter that returns a `ScopedLogger`
+- Uses `runtimeType.toString()` to automatically get the class name
+- The mixin's `logger` shadows any imported global `logger` within the class
+- Works correctly with inheritance - subclasses get their own class name
+
+#### 🔧 **Option 2: Scoped Logger**
+
+For more control, create a scoped logger instance:
+
+```dart
+import 'package:flutter_awesome_logger/flutter_awesome_logger.dart';
+
+class MyService {
+  // Option A: Hardcoded source name
+  final _logger = logger.scoped('MyService');
+  
+  // Option B: Using runtimeType (use late final)
+  // late final _logger = logger.scoped(runtimeType.toString());
+  
+  void doSomething() {
+    _logger.d('Doing something'); // source: 'MyService'
+    _logger.i('Task completed');  // source: 'MyService'
+  }
+}
+```
+
+#### 📊 **Comparison Table**
+
+| Approach | Pros | Use When |
+|----------|------|----------|
+| `AwesomeLoggerMixin` | Zero boilerplate, auto class name | Most cases - just add `with AwesomeLoggerMixin` |
+| `logger.scoped()` | Explicit control, custom naming | Custom source names, or can't use mixin |
+| `source:` parameter | One-off overrides | Occasional different source needed |
+
+#### 💡 **Tips**
+
+- **Mixin + Global Logger**: When you use `AwesomeLoggerMixin`, the mixin's `logger` getter shadows your imported global `logger` only within that class. Outside the class, the global logger works normally.
+- **Production Ready**: Uses `runtimeType` which is available in both debug and release builds
+- **Filtering**: All logs with source are filterable in the logger UI using the Classes filter
 
 ---
 

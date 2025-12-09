@@ -6,6 +6,63 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.0.0] (2025-12-09)
+
+### 🎉 Major Release - Scoped Logger & Mixin Support
+
+This release introduces powerful new ways to add automatic source tracking to your logs, making it easier to filter and identify logs by class/component.
+
+### Added
+- 🏷️ **AwesomeLoggerMixin** - New mixin for automatic class-based source tracking using `runtimeType`
+  - Simply add `with AwesomeLoggerMixin` to any class
+  - Use `logger.d()`, `logger.i()`, `logger.w()`, `logger.e()` - source is automatically set to class name
+  - Perfect for Cubits, Blocs, Services, Repositories, and any class
+- 🎯 **ScopedLogger** - New scoped logger class with pre-configured source identifier
+  - All logs automatically include the source name
+  - Same API as regular logger (`d`, `i`, `w`, `e` methods)
+- 🔧 **`logger.scoped()` Method** - Create scoped logger instances with custom source names
+  - `final _logger = logger.scoped('MyClassName')` for manual source control
+  - `late final _logger = logger.scoped(runtimeType.toString())` for automatic class name
+
+### Usage Examples
+
+**Using AwesomeLoggerMixin (Recommended):**
+```dart
+class CubitAppConfig extends Cubit<StateAppConfig> with AwesomeLoggerMixin {
+  CubitAppConfig() : super(const StateAppConfig()) {
+    logger.d('Instance created'); // source: 'CubitAppConfig'
+  }
+  
+  void loadConfig() {
+    logger.i('Loading config...'); // source: 'CubitAppConfig'
+  }
+}
+```
+
+**Using Scoped Logger:**
+```dart
+class MyService {
+  final _logger = logger.scoped('MyService');
+  // Or: late final _logger = logger.scoped(runtimeType.toString());
+  
+  void doWork() {
+    _logger.d('Working...'); // source: 'MyService'
+  }
+}
+```
+
+### Technical
+- 🏗️ **Zero Boilerplate** - Mixin approach requires no additional code, just add `with AwesomeLoggerMixin`
+- 🎯 **Production Ready** - Uses `runtimeType` which works correctly with inheritance
+- 📦 **Backward Compatible** - Existing `source` parameter still works for one-off overrides
+- 🔄 **Shadows Global Logger** - Mixin's `logger` getter shadows imported global logger within the class
+
+### Exports
+- Added `AwesomeLoggerMixin` to public exports
+- Added `ScopedLogger` to public exports
+
+---
+
 ## [2.1.2] (2025-12-06)
 
 ### Added
