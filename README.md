@@ -258,6 +258,61 @@ class MyService {
 
 ---
 
+## ⚠️ Release Build Limitations
+
+### 🔍 **File Paths in Production/Release Builds**
+
+In **debug mode**, the logger automatically extracts file paths from stack traces to show you exactly where each log originates. However, in **release/production builds**, Flutter strips debug information (including stack traces) for performance and security reasons.
+
+**What you'll see:**
+- **Debug mode**: `./lib/pages/home_page.dart:42:10` ✅
+- **Release mode**: `unknown` ⚠️
+
+### 💡 **Solution: Use the `source` Parameter**
+
+To maintain source tracking in release builds, use the optional `source` parameter:
+
+```dart
+// Without source (works in debug, shows 'unknown' in release)
+logger.d('Loading user data');
+
+// With source (works in both debug AND release builds!)
+logger.d('Loading user data', source: 'HomeScreen');
+logger.i('User logged in successfully', source: 'AuthService');
+logger.w('Cache miss detected', source: 'CacheManager');
+logger.e('Failed to fetch data', error: e, source: 'ApiRepository');
+```
+
+### 🎯 **Best Practice for Production Apps**
+
+```dart
+class UserRepository {
+  static const _source = 'UserRepository'; // Define once per class
+  
+  Future<User> fetchUser(String id) async {
+    logger.d('Fetching user: $id', source: _source);
+    try {
+      final user = await api.getUser(id);
+      logger.i('User fetched successfully', source: _source);
+      return user;
+    } catch (e, stack) {
+      logger.e('Failed to fetch user', error: e, stackTrace: stack, source: _source);
+      rethrow;
+    }
+  }
+}
+```
+
+### 🏷️ **Impact on Class Filtering**
+
+When file paths show as `unknown` in release builds:
+- **Classes button** will appear grey (no classes available)
+- **Class filtering** won't work since classes are extracted from file paths
+
+**Solution**: Always use the `source` parameter in production apps to enable full filtering capabilities!
+
+---
+
 ## 🏷️ Class-Based Filtering
 
 ### 🎯 **Focus on Specific App Components**

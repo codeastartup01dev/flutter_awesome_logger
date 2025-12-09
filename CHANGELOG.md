@@ -17,17 +17,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🔍 **Class Search** - Search and filter through available classes in the bottom sheet
 - 📋 **Selected Classes Display** - Horizontal chip list showing currently selected classes
 - 💡 **Educational Content** - Informative message explaining class filtering when no classes exist
+- 🏷️ **Source Parameter for Logging** - All log methods (`d`, `i`, `w`, `e`) now accept an optional `source` parameter for explicit source identification in release builds
 
 ### Enhanced
 - 🎛️ **Advanced Filtering** - Expanded filtering capabilities beyond log levels and API methods
 - 📱 **Better UX** - Improved filter section with more granular control options
 - 🎯 **Source-Aware Filtering** - Class filtering only applies to general logs, respects main source filters
+- 📖 **Release Build Support** - Added documentation for handling file path extraction limitations in production builds
 
 ### Technical
 - 🏗️ **FilterManager Enhancement** - Added `selectedClasses` state management and class filtering logic
 - 📊 **LogDataService Updates** - New methods for extracting and counting classes from logs
 - 🎨 **UI Components** - New `ClassFilterBottomSheet` and `ClassChipTile` widgets with responsive design
 - 📱 **Material Design 3** - Full theming support for the new filter components
+
+### Documentation
+- ⚠️ **Release Build Limitations** - Added comprehensive documentation explaining why file paths show as "unknown" in production
+- 💡 **Best Practices** - Added examples for using the `source` parameter effectively in production apps
 
 
 ## [2.1.1] (2025-10-31)

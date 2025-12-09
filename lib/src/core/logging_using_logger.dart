@@ -207,7 +207,8 @@ class LoggingUsingLogger {
   }
 
   /// Add log entry to memory storage
-  void _addLogEntry(String message, String level, {String? stackTrace}) {
+  void _addLogEntry(String message, String level,
+      {String? stackTrace, String? source}) {
     // Only store logs if storage is enabled
     if (!_storageEnabled) return;
 
@@ -217,7 +218,8 @@ class LoggingUsingLogger {
       return;
     }
 
-    final filePath = _getFilePath();
+    // Use provided source or try to extract from stack trace
+    final filePath = source ?? _getFilePath();
     final entry = LogEntry(
       message: message,
       filePath: filePath,
@@ -233,64 +235,92 @@ class LoggingUsingLogger {
   }
 
   /// Log debug message
-  void d(String message) {
+  ///
+  /// [message] - The log message
+  /// [source] - Optional source identifier (e.g., class name or file path).
+  ///            Useful in release builds where stack traces are not available.
+  ///            Example: `logger.d('Loading data', source: 'HomeScreen')`
+  void d(String message, {String? source}) {
     if (_pauseLogging) return;
 
-    _addLogEntry(message, 'DEBUG');
+    final filePath = source ?? _getFilePath();
+    _addLogEntry(message, 'DEBUG', source: filePath);
 
     if (_config.showFilePaths) {
-      _loggerInstance.d('$message\n[${_getFilePath()}]');
+      _loggerInstance.d('$message\n[$filePath]');
     } else {
       _loggerInstance.d(message);
     }
   }
 
   /// Log info message
-  void i(String message) {
+  ///
+  /// [message] - The log message
+  /// [source] - Optional source identifier (e.g., class name or file path).
+  ///            Useful in release builds where stack traces are not available.
+  ///            Example: `logger.i('User logged in', source: 'AuthService')`
+  void i(String message, {String? source}) {
     if (_pauseLogging) return;
 
-    _addLogEntry(message, 'INFO');
+    final filePath = source ?? _getFilePath();
+    _addLogEntry(message, 'INFO', source: filePath);
 
     if (_config.showFilePaths) {
-      _loggerInstance.i('$message\n[${_getFilePath()}]');
+      _loggerInstance.i('$message\n[$filePath]');
     } else {
       _loggerInstance.i(message);
     }
   }
 
   /// Log warning message
-  void w(String message) {
+  ///
+  /// [message] - The log message
+  /// [source] - Optional source identifier (e.g., class name or file path).
+  ///            Useful in release builds where stack traces are not available.
+  ///            Example: `logger.w('Cache miss', source: 'CacheManager')`
+  void w(String message, {String? source}) {
     if (_pauseLogging) return;
 
-    _addLogEntry(message, 'WARNING');
+    final filePath = source ?? _getFilePath();
+    _addLogEntry(message, 'WARNING', source: filePath);
 
     if (_config.showFilePaths) {
-      _loggerInstance.w('$message\n[${_getFilePath()}]');
+      _loggerInstance.w('$message\n[$filePath]');
     } else {
       _loggerInstance.w(message);
     }
   }
 
   /// Log error message with optional error object and stack trace
-  void e(String message, {Object? error, StackTrace? stackTrace}) {
+  ///
+  /// [message] - The log message
+  /// [error] - Optional error object
+  /// [stackTrace] - Optional stack trace
+  /// [source] - Optional source identifier (e.g., class name or file path).
+  ///            Useful in release builds where stack traces are not available.
+  ///            Example: `logger.e('Failed to load', error: e, source: 'DataRepo')`
+  void e(String message,
+      {Object? error, StackTrace? stackTrace, String? source}) {
     if (_pauseLogging) return;
 
+    final filePath = source ?? _getFilePath();
     String? formattedError;
 
     if (error != null) {
       formattedError = _formatErrorStackTrace(error, stackTrace);
-      _addLogEntry(message, 'ERROR', stackTrace: formattedError);
+      _addLogEntry(message, 'ERROR',
+          stackTrace: formattedError, source: filePath);
 
       if (_config.showFilePaths) {
-        _loggerInstance.e('$message\n[${_getFilePath()}]\n$formattedError');
+        _loggerInstance.e('$message\n[$filePath]\n$formattedError');
       } else {
         _loggerInstance.e('$message: ${error.toString()}');
       }
     } else {
-      _addLogEntry(message, 'ERROR');
+      _addLogEntry(message, 'ERROR', source: filePath);
 
       if (_config.showFilePaths) {
-        _loggerInstance.e('$message\n[${_getFilePath()}]');
+        _loggerInstance.e('$message\n[$filePath]');
       } else {
         _loggerInstance.e(message);
       }
