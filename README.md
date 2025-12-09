@@ -50,7 +50,9 @@
 | 🔍 **Source File Tracking** | **Easy Debugging**: See exact file paths and line numbers for all logs - instantly identify where issues originate! |
 | ⏸️ **Pause/Resume Logging** | Temporarily pause all logging with visual indicators - useful for focusing on specific app sections |
 | 🔍 **Search & Filter** | Easily find specific logs with advanced filtering - search by text, level, timestamp, or source file |
-| 🏷️ **Class-Based Filtering** | Filter logs by class names extracted from file paths - focus on specific parts of your app |
+| 🏷️ **Class-Based Filtering** | Advanced filtering by class names, sources, and file paths with visual badges and unified clear controls |
+| 🗑️ **Smart Filter Management** | Universal "Clear All Filters" button and always-visible selected items - manage filters across all modes |
+| 📊 **Filter Mode Indicators** | Filter mode chips show badges indicating selected item counts for each category |
 | 🎭 **AwesomeLoggerMixin** | Add `with AwesomeLoggerMixin` to any class for automatic source tracking - zero boilerplate! |
 | 🎯 **Scoped Logger** | Create scoped logger instances with `logger.scoped('ClassName')` for pre-configured source |
 | 🔄 **Dual View Filtering** | Toggle between list and compact chip views for class selection with search capabilities |

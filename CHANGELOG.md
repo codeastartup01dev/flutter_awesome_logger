@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.0.2] (2025-12-09)
+
+### 🎨 UI/UX Improvements
+- 🎯 **Enhanced Class Filter UI** - Major improvements to the class filter bottom sheet
+- 🗑️ **Universal Clear Button** - Added prominent "Clear All Filters" button at the top that clears all selected filters from all modes
+- 🏷️ **Always-Visible Selected Items** - Selected filter chips are now always visible at the top, regardless of current filter mode
+- 📊 **Filter Mode Badges** - Filter mode chips (All/Source/Path) now show badges indicating how many items are selected for each mode
+- 🎨 **Better Visual Hierarchy** - Improved layout with clear button and selected items prominently displayed
+- ⚡ **Mode-Agnostic Clearing** - Clear button works across all filter modes, not just the currently active one
+
+### 🔧 Technical Enhancements
+- 🏗️ **Unified Filter Management** - Single clear function that handles all filter types simultaneously
+- 📱 **Responsive UI Components** - Better organization of filter controls and selected items display
+- 🎯 **Smart State Management** - Improved handling of filter state across different modes
+
+### 📱 User Experience
+- 🚀 **Faster Filter Management** - Quick access to clear all filters from any filter mode
+- 👁️ **Better Visibility** - Selected items always visible, no need to switch modes to see what's selected
+- 📊 **Visual Feedback** - Clear indication of which filter modes have active selections
+- 🎨 **Cleaner Interface** - More intuitive layout with logical grouping of controls
+
+---
+
 ## [3.0.1] (2025-12-09)
 
 ### 🐛 Bug Fixes

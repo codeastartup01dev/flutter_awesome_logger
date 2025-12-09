@@ -74,6 +74,106 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
     }
   }
 
+  /// Check if any items are selected across all filter modes
+  bool get _hasAnySelectedItems =>
+      widget.filterManager.selectedClasses.isNotEmpty ||
+      widget.filterManager.selectedSourceNames.isNotEmpty ||
+      widget.filterManager.selectedFilePaths.isNotEmpty;
+
+  /// Clear all filters from all modes
+  void _clearAllFilters() {
+    widget.filterManager.clearClassFilters();
+    widget.filterManager.clearSourceNameFilters();
+    widget.filterManager.clearFilePathFilters();
+  }
+
+  /// Get count of selected items for a specific filter mode
+  int _getSelectedCountForMode(ClassFilterMode mode) {
+    switch (mode) {
+      case ClassFilterMode.all:
+        return widget.filterManager.selectedClasses.length;
+      case ClassFilterMode.source:
+        return widget.filterManager.selectedSourceNames.length;
+      case ClassFilterMode.filePath:
+        return widget.filterManager.selectedFilePaths.length;
+    }
+  }
+
+  /// Build a filter mode chip with optional badge
+  Widget _buildFilterModeChip({
+    required BuildContext context,
+    required ClassFilterMode mode,
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final selectedCount = _getSelectedCountForMode(mode);
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primaryContainer
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              // Badge showing selected count
+              if (selectedCount > 0) ...[
+                const SizedBox(width: 6),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    '$selectedCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get available data based on filter mode
@@ -172,6 +272,7 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                       ],
                     ),
                   ),
+                  Flexible(child: _buildClearAllFiltersButton(context)),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
@@ -193,161 +294,58 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                 child: Row(
                   children: [
                     // All option
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _filterMode = ClassFilterMode.all;
-                            _searchQuery = '';
-                            _searchController.clear();
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: _filterMode == ClassFilterMode.all
-                                ? Theme.of(context).colorScheme.primaryContainer
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.filter_list,
-                                size: 16,
-                                color: _filterMode == ClassFilterMode.all
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'All',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: _filterMode == ClassFilterMode.all
-                                      ? FontWeight.w600
-                                      : FontWeight.normal,
-                                  color: _filterMode == ClassFilterMode.all
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    _buildFilterModeChip(
+                      context: context,
+                      mode: ClassFilterMode.all,
+                      icon: Icons.filter_list,
+                      label: 'All',
+                      isSelected: _filterMode == ClassFilterMode.all,
+                      onTap: () {
+                        setState(() {
+                          _filterMode = ClassFilterMode.all;
+                          _searchQuery = '';
+                          _searchController.clear();
+                        });
+                      },
                     ),
                     // Source option
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _filterMode = ClassFilterMode.source;
-                            _searchQuery = '';
-                            _searchController.clear();
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: _filterMode == ClassFilterMode.source
-                                ? Theme.of(context).colorScheme.primaryContainer
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.class_outlined,
-                                size: 16,
-                                color: _filterMode == ClassFilterMode.source
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Source',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight:
-                                      _filterMode == ClassFilterMode.source
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                  color: _filterMode == ClassFilterMode.source
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    _buildFilterModeChip(
+                      context: context,
+                      mode: ClassFilterMode.source,
+                      icon: Icons.class_outlined,
+                      label: 'Source',
+                      isSelected: _filterMode == ClassFilterMode.source,
+                      onTap: () {
+                        setState(() {
+                          _filterMode = ClassFilterMode.source;
+                          _searchQuery = '';
+                          _searchController.clear();
+                        });
+                      },
                     ),
                     // File Path option
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _filterMode = ClassFilterMode.filePath;
-                            _searchQuery = '';
-                            _searchController.clear();
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: _filterMode == ClassFilterMode.filePath
-                                ? Theme.of(context).colorScheme.primaryContainer
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.folder_outlined,
-                                size: 16,
-                                color: _filterMode == ClassFilterMode.filePath
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Path',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight:
-                                      _filterMode == ClassFilterMode.filePath
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                  color: _filterMode == ClassFilterMode.filePath
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                    _buildFilterModeChip(
+                      context: context,
+                      mode: ClassFilterMode.filePath,
+                      icon: Icons.folder_outlined,
+                      label: 'Path',
+                      isSelected: _filterMode == ClassFilterMode.filePath,
+                      onTap: () {
+                        setState(() {
+                          _filterMode = ClassFilterMode.filePath;
+                          _searchQuery = '';
+                          _searchController.clear();
+                        });
+                      },
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
+
+              // selected items display (always visible)
+
+              _buildAllSelectedItemsChips(context),
 
               // Search field and view toggle button
               Row(
@@ -408,153 +406,6 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
                   ),
                 ],
               ),
-
-              // Selected items chips (only show if there are selected items)
-              if (selectedItems.isNotEmpty) ...[
-                Row(
-                  children: [
-                    Text(
-                      '${selectedItems.length} selected',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        switch (_filterMode) {
-                          case ClassFilterMode.all:
-                            widget.filterManager.clearClassFilters();
-                            break;
-                          case ClassFilterMode.source:
-                            widget.filterManager.clearSourceNameFilters();
-                            break;
-                          case ClassFilterMode.filePath:
-                            widget.filterManager.clearFilePathFilters();
-                            break;
-                        }
-                      },
-                      child: const Text('Clear'),
-                    ),
-                  ],
-                ),
-                Container(
-                  height: 36,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: selectedItems.length,
-                    itemBuilder: (context, index) {
-                      final item = selectedItems.elementAt(index);
-                      int count;
-                      switch (_filterMode) {
-                        case ClassFilterMode.all:
-                          count = LogDataService.getClassCount(
-                            widget.allLogs,
-                            item,
-                            selectedSources:
-                                widget.filterManager.selectedSources,
-                          );
-                          break;
-                        case ClassFilterMode.source:
-                          count = LogDataService.getSourceCount(
-                            widget.allLogs,
-                            item,
-                            selectedSources:
-                                widget.filterManager.selectedSources,
-                          );
-                          break;
-                        case ClassFilterMode.filePath:
-                          count = LogDataService.getFilePathCount(
-                            widget.allLogs,
-                            item,
-                            selectedSources:
-                                widget.filterManager.selectedSources,
-                          );
-                          break;
-                      }
-
-                      // Display name - for file paths, show just the filename
-                      final displayName =
-                          _filterMode == ClassFilterMode.filePath
-                              ? item.split('/').last.split(':').first
-                              : item;
-
-                      return Container(
-                        margin: const EdgeInsets.only(right: 8),
-                        child: Chip(
-                          label: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                displayName,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 4, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  '$count',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          deleteIcon: const Icon(Icons.close, size: 14),
-                          onDeleted: () {
-                            switch (_filterMode) {
-                              case ClassFilterMode.all:
-                                widget.filterManager.toggleClass(item);
-                                break;
-                              case ClassFilterMode.source:
-                                widget.filterManager.toggleSourceName(item);
-                                break;
-                              case ClassFilterMode.filePath:
-                                widget.filterManager.toggleFilePath(item);
-                                break;
-                            }
-                          },
-                          backgroundColor: Theme.of(context)
-                              .colorScheme
-                              .primaryContainer
-                              .withOpacity(0.3),
-                          side: BorderSide(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.5),
-                            width: 1,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          labelPadding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          padding: EdgeInsets.zero,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
 
               // Item count info
               Padding(
@@ -706,6 +557,182 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
           ),
         );
       },
+    );
+  }
+
+  Container _buildClearAllFiltersButton(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: OutlinedButton.icon(
+        onPressed: !_hasAnySelectedItems
+            ? null // Disabled when no items selected
+            : _clearAllFilters,
+        icon: const Icon(Icons.clear_all),
+        label: const Text('Clear All Filters'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: _hasAnySelectedItems
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+          side: BorderSide(
+            color: _hasAnySelectedItems
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            width: _hasAnySelectedItems ? 2 : 1,
+          ),
+          backgroundColor: _hasAnySelectedItems
+              ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1)
+              : null,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        ),
+      ),
+    );
+  }
+
+  /// Build selected items chips from all filter modes
+  Widget _buildAllSelectedItemsChips(BuildContext context) {
+    // Collect all selected items from all modes
+    final allSelectedItems = <MapEntry<String, String>>[];
+
+    // Add class items
+    for (final item in widget.filterManager.selectedClasses) {
+      final count = LogDataService.getClassCount(
+        widget.allLogs,
+        item,
+        selectedSources: widget.filterManager.selectedSources,
+      );
+      allSelectedItems.add(MapEntry(item, 'class:$item:$count'));
+    }
+
+    // Add source items
+    for (final item in widget.filterManager.selectedSourceNames) {
+      final count = LogDataService.getSourceCount(
+        widget.allLogs,
+        item,
+        selectedSources: widget.filterManager.selectedSources,
+      );
+      allSelectedItems.add(MapEntry(item, 'source:$item:$count'));
+    }
+
+    // Add file path items
+    for (final item in widget.filterManager.selectedFilePaths) {
+      final count = LogDataService.getFilePathCount(
+        widget.allLogs,
+        item,
+        selectedSources: widget.filterManager.selectedSources,
+      );
+      final displayName = item.split('/').last.split(':').first;
+      allSelectedItems.add(MapEntry(displayName, 'path:$item:$count'));
+    }
+
+    if (allSelectedItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              '${allSelectedItems.length} selected',
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const Spacer(),
+            TextButton(
+              onPressed: _clearAllFilters,
+              child: const Text('Clear All'),
+            ),
+          ],
+        ),
+        Container(
+          height: 36,
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: allSelectedItems.length,
+            itemBuilder: (context, index) {
+              final entry = allSelectedItems[index];
+              final displayName = entry.key;
+              final data = entry.value.split(':');
+              final type = data[0];
+              final originalName = data[1];
+              final count = int.parse(data[2]);
+
+              return Container(
+                margin: const EdgeInsets.only(right: 8),
+                child: Chip(
+                  label: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        displayName,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '$count',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  deleteIcon: const Icon(Icons.close, size: 14),
+                  onDeleted: () {
+                    switch (type) {
+                      case 'class':
+                        widget.filterManager.toggleClass(originalName);
+                        break;
+                      case 'source':
+                        widget.filterManager.toggleSourceName(originalName);
+                        break;
+                      case 'path':
+                        widget.filterManager.toggleFilePath(originalName);
+                        break;
+                    }
+                  },
+                  backgroundColor: Theme.of(context)
+                      .colorScheme
+                      .primaryContainer
+                      .withOpacity(0.3),
+                  side: BorderSide(
+                    color:
+                        Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    width: 1,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  labelPadding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: EdgeInsets.zero,
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
