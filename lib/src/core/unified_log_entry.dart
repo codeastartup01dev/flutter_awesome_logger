@@ -181,6 +181,55 @@ class UnifiedLogEntry {
     return message;
   }
 
+  /// Get minimal formatted content for bulk export (API logs only include cURL and response body)
+  String get formattedContentMinimal {
+    if (source == LogSource.api && apiLogEntry != null) {
+      final buffer = StringBuffer();
+      // Status and timing info
+      if (apiLogEntry!.statusCode != null || apiLogEntry!.duration != null) {
+        if (apiLogEntry!.statusCode != null) {
+          buffer.write('Status: ${apiLogEntry!.statusCode}');
+        }
+        if (apiLogEntry!.duration != null) {
+          if (apiLogEntry!.statusCode != null) buffer.write(' • ');
+          buffer.write('Duration: ${apiLogEntry!.duration}ms');
+        }
+        buffer.writeln();
+        buffer.writeln();
+      }
+
+      buffer.writeln('cURL:');
+      buffer.writeln(apiLogEntry!.curl);
+      buffer.writeln();
+      if (apiLogEntry!.responseData != null) {
+        buffer.writeln('Response:');
+        buffer.writeln(apiLogEntry!.formattedResponseBody);
+        buffer.writeln();
+      }
+      if (apiLogEntry!.error != null) {
+        buffer.writeln('Error: ${apiLogEntry!.error}');
+        buffer.writeln();
+      }
+      return buffer.toString();
+    } else if (source == LogSource.general && generalLogEntry != null) {
+      final buffer = StringBuffer();
+      buffer.writeln('=== GENERAL LOG ===');
+      buffer.writeln('Level: ${generalLogEntry!.level}');
+      buffer.writeln('Time: ${generalLogEntry!.timestamp}');
+      if (generalLogEntry!.source != null) {
+        buffer.writeln('Source: ${generalLogEntry!.source}');
+      }
+      buffer.writeln('File: ${generalLogEntry!.filePath}');
+      buffer.writeln('Message: ${generalLogEntry!.message}');
+      if (generalLogEntry!.stackTrace != null) {
+        buffer.writeln('Stack Trace:');
+        buffer.writeln(generalLogEntry!.stackTrace);
+      }
+      return buffer.toString();
+    }
+    return message;
+  }
+
   /// Check if this log matches a search query
   bool matchesSearch(String query) {
     if (query.isEmpty) return true;

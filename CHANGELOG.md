@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.0.3] (2025-12-10)
+
+### ✨ New Features - Enhanced Copy Functionality
+
+This release introduces powerful new copy options for both individual log entries and bulk filtered exports, making it easier to debug API calls and share log information.
+
+### Added
+- 📋 **Copy cURL & Response** - New menu option for individual API logs that copies both cURL command and formatted response body
+- 📄 **Copy Response** - New menu option for individual API logs that copies only the response body
+- 📦 **Minimal Bulk Export** - Filtered log exports now use a cleaner format for API logs (cURL + response only, no headers)
+- 🎯 **Smart Copy Menu** - API logs now have 5 copy options: Message, Full Log, cURL & Response, Response, and cURL
+
+### Enhanced
+- 🔧 **Bulk Export Format** - API logs in filtered exports now show essential information only (status, cURL, response)
+- 🎨 **Copy Menu Organization** - Better ordering with "Copy cURL & Response" as the first API-specific option
+- 📱 **Individual Log Copy** - Each API log entry now has comprehensive copy options in the popup menu
+
+### Technical
+- 🏗️ **New `formattedContentMinimal` Property** - Added to `UnifiedLogEntry` for cleaner bulk exports
+- 🔄 **Updated Copy Handler** - Enhanced `CopyHandler` with new copy actions and menu items
+- 📊 **Improved Export Logic** - `LogDataService.exportLogsToString()` now uses minimal format for cleaner exports
+
+### User Experience
+- 🚀 **Faster Debugging** - Copy cURL commands and responses with a single tap
+- 📋 **Clean Exports** - Bulk filtered logs now focus on essential API information
+- 🎯 **Context-Aware Copy** - Different copy options for different use cases (full logs vs API debugging)
+
+---
+
 ## [3.0.2] (2025-12-09)
 
 ### 🎨 UI/UX Improvements

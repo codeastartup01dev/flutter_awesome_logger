@@ -60,6 +60,8 @@
 | ⚙️ **Settings Modal** | Comprehensive runtime configuration via settings modal - adjust all logger options on-the-fly |
 | 🔄 **Circular Buffer** | Configurable log replacement behavior - choose between replacing oldest logs or stopping when limit reached |
 | 📱 **Responsive Design** | Works perfectly on all screen sizes - adaptive layouts for phones, tablets, and different orientations |
+| 📋 **Smart Copy Options** | Multiple copy options for logs: full logs, cURL commands, responses, and cURL+response combinations |
+| 📦 **Clean Bulk Exports** | Filtered log exports focus on essential information - API logs show cURL and response only |
 
 </div>
 

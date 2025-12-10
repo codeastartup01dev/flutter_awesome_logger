@@ -25,6 +25,18 @@ class CopyHandler {
         textToCopy = log.formattedContent;
         successMessage = 'Full log copied to clipboard';
         break;
+      case 'copy_curl_response':
+        if (log.source == LogSource.api && log.apiLogEntry != null) {
+          textToCopy = log.formattedContentMinimal;
+          successMessage = 'cURL and response copied to clipboard';
+        }
+        break;
+      case 'copy_response':
+        if (log.source == LogSource.api && log.apiLogEntry != null) {
+          textToCopy = log.apiLogEntry!.formattedResponseBody;
+          successMessage = 'Response copied to clipboard';
+        }
+        break;
       case 'copy_curl':
         if (log.source == LogSource.api && log.apiLogEntry != null) {
           textToCopy = log.apiLogEntry!.curl;
@@ -85,34 +97,33 @@ class CopyHandler {
 
   /// Get copy menu items for a log entry
   static List<PopupMenuEntry<String>> getCopyMenuItems(UnifiedLogEntry log) {
-    final items = <PopupMenuEntry<String>>[
-      const PopupMenuItem(
-        value: 'copy_message',
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.copy, size: 16),
-            SizedBox(width: 8),
-            Text('Copy Message'),
-          ],
-        ),
-      ),
-      const PopupMenuItem(
-        value: 'copy_full',
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.content_copy, size: 16),
-            SizedBox(width: 8),
-            Text('Copy Full Log'),
-          ],
-        ),
-      ),
-    ];
+    final items = <PopupMenuEntry<String>>[];
 
     // Add API-specific menu items
     if (log.source == LogSource.api) {
       items.addAll([
+        const PopupMenuItem(
+          value: 'copy_curl_response',
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.code, size: 16),
+              SizedBox(width: 8),
+              Text('Copy cURL & Response'),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'copy_response',
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.description, size: 16),
+              SizedBox(width: 8),
+              Text('Copy Response'),
+            ],
+          ),
+        ),
         const PopupMenuItem(
           value: 'copy_curl',
           child: Row(
@@ -154,6 +165,34 @@ class CopyHandler {
         ),
       );
     }
+
+    // Add copy full log menu item
+    items.add(
+      const PopupMenuItem(
+        value: 'copy_message',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.copy, size: 16),
+            SizedBox(width: 8),
+            Text('Copy Message'),
+          ],
+        ),
+      ),
+    );
+    items.add(
+      const PopupMenuItem(
+        value: 'copy_full',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.content_copy, size: 16),
+            SizedBox(width: 8),
+            Text('Copy Full Log'),
+          ],
+        ),
+      ),
+    );
 
     return items;
   }

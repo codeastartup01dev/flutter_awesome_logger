@@ -290,7 +290,7 @@ class LogDataService {
 
     for (final log in logs) {
       buffer.writeln('--- ${log.source.displayName.toUpperCase()} LOG ---');
-      buffer.writeln(log.formattedContent);
+      buffer.writeln(log.formattedContentMinimal);
       buffer.writeln();
     }
 
