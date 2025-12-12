@@ -569,7 +569,7 @@ class _ClassFilterBottomSheetState extends State<ClassFilterBottomSheet> {
             ? null // Disabled when no items selected
             : _clearAllFilters,
         icon: const Icon(Icons.clear_all),
-        label: const Text('Clear All Filters'),
+        label: const Text('Clear'),
         style: OutlinedButton.styleFrom(
           foregroundColor: _hasAnySelectedItems
               ? Theme.of(context).colorScheme.primary

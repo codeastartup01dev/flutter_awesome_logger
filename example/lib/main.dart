@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
 
       // 🎨 Floating logger UI configuration (optional)
       config: const FloatingLoggerConfig(
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.blue,
         icon: Icons.developer_mode,
         showCount: true,
         enableGestures: true,

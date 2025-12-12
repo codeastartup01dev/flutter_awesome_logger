@@ -135,6 +135,11 @@ class UnifiedLogEntry {
     final timeText = timestamp.toIso8601String().substring(11, 19);
 
     if (source == LogSource.api) {
+      // For pending API requests, show "pending since timestamp"
+      if (type == UnifiedLogType.apiPending) {
+        return 'Pending since $timeText';
+      }
+
       final durationText = duration != null ? ' in ${duration}ms' : '';
       return '$httpMethod at $timeText$durationText';
     } else {

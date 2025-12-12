@@ -511,10 +511,10 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
                 size: widget.config.size * 0.4,
               ),
             ),
-            // API logs badge (top-left)
+            // API logs badge (top-right)
             if (widget.config.showCount && _apiLogs > 0)
               Positioned(
-                left: 0,
+                right: 0,
                 top: 0,
                 child: _buildBadge(
                   _apiLogs.toString(),
@@ -522,18 +522,18 @@ class _FlutterAwesomeLoggerState extends State<FlutterAwesomeLogger> {
                 ),
               ),
 
-            // General logs badge (top-right)
+            // General logs badge (top-left)
             if (widget.config.showCount && _generalLogs > 0)
               Positioned(
-                right: 0,
+                left: 0,
                 top: 0,
-                child: _buildBadge(_generalLogs.toString(), Colors.grey[600]!),
+                child: _buildBadge(_generalLogs.toString(), Colors.blue[900]!),
               ),
 
-            // API errors badge (bottom-left) - only if there are errors
+            // API errors badge (bottom-right) - only if there are errors
             if (widget.config.showCount && _apiErrors > 0)
               Positioned(
-                left: 2,
+                right: 2,
                 bottom: 0,
                 child: _buildBadge('⚠', Colors.orange, small: true),
               ),

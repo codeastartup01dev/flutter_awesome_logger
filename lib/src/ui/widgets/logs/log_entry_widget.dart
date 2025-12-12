@@ -332,6 +332,15 @@ class _LogEntryWidgetState extends State<LogEntryWidget> {
                 color: Colors.white,
                 fontSize: 10,
               ),
+            )
+          else if (widget.log.source == LogSource.api &&
+              widget.log.statusCode == null)
+            const Text(
+              '...',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+              ),
             ),
         ],
       ),

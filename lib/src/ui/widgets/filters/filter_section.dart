@@ -79,7 +79,7 @@ class FilterSection extends StatelessWidget {
                   MainFilterChip(
                     label: 'Logger Logs',
                     icon: Icons.bug_report,
-                    color: Colors.purple,
+                    color: Colors.blue[900]!,
                     isSelected: filterManager.selectedSources
                         .contains(LogSource.general),
                     count: LogDataService.getGeneralLogCount(allLogs),

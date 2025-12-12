@@ -65,7 +65,7 @@ extension UnifiedLogTypeExtension on UnifiedLogType {
       case UnifiedLogType.apiServerError:
         return Colors.red;
       case UnifiedLogType.apiNetworkError:
-        return Colors.purple;
+        return Colors.red;
       case UnifiedLogType.apiPending:
         return Colors.grey;
     }

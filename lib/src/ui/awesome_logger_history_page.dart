@@ -550,12 +550,12 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         backgroundColor: hasSelection && hasAvailableItems
-            ? Colors.purple
+            ? Colors.blue[900]!
             : hasAvailableItems
-                ? const Color(0x1A9C27B0) // purple with 10% opacity
+                ? const Color(0x1A0000FF) // blue with 10% opacity
                 : Colors.grey[200], // grey background when no items
         foregroundColor: hasAvailableItems
-            ? (hasSelection ? Colors.white : Colors.purple)
+            ? (hasSelection ? Colors.white : Colors.blue[900]!)
             : Colors.grey[500], // grey text when disabled
         elevation: 0,
       ),
@@ -731,7 +731,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                       padding: const EdgeInsets.all(0),
                       constraints: const BoxConstraints(),
                       style: IconButton.styleFrom(
-                        foregroundColor: Colors.purple,
+                        foregroundColor: Colors.blue[900]!,
                       ),
                     ),
                   const SizedBox(width: 8),
