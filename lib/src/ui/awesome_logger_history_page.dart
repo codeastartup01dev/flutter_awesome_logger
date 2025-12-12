@@ -8,6 +8,7 @@ import '../core/unified_log_types.dart';
 import 'managers/filter_manager.dart';
 import 'services/log_data_service.dart';
 import 'utils/copy_handler.dart';
+import 'utils/filter_display_utils.dart';
 import 'widgets/common/logger_search_bar.dart';
 import 'widgets/common/logger_sort_toggle.dart';
 import 'widgets/common/logger_statistics.dart';
@@ -667,7 +668,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
             // Search bar
             LoggerSearchBar(
               controller: _searchController,
-              hintText: 'Search all logs...',
+              hintText: FilterDisplayUtils.getSearchHintText(_filterManager),
               searchQuery: _filterManager.searchQuery,
               actions: [
                 IconButton(
@@ -781,9 +782,10 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                               size: 64, color: Colors.grey[400]),
                           const SizedBox(height: 16),
                           Text(
-                            _filterManager.searchQuery.isEmpty
-                                ? 'No logs available\nStart using the logger to see logs here'
-                                : 'No logs matching "${_searchController.text}"',
+                            FilterDisplayUtils.getEmptyStateMessage(
+                              _filterManager,
+                              _searchController,
+                            ),
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 16,
