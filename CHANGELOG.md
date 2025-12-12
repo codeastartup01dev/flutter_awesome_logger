@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [4.0.0] (2025-12-12)
+
+### 🎉 Major Release - Enhanced Statistics & Filtering
+
+This release introduces comprehensive statistics enhancements and improved filtering capabilities, making log analysis more powerful and intuitive.
+
+### Added
+- 📊 **Warnings Statistics** - New warnings count added to statistics bar, positioned before errors for better visual hierarchy
+- 🎯 **Warnings Filtering** - Clicking on warnings statistic now properly filters to show only warning logs
+- 🔧 **Enhanced Filter Messages** - Search hints and empty state messages now account for warnings filter selection
+- 🎨 **Unified Filter Section** - LoggerStatistics and filter buttons now toggle visibility together with the main filter section
+
+### Fixed
+- 🐛 **Sort Toggle SnackBar Inconsistency** - Fixed SnackBar showing opposite sorting direction after toggle action
+- ⚡ **Warnings Filter Logic** - Added missing 'warnings' case to stats filtering logic in FilterManager
+- 📝 **Filter Display Utils** - Updated search hints and empty state messages to handle warnings filter
+
+### Enhanced
+- 🎯 **Better UI Consistency** - Statistics bar and filter controls now collapse/expand together for cleaner interface
+- 📱 **Improved User Experience** - More accurate feedback messages when warnings filter is active
+- 🔄 **Consistent Filter Behavior** - Warnings filtering now works identically to success and errors filtering
+
+### Technical
+- 🏗️ **FilterManager Updates** - Added warnings filtering case to `applyFilters` method
+- 🎨 **Display Utils Enhancement** - Extended `FilterDisplayUtils` to handle warnings in all message types
+- 📊 **Statistics Ordering** - Reorganized statistics display order: Total → Success → Warnings → Errors
+
+---
+
 ## [3.0.3] (2025-12-10)
 
 ### ✨ New Features - Enhanced Copy Functionality
