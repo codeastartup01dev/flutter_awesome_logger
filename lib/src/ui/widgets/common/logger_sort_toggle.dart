@@ -16,8 +16,8 @@ class LoggerSortToggle extends StatelessWidget {
     super.key,
     required this.sortNewestFirst,
     required this.onToggle,
-    this.newestFirstLabel,
-    this.oldestFirstLabel,
+    this.newestFirstLabel = 'Newest logs first',
+    this.oldestFirstLabel = 'Oldest logs first',
   });
 
   @override
@@ -25,13 +25,15 @@ class LoggerSortToggle extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: () {
         FocusScope.of(context).unfocus();
+        // Capture the current state before toggling for the SnackBar message
+        final wasNewestFirst = sortNewestFirst;
         onToggle();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              sortNewestFirst
-                  ? newestFirstLabel ?? 'Newest logs first'
-                  : oldestFirstLabel ?? 'Oldest logs first',
+              wasNewestFirst
+                  ? "Showing $oldestFirstLabel"
+                  : "Showing $newestFirstLabel",
             ),
             duration: const Duration(seconds: 2),
           ),

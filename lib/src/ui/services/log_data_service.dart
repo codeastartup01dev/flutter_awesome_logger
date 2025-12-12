@@ -40,6 +40,8 @@ class LogDataService {
     }
 
     final successCount = relevantLogs.where((l) => l.type.isSuccess).length;
+    final warningCount =
+        relevantLogs.where((l) => l.type == UnifiedLogType.warning).length;
     final errorCount = relevantLogs.where((l) => l.type.isError).length;
 
     return [
@@ -54,6 +56,12 @@ class LogDataService {
         value: '$successCount',
         color: Colors.green,
         filterKey: 'success',
+      ),
+      StatisticItem(
+        label: 'Warnings',
+        value: '$warningCount',
+        color: Colors.orange,
+        filterKey: 'warnings',
       ),
       StatisticItem(
         label: 'Errors',
