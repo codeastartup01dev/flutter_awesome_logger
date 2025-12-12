@@ -705,88 +705,95 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
             ),
 
             // Sort toggle and statistics
-            Padding(
-              padding: const EdgeInsets.only(left: 16, bottom: 8),
-              child: Row(
-                children: [
-                  // LoggerSortToggle(
-                  //   sortNewestFirst: _filterManager.sortNewestFirst,
-                  //   onToggle: _filterManager.toggleSortOrder,
-                  // ),
-                  // const SizedBox(width: 16),
-                  LoggerStatistics(
-                    statistics: statistics,
-                    onStatisticTapped: _onStatisticTapped,
-                    selectedFilter: _filterManager.statsFilter,
-                  ),
-                ],
+            Visibility(
+              visible: _filterManager.isFilterSectionExpanded,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16, bottom: 8),
+                child: Row(
+                  children: [
+                    // LoggerSortToggle(
+                    //   sortNewestFirst: _filterManager.sortNewestFirst,
+                    //   onToggle: _filterManager.toggleSortOrder,
+                    // ),
+                    // const SizedBox(width: 16),
+                    LoggerStatistics(
+                      statistics: statistics,
+                      onStatisticTapped: _onStatisticTapped,
+                      selectedFilter: _filterManager.statsFilter,
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            SizedBox(
-              height: 40,
-              child: ListView(
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                children: [
-                  const SizedBox(width: 16),
-                  LoggerSortToggle(
-                    oldestFirstLabel: 'Oldest logs first',
-                    newestFirstLabel: 'Newest logs first',
-                    sortNewestFirst: _filterManager.sortNewestFirst,
-                    onToggle: _filterManager.toggleSortOrder,
-                  ),
-                  const SizedBox(width: 8),
-                  _buildClassesFilterButton(allLogs),
-                  // Clear source filters button (only show when there are selections)
-                  if (_filterManager.selectedClasses.isNotEmpty ||
-                      _filterManager.selectedSourceNames.isNotEmpty ||
-                      _filterManager.selectedFilePaths.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.clear, size: 18),
-                      onPressed: () {
-                        _filterManager.clearAllSourceFilters();
+            Visibility(
+              visible: _filterManager.isFilterSectionExpanded,
+              child: SizedBox(
+                height: 40,
+                child: ListView(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    const SizedBox(width: 16),
+                    LoggerSortToggle(
+                      oldestFirstLabel: 'Oldest logs first',
+                      newestFirstLabel: 'Newest logs first',
+                      sortNewestFirst: _filterManager.sortNewestFirst,
+                      onToggle: _filterManager.toggleSortOrder,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildClassesFilterButton(allLogs),
+                    // Clear source filters button (only show when there are selections)
+                    if (_filterManager.selectedClasses.isNotEmpty ||
+                        _filterManager.selectedSourceNames.isNotEmpty ||
+                        _filterManager.selectedFilePaths.isNotEmpty)
+                      IconButton(
+                        icon: const Icon(Icons.clear, size: 18),
+                        onPressed: () {
+                          _filterManager.clearAllSourceFilters();
+                        },
+                        tooltip: 'Clear source filters',
+                        padding: const EdgeInsets.all(0),
+                        constraints: const BoxConstraints(),
+                        style: IconButton.styleFrom(
+                          foregroundColor: Colors.blue[900]!,
+                        ),
+                      ),
+                    const SizedBox(width: 8),
+                    //copy (count) filtered logs to clipboard
+                    InkWell(
+                      onTap: () {
+                        final allLogs = LogDataService.getUnifiedLogs();
+                        final filteredLogs =
+                            _filterManager.applyFilters(allLogs);
+                        if (filteredLogs.isNotEmpty) {
+                          final exportContent =
+                              LogDataService.exportLogsToString(filteredLogs);
+                          CopyHandler.exportLogsToClipboard(
+                            context,
+                            exportContent,
+                            successMessage:
+                                'Copied ${filteredLogs.length} filtered logs to clipboard',
+                            dialogTitle: 'Filtered Logs Export',
+                          );
+                        }
                       },
-                      tooltip: 'Clear source filters',
-                      padding: const EdgeInsets.all(0),
-                      constraints: const BoxConstraints(),
-                      style: IconButton.styleFrom(
-                        foregroundColor: Colors.blue[900]!,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.copy,
+                              size: 16,
+                              color: Colors.purple,
+                            ),
+                            Text('(${filteredLogs.length}) filtered logs'),
+                          ],
+                        ),
                       ),
                     ),
-                  const SizedBox(width: 8),
-                  //copy (count) filtered logs to clipboard
-                  InkWell(
-                    onTap: () {
-                      final allLogs = LogDataService.getUnifiedLogs();
-                      final filteredLogs = _filterManager.applyFilters(allLogs);
-                      if (filteredLogs.isNotEmpty) {
-                        final exportContent =
-                            LogDataService.exportLogsToString(filteredLogs);
-                        CopyHandler.exportLogsToClipboard(
-                          context,
-                          exportContent,
-                          successMessage:
-                              'Copied ${filteredLogs.length} filtered logs to clipboard',
-                          dialogTitle: 'Filtered Logs Export',
-                        );
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.copy,
-                            size: 16,
-                            color: Colors.purple,
-                          ),
-                          Text('(${filteredLogs.length}) filtered logs'),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             SizedBox(height: 4),
