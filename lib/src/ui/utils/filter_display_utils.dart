@@ -35,6 +35,9 @@ class FilterDisplayUtils {
         case 'success':
           parts.add('successful');
           break;
+        case 'warnings':
+          parts.add('warning');
+          break;
         case 'errors':
           parts.add('error');
           break;
@@ -100,7 +103,7 @@ class FilterDisplayUtils {
     TextEditingController searchController,
   ) {
     if (filterManager.searchQuery.isEmpty) {
-      return 'No logs available\nStart using the logger to see logs here';
+      return 'No logs available\n';
     }
 
     // Check if there are any active filters
@@ -132,6 +135,9 @@ class FilterDisplayUtils {
       switch (statsFilter) {
         case 'success':
           descriptions.add('successful logs');
+          break;
+        case 'warnings':
+          descriptions.add('warning logs');
           break;
         case 'errors':
           descriptions.add('error logs');

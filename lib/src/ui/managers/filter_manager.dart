@@ -311,6 +311,9 @@ class FilterManager extends ChangeNotifier {
           case 'success':
             if (!log.type.isSuccess) return false;
             break;
+          case 'warnings':
+            if (log.type != UnifiedLogType.warning) return false;
+            break;
           case 'errors':
             if (!log.type.isError) return false;
             break;
