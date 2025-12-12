@@ -29,43 +29,6 @@ class FilterSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Filter section header with collapse/expand
-          InkWell(
-            onTap: filterManager.toggleFilterSectionExpanded,
-            borderRadius: BorderRadius.circular(8),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 0),
-              child: Row(
-                children: [
-                  const Spacer(),
-                  // Show active filter count when collapsed
-                  if (!filterManager.isFilterSectionExpanded &&
-                      filterManager.hasActiveFilters()) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0x1A2196F3), // blue with 10% opacity
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                            color: const Color(
-                                0x4D2196F3)), // blue with 30% opacity
-                      ),
-                      child: Text(
-                        '${filterManager.getActiveFilterCount()} active',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blue[700],
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-
           // Expandable filter content
           if (filterManager.isFilterSectionExpanded) ...[
             const SizedBox(height: 8),
@@ -110,15 +73,12 @@ class FilterSection extends StatelessWidget {
 
                   // Clear all filters button (only show if there are active filters)
                   if (filterManager.hasActiveFilters())
-                    IconButton(
-                      onPressed: filterManager.clearAllFilters,
-                      icon: const Icon(Icons.clear_all, size: 20),
-                      tooltip: 'Clear all filters',
-                      padding: const EdgeInsets.all(8),
-                      constraints: const BoxConstraints(),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.grey[100],
-                        foregroundColor: Colors.grey[700],
+                    InkWell(
+                      onTap: filterManager.clearAllFilters,
+                      child: Icon(
+                        Icons.clear_all,
+                        size: 20,
+                        color: Colors.grey[700],
                       ),
                     ),
                 ],

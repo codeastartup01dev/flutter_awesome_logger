@@ -676,6 +676,25 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                   onPressed: _clearAllLogs,
                   tooltip: 'Clear all logs',
                 ),
+                // toggle filter section button
+                Badge(
+                  isLabelVisible: _filterManager.getActiveFilterCount() > 0,
+                  label: Text(_filterManager.getActiveFilterCount().toString()),
+                  backgroundColor: Colors.deepPurple,
+                  child: IconButton(
+                    icon: Icon(
+                      _filterManager.isFilterSectionExpanded
+                          ? Icons.filter_list
+                          : Icons.filter_list_off,
+                    ),
+                    onPressed: () {
+                      _filterManager.toggleFilterSectionExpanded();
+                    },
+                    tooltip: _filterManager.isFilterSectionExpanded
+                        ? 'Hide filter section'
+                        : 'Show filter section',
+                  ),
+                ),
               ],
             ),
 
@@ -770,7 +789,7 @@ class _AwesomeLoggerHistoryPageState extends State<AwesomeLoggerHistoryPage> {
                 ],
               ),
             ),
-
+            SizedBox(height: 4),
             // Logs list
             Expanded(
               child: filteredLogs.isEmpty
